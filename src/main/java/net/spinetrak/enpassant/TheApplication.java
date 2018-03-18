@@ -2,6 +2,8 @@ package net.spinetrak.enpassant;
 
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
+import io.dropwizard.configuration.SubstitutingSourceProvider;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.enpassant.configuration.DSBDataClient;
@@ -25,6 +27,12 @@ public class TheApplication extends Application<TheConfiguration>
   @Override
   public void initialize(final Bootstrap<TheConfiguration> bootstrap_)
   {
+    bootstrap_.setConfigurationSourceProvider(
+      new SubstitutingSourceProvider(bootstrap_.getConfigurationSourceProvider(),
+                                     new EnvironmentVariableSubstitutor(false)
+      )
+    );
+
     bootstrap_.addBundle(new AssetsBundle("/assets/", "/"));
   }
 

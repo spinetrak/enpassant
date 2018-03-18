@@ -1,11 +1,3 @@
-server:
-  applicationConnectors:
-    - type: http
-      port: 8085
-  adminConnectors:
-    - type: http
-      port: 8091
-
 logging:
   level: INFO
   loggers:
@@ -17,3 +9,9 @@ dsbData:
 
 server:
   rootPath: /api/
+  type: simple
+  applicationContextPath: /app
+  adminContextPath: /admin
+  connector:
+    type: http
+    port: ${PORT:-7777}
