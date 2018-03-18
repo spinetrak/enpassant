@@ -20,11 +20,18 @@ import java.util.Date;
 
 public class DSBDataClient implements Runnable
 {
-  private final static String DSB_DATA_FILE = System.getProperty("java.io.tmpdir") + "dsb_data.zip";
-  private final static String DSB_JSON_FILE = System.getProperty("java.io.tmpdir") + "dsb_data.json";
+  private final static String DSB_DATA_FILE = System.getProperty("java.io.tmpdir") + File.separator + "dsb_data.zip";
+  private final static String DSB_JSON_FILE = System.getProperty("java.io.tmpdir") + File.separator + "dsb_data.json";
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataClient.class);
-  private final String _url;
   private final Object _lock = new Object();
+  private final String _url;
+  private DSBVerband _dsb;
+  private Date _lastUpdate;
+
+  DSBDataClient(final String url_)
+  {
+    _url = url_;
+  }
 
   public DSBVerband getDSBVerband()
   {
@@ -44,15 +51,6 @@ public class DSBDataClient implements Runnable
       }
     }
     return _dsb;
-  }
-
-  private DSBVerband _dsb;
-  private Date _lastUpdate;
-
-
-  public DSBDataClient(final String url_)
-  {
-    _url = url_;
   }
 
   public boolean isUpToDate()
