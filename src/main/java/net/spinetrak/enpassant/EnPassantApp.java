@@ -41,12 +41,12 @@ import net.spinetrak.enpassant.health.DSBDataHealthCheck;
 import net.spinetrak.enpassant.resources.DSBDataResource;
 import org.jdbi.v3.core.Jdbi;
 
-public class TheApplication extends Application<TheConfiguration>
+public class EnPassantApp extends Application<EnPassantConfig>
 {
 
   public static void main(final String[] args_) throws Exception
   {
-    new TheApplication().run(args_);
+    new EnPassantApp().run(args_);
   }
 
   @Override
@@ -56,7 +56,7 @@ public class TheApplication extends Application<TheConfiguration>
   }
 
   @Override
-  public void initialize(final Bootstrap<TheConfiguration> bootstrap_)
+  public void initialize(final Bootstrap<EnPassantConfig> bootstrap_)
   {
     bootstrap_.setConfigurationSourceProvider(
       new SubstitutingSourceProvider(bootstrap_.getConfigurationSourceProvider(),
@@ -68,7 +68,7 @@ public class TheApplication extends Application<TheConfiguration>
   }
 
   @Override
-  public void run(final TheConfiguration configuration_,
+  public void run(final EnPassantConfig configuration_,
                   final Environment environment_)
   {
     final JdbiFactory factory = new JdbiFactory();

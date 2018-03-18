@@ -27,14 +27,19 @@ package net.spinetrak.enpassant;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.db.DatabaseConfiguration;
 import net.spinetrak.enpassant.configuration.DSBDataFactory;
+import net.spinetrak.enpassant.core.utils.Converters;
+import net.spinetrak.enpassant.db.EnPassantDBConfig;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
-class TheConfiguration extends Configuration
+class EnPassantConfig extends Configuration
 {
-
+  private final static Logger LOGGER = LoggerFactory.getLogger(EnPassantConfig.class);
   @Valid
   @NotNull
   private DataSourceFactory database = new DataSourceFactory();
@@ -52,6 +57,13 @@ class TheConfiguration extends Configuration
   @JsonProperty("database")
   DataSourceFactory getDataSourceFactory()
   {
+    if (Converters.noNullsorEmpties(System.getenv("DATABASE_URL")))
+    {
+      LOGGER.info("Dropwizard dummy DB URL (will be overridden)=" + database.getUrl());
+      DatabaseConfiguration databaseConfiguration = EnPassantDBConfig.create(System.getenv("DATABASE_URL"));
+      database = (DataSourceFactory) databaseConfiguration.getDataSourceFactory(null);
+      LOGGER.info("Heroku DB URL=" + database.getUrl());
+    }
     return database;
   }
 
