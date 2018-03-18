@@ -1,4 +1,4 @@
-# chess
+# En Passant - Chess / Schach Data API
 
 How to start the enpassant application
 ---
