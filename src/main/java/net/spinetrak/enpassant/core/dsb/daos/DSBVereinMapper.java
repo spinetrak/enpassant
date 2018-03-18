@@ -22,54 +22,20 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.resources;
+package net.spinetrak.enpassant.core.dsb.daos;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
-import org.jdbi.v3.core.Jdbi;
+import org.jdbi.v3.core.mapper.RowMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-@Path("/dsb")
-@Produces(MediaType.APPLICATION_JSON)
-public class DSBDataResource
+class DSBVereinMapper implements RowMapper<DSBVerein>
 {
-  final private DSBVerband _dsbVerband;
-  final private Jdbi _jdbi;
-
-  public DSBDataResource(final DSBVerband dsbVerband_, final Jdbi jdbi_)
+  @Override
+  public DSBVerein map(final ResultSet resultSet_, final StatementContext statementContext_) throws SQLException
   {
-    _dsbVerband = dsbVerband_;
-    _jdbi = jdbi_;
-  }
-
-  @Path("/verband/{id}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @GET
-  public DSBVerband getVerband(@PathParam("id") @DefaultValue("00000") String id_)
-  {
-    final DSBVerband verband = _dsbVerband.getVerband(id_);
-
-    if (verband != null)
-    {
-      return verband;
-    }
-    throw new WebApplicationException(Response.Status.NOT_FOUND);
-  }
-
-  @Path("/verein/{id}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @GET
-  public DSBVerein getVerein(@PathParam("id") @DefaultValue("00000") String id_)
-  {
-    final DSBVerein verein = _dsbVerband.getVerein(id_);
-
-    if (verein != null)
-    {
-      return verein;
-    }
-    throw new WebApplicationException(Response.Status.NOT_FOUND);
+    return null;
   }
 }

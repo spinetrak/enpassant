@@ -22,48 +22,53 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant;
+package net.spinetrak.enpassant.core.dsb.pojos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
-import net.spinetrak.enpassant.configuration.DSBDataFactory;
-
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
-class TheConfiguration extends Configuration
+public class DSBVerein
 {
+  private final String _id;
+  private final String _name;
+  private final List<DSBSpieler> _spieler = new ArrayList<>();
+  private final DSBVerband _verband;
 
-  @Valid
-  @NotNull
-  private DataSourceFactory database = new DataSourceFactory();
-  @Valid
-  @NotNull
-  @JsonProperty("dsbData")
-  private DSBDataFactory dsbData;
-
-  @JsonProperty("dsbData")
-  DSBDataFactory getDSBDataFactory()
+  public DSBVerein(@NotNull final String id_, @NotNull final String name_, @NotNull final DSBVerband verband_)
   {
-    return dsbData;
+    _id = id_;
+    _name = name_;
+    _verband = verband_;
   }
 
-  @JsonProperty("database")
-  DataSourceFactory getDataSourceFactory()
+  String getId()
   {
-    return database;
+    return _id;
   }
 
-  @JsonProperty("dsbData")
-  public void setDSBDataFactory(final DSBDataFactory factory_)
+  public void add(@NotNull final DSBSpieler spieler_)
   {
-    dsbData = factory_;
+    _spieler.add(spieler_);
   }
 
-  @JsonProperty("database")
-  public void setDataSourceFactory(final DataSourceFactory factory_)
+  public String getName()
   {
-    database = factory_;
+    return _name;
+  }
+
+  public List<DSBSpieler> getSpieler()
+  {
+    return _spieler;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "DSBVerein{" +
+
+      "id='" + _id + '\'' +
+      ", name='" + _name + '\'' +
+      '}';
   }
 }

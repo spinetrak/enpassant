@@ -1,9 +1,36 @@
+/*
+ *  The MIT License (MIT)
+ *
+ *  Copyright (c) 2018 spinetrak
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ *  SOFTWARE.
+ */
+
 package net.spinetrak.enpassant.core.dsb.etl;
 
-import net.spinetrak.enpassant.core.dsb.DSBSpieler;
-import net.spinetrak.enpassant.core.dsb.DSBVerband;
-import net.spinetrak.enpassant.core.dsb.DSBVerein;
-import net.spinetrak.enpassant.core.dsb.DWZ;
+import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
+import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
 import net.spinetrak.enpassant.core.utils.Converters;
 import org.apache.commons.csv.CSVFormat;
@@ -45,7 +72,7 @@ public class DSBDataTransformer
         {
           continue;
         }
-        InputStreamReader isr = null;
+        InputStreamReader isr;
         try
         {
           isr = new InputStreamReader(zipIn, Charset.forName("Cp1252"));
@@ -96,7 +123,8 @@ public class DSBDataTransformer
         if (null != verband)
         {
           final DSBVerein vereinslos = verband.asVerein();
-          final DSBSpieler dsbSpieler = new DSBSpieler(spieler.getID(), verein, spieler.getName(), spieler.getStatus(),
+          final DSBSpieler dsbSpieler = new DSBSpieler(spieler.getID(), vereinslos, spieler.getName(),
+                                                       spieler.getStatus(),
                                                        spieler.getGender(),
                                                        spieler.getEligibility(), spieler.getYOB(), spieler.getDWZ(),
                                                        spieler.getFIDE());
@@ -113,6 +141,12 @@ public class DSBDataTransformer
     }
     LOGGER.info("Done adding spieler.");
     return dsb;
+  }
+
+  public static void updateDatabase(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
+                                    final DSBSpielerDAO dsbSpielerDAO_, final DSBVerband dsbVerband_)
+  {
+
   }
 
   private static void updateDSBPlayers(final List<Spieler> spieler_s,
@@ -199,15 +233,7 @@ public class DSBDataTransformer
         {
           final String level = DSBVerband.KREIS;
           final DSBVerband dsbVerband = dsb_.getVerband(parentId);
-          if (verband != null)
-          {
-            dsbVerband.add(
-              new DSBVerband(id, parentId, level, verband.getName()));
-          }
-          else
-          {
-            LOGGER.error("No KREIS association found for id " + parentId);
-          }
+          dsbVerband.add(new DSBVerband(id, parentId, level, verband.getName()));
         }
       }
     }
@@ -243,10 +269,10 @@ public class DSBDataTransformer
     final String _yearOfBirth;
     final String _zps;
 
-    public Spieler(final String zps_, final String membernr_, final String status_, final String name_,
-                   final String gender_, final String eligibility_, final String yearOfBirth_,
-                   final String lastEvaluation_, final String dwz_, final String index_, final String fideElo_,
-                   final String fideTitle_, final String fideID, final String fideCountry_)
+    Spieler(final String zps_, final String membernr_, final String status_, final String name_,
+            final String gender_, final String eligibility_, final String yearOfBirth_,
+            final String lastEvaluation_, final String dwz_, final String index_, final String fideElo_,
+            final String fideTitle_, final String fideID, final String fideCountry_)
     {
       _zps = zps_;
       _membernr = membernr_;
@@ -264,7 +290,7 @@ public class DSBDataTransformer
       _fideCountry = fideCountry_;
     }
 
-    public DWZ getDWZ()
+    DWZ getDWZ()
     {
       if (Converters.noNullsorEmpties(_dwz, _index, _lastEvaluation))
       {
@@ -274,7 +300,12 @@ public class DSBDataTransformer
       return null;
     }
 
-    public FIDE getFIDE()
+    String getEligibility()
+    {
+      return _eligibility;
+    }
+
+    FIDE getFIDE()
     {
       if (Converters.noNullsorEmpties(_fideID, _fideElo, _fideTitle, _fideCountry))
       {
@@ -285,12 +316,7 @@ public class DSBDataTransformer
       return null;
     }
 
-    public String getEligibility()
-    {
-      return _eligibility;
-    }
-
-    public Character getGender()
+    Character getGender()
     {
       if (Converters.noNullsorEmpties(_gender))
       {
@@ -299,29 +325,29 @@ public class DSBDataTransformer
       return null;
     }
 
-    public String getID()
+    String getID()
     {
       return _membernr;
+    }
+
+    String getStatus()
+    {
+      return _status;
+    }
+
+    String getVereinsID()
+    {
+      return _zps;
+    }
+
+    Integer getYOB()
+    {
+      return Converters.integerFromString(_yearOfBirth);
     }
 
     public String getName()
     {
       return _name;
-    }
-
-    public String getStatus()
-    {
-      return _status;
-    }
-
-    public String getVereinsID()
-    {
-      return _zps;
-    }
-
-    public Integer getYOB()
-    {
-      return Converters.integerFromString(_yearOfBirth);
     }
 
     @Override
@@ -353,7 +379,7 @@ public class DSBDataTransformer
     private final String _verband;
     private final String _zps;
 
-    public Verein(final String zps_, final String landesverband_, final String verband_, final String name_)
+    Verein(final String zps_, final String landesverband_, final String verband_, final String name_)
     {
       _verband = verband_;
       _landesverband = landesverband_;
@@ -361,19 +387,19 @@ public class DSBDataTransformer
       _name = name_;
     }
 
-    public String getID()
+    String getID()
     {
       return _zps;
+    }
+
+    String getVerband()
+    {
+      return _verband;
     }
 
     public String getName()
     {
       return _name;
-    }
-
-    public String getVerband()
-    {
-      return _verband;
     }
 
     @Override
@@ -395,8 +421,8 @@ public class DSBDataTransformer
     private final String _parent;
     private final String _region;
 
-    public Verband(final String id_, final String region_, final String parentverband_,
-                   final String name_)
+    Verband(final String id_, final String region_, final String parentverband_,
+            final String name_)
     {
       _id = id_;
       _region = region_;
@@ -404,19 +430,19 @@ public class DSBDataTransformer
       _name = name_;
     }
 
-    public String getId()
+    String getId()
     {
       return _id;
+    }
+
+    String getParent()
+    {
+      return _parent;
     }
 
     public String getName()
     {
       return _name;
-    }
-
-    public String getParent()
-    {
-      return _parent;
     }
 
     public String getRegion()

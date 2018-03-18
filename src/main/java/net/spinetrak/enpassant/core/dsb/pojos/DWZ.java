@@ -22,48 +22,37 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant;
+package net.spinetrak.enpassant.core.dsb.pojos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
-import net.spinetrak.enpassant.configuration.DSBDataFactory;
-
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.Date;
 
-class TheConfiguration extends Configuration
+public class DWZ
 {
+  private final Integer _dwz;
+  private final Integer _index;
+  private final Date _lastEvaluation;
 
-  @Valid
-  @NotNull
-  private DataSourceFactory database = new DataSourceFactory();
-  @Valid
-  @NotNull
-  @JsonProperty("dsbData")
-  private DSBDataFactory dsbData;
-
-  @JsonProperty("dsbData")
-  DSBDataFactory getDSBDataFactory()
+  public DWZ(@NotNull final Integer dwz_, @NotNull final Integer index_, @NotNull final Date lastEvaluation_)
   {
-    return dsbData;
+    _dwz = dwz_;
+    _index = index_;
+
+    _lastEvaluation = lastEvaluation_;
   }
 
-  @JsonProperty("database")
-  DataSourceFactory getDataSourceFactory()
+  public Integer getDwz()
   {
-    return database;
+    return _dwz;
   }
 
-  @JsonProperty("dsbData")
-  public void setDSBDataFactory(final DSBDataFactory factory_)
+  public Integer getIndex()
   {
-    dsbData = factory_;
+    return _index;
   }
 
-  @JsonProperty("database")
-  public void setDataSourceFactory(final DataSourceFactory factory_)
+  public Date getLastEvaluation()
   {
-    database = factory_;
+    return _lastEvaluation;
   }
 }

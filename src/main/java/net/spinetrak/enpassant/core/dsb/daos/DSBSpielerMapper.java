@@ -22,48 +22,20 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant;
+package net.spinetrak.enpassant.core.dsb.daos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import io.dropwizard.Configuration;
-import io.dropwizard.db.DataSourceFactory;
-import net.spinetrak.enpassant.configuration.DSBDataFactory;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
+import org.jdbi.v3.core.mapper.RowMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-class TheConfiguration extends Configuration
+class DSBSpielerMapper implements RowMapper<DSBSpieler>
 {
-
-  @Valid
-  @NotNull
-  private DataSourceFactory database = new DataSourceFactory();
-  @Valid
-  @NotNull
-  @JsonProperty("dsbData")
-  private DSBDataFactory dsbData;
-
-  @JsonProperty("dsbData")
-  DSBDataFactory getDSBDataFactory()
+  @Override
+  public DSBSpieler map(final ResultSet resultSet_, final StatementContext statementContext_) throws SQLException
   {
-    return dsbData;
-  }
-
-  @JsonProperty("database")
-  DataSourceFactory getDataSourceFactory()
-  {
-    return database;
-  }
-
-  @JsonProperty("dsbData")
-  public void setDSBDataFactory(final DSBDataFactory factory_)
-  {
-    dsbData = factory_;
-  }
-
-  @JsonProperty("database")
-  public void setDataSourceFactory(final DataSourceFactory factory_)
-  {
-    database = factory_;
+    return null;
   }
 }

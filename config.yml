@@ -15,3 +15,14 @@ server:
   connector:
     type: http
     port: ${PORT:-7777}
+
+database:
+  driverClass: org.postgresql.Driver
+  user: enpassant
+  password: enpassant
+  url: jdbc:postgresql://localhost/enpassant
+  properties:
+    charSet: UTF-8
+  maxWaitForConnection: 1s
+  validationQuery: "/* MyService Health Check */ SELECT 1"
+  validationQueryTimeout: 3s
