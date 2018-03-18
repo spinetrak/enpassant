@@ -1,0 +1,11 @@
+logging:
+  level: INFO
+  loggers:
+    net.spinetrak.enpassant: DEBUG
+
+dsbData:
+  url: https://dwz.svw.info/services/files/export/csv/LV-0-csv.zip
+  refreshInterval: 86400
+
+server:
+  rootPath: /api/
