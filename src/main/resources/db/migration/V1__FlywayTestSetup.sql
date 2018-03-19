@@ -1,0 +1,4 @@
+CREATE TABLE test
+(
+  userid SERIAL PRIMARY KEY NOT NULL
+);

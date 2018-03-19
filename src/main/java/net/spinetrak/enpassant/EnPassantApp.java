@@ -28,6 +28,9 @@ import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
 import io.dropwizard.configuration.SubstitutingSourceProvider;
+import io.dropwizard.db.DataSourceFactory;
+import io.dropwizard.flyway.FlywayBundle;
+import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -39,6 +42,7 @@ import net.spinetrak.enpassant.core.dsb.etl.DSBDataTransformer;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import net.spinetrak.enpassant.health.DSBDataHealthCheck;
 import net.spinetrak.enpassant.resources.DSBDataResource;
+import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 
 public class EnPassantApp extends Application<EnPassantConfig>
@@ -63,8 +67,22 @@ public class EnPassantApp extends Application<EnPassantConfig>
                                      new EnvironmentVariableSubstitutor(false)
       )
     );
-
     bootstrap_.addBundle(new AssetsBundle("/assets/", "/"));
+
+    bootstrap_.addBundle(new FlywayBundle<EnPassantConfig>()
+    {
+      @Override
+      public DataSourceFactory getDataSourceFactory(final EnPassantConfig configuration_)
+      {
+        return configuration_.getDataSourceFactory();
+      }
+
+      @Override
+      public FlywayFactory getFlywayFactory(final EnPassantConfig configuration_)
+      {
+        return configuration_.getFlywayFactory();
+      }
+    });
   }
 
   @Override
@@ -85,6 +103,11 @@ public class EnPassantApp extends Application<EnPassantConfig>
 
     environment_.jersey().register(new DSBDataResource(dsbVerband, jdbi));
     environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataClient));
-  }
 
+    final Flyway flyway = configuration_.getFlywayFactory().build(
+      configuration_.getDataSourceFactory().build(environment_.metrics(), "flyway"));
+    flyway.repair();
+    flyway.migrate();
+    flyway.validate();
+  }
 }

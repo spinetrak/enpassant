@@ -28,6 +28,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.db.DatabaseConfiguration;
+import io.dropwizard.flyway.FlywayFactory;
 import net.spinetrak.enpassant.configuration.DSBDataFactory;
 import net.spinetrak.enpassant.core.utils.Converters;
 import net.spinetrak.enpassant.db.EnPassantDBConfig;
@@ -47,6 +48,9 @@ class EnPassantConfig extends Configuration
   @NotNull
   @JsonProperty("dsbData")
   private DSBDataFactory dsbData;
+  @Valid
+  @NotNull
+  private FlywayFactory flyway = new FlywayFactory();
 
   @JsonProperty("dsbData")
   DSBDataFactory getDSBDataFactory()
@@ -65,6 +69,11 @@ class EnPassantConfig extends Configuration
       LOGGER.info("Heroku DB URL=" + database.getUrl());
     }
     return database;
+  }
+
+  FlywayFactory getFlywayFactory()
+  {
+    return flyway;
   }
 
   @JsonProperty("dsbData")
