@@ -63,10 +63,9 @@ class EnPassantConfig extends Configuration
   {
     if (Converters.noNullsorEmpties(System.getenv("DATABASE_URL")))
     {
-      LOGGER.info("Dropwizard dummy DB URL (will be overridden)=" + database.getUrl());
+      LOGGER.info("Using DATABASE_URL from environment...");
       DatabaseConfiguration databaseConfiguration = EnPassantDBConfig.create(System.getenv("DATABASE_URL"));
       database = (DataSourceFactory) databaseConfiguration.getDataSourceFactory(null);
-      LOGGER.info("Heroku DB URL=" + database.getUrl());
     }
     return database;
   }

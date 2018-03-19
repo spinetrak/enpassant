@@ -37,7 +37,6 @@ import java.net.URISyntaxException;
  * This class is basically a hack to use the Heroku DATABASE_URL instead of the database configuration in the
  * Dropwizard example.yml.
  * <p>
- * TODO Make this not so ugly
  * See https://github.com/alexroussos/dropwizard-heroku-example/blob/master/src/main/java/com/example/helloworld/ExampleDatabaseConfiguration.java
  */
 public class EnPassantDBConfig implements DatabaseConfiguration
@@ -45,10 +44,10 @@ public class EnPassantDBConfig implements DatabaseConfiguration
   private final static Logger LOGGER = LoggerFactory.getLogger(EnPassantDBConfig.class);
   private static DatabaseConfiguration _databaseConfiguration;
 
-  public static DatabaseConfiguration create(String databaseUrl)
+  public static DatabaseConfiguration create(final String databaseUrl_)
   {
-    LOGGER.info("Creating DB for " + databaseUrl);
-    if (databaseUrl == null)
+    LOGGER.info("Creating DB config..");
+    if (databaseUrl_ == null)
     {
       throw new IllegalArgumentException("The DATABASE_URL environment variable must be set before running the app " +
                                            "example: DATABASE_URL=\"postgres://username:password@host:5432/dbname\"");
@@ -56,7 +55,7 @@ public class EnPassantDBConfig implements DatabaseConfiguration
     _databaseConfiguration = null;
     try
     {
-      URI dbUri = new URI(databaseUrl);
+      URI dbUri = new URI(databaseUrl_);
       final String user = dbUri.getUserInfo().split(":")[0];
       final String password = dbUri.getUserInfo().split(":")[1];
       final String url = "jdbc:postgresql://" + dbUri.getHost() + ':' + dbUri.getPort() + dbUri.getPath()
@@ -82,15 +81,15 @@ public class EnPassantDBConfig implements DatabaseConfiguration
         }
       };
     }
-    catch (URISyntaxException e)
+    catch (final URISyntaxException ex_)
     {
-      LOGGER.info(e.getMessage());
+      LOGGER.error("Error creating database: " + ex_.getMessage());
     }
     return _databaseConfiguration;
   }
 
   @Override
-  public DataSourceFactory getDataSourceFactory(Configuration configuration)
+  public DataSourceFactory getDataSourceFactory(final Configuration configuration_)
   {
     LOGGER.info("Getting DataSourceFactory");
     if (_databaseConfiguration == null)
