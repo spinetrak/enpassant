@@ -61,11 +61,11 @@ class EnPassantConfig extends Configuration
   @JsonProperty("database")
   DataSourceFactory getDataSourceFactory()
   {
-    if (Converters.noNullsorEmpties(System.getenv("HEROKU_POSTGRESQL_COBALT_URL")))
+    if (Converters.noNullsorEmpties(System.getenv("JDBC_DATABASE_URL")))
     {
-      LOGGER.info("Using HEROKU_POSTGRESQL_COBALT_URL from environment...");
+      LOGGER.info("Using JDBC_DATABASE_URL from environment...");
       DatabaseConfiguration databaseConfiguration = EnPassantDBConfig.create(
-        System.getenv("HEROKU_POSTGRESQL_COBALT_URL"));
+        System.getenv("JDBC_DATABASE_URL"));
       database = (DataSourceFactory) databaseConfiguration.getDataSourceFactory(null);
     }
     return database;
