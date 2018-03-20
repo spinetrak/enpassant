@@ -39,7 +39,6 @@ public class DSBSpieler
   private final String _status;
   private final DSBVerein _verein;
   private final Integer _yob;
-
   public DSBSpieler(@NotNull final String id_, final DSBVerein verein_, @NotNull final String name_,
                     final String status_,
                     final Character gender_, final String eligibility_, final Integer yob_, final DWZ dwz_,
@@ -89,6 +88,11 @@ public class DSBSpieler
   public String getStatus()
   {
     return _status;
+  }
+
+  public DSBVerein getVerein()
+  {
+    return _verein;
   }
 
   public Integer getYob()

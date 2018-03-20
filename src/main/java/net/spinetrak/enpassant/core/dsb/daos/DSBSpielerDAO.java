@@ -26,13 +26,24 @@ package net.spinetrak.enpassant.core.dsb.daos;
 
 import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
+import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
 
 public interface DSBSpielerDAO
 {
-  @SqlQuery("select * from spieler")
+  @SqlUpdate("INSERT INTO dwz (zps, member, lasteval, dwz, index) VALUES (:s.verein.id, :s.id, :s.dwz.lastEvaluation, :s.dwz.dwz, :s.dwz.index) ON CONFLICT (zps, member, lasteval) DO NOTHING")
+  void insertOrUpdateDWZ(@BindBean("s") final DSBSpieler spieler_);
+
+  @SqlUpdate("INSERT INTO fide (id, elo, title, country, lasteval) VALUES (:s.fide.id, :s.fide.elo, :s.fide.title, :s.fide.country, :s.dwz.lastEvaluation) ON CONFLICT (id, lasteval) DO NOTHING")
+  void insertOrUpdateFIDE(@BindBean("s") final DSBSpieler spieler_);
+
+  @SqlUpdate("INSERT INTO dsb_player (zps, member, dsbid, name, status, gender, yob, eligibility) VALUES (:s.verein.id, :s.id, " + (-1) + ", :s.name, :s.status, :s.gender, :s.yob, :s.eligibility) ON CONFLICT (zps,member) DO UPDATE SET dsbid = " + (-1) + ", name = :s.name, status = :s.status, gender = :s.gender, yob = :s.yob")
+  void insertOrUpdateSpieler(@BindBean("s") final DSBSpieler spieler_);
+
+  @SqlQuery("SELECT * FROM dsb_player")
   @RegisterRowMapper(DSBSpielerMapper.class)
-  List<DSBSpieler> select();
+  List<DSBSpieler> selectPlayers();
 }

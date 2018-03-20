@@ -30,19 +30,19 @@ import java.util.Map;
 
 public class DSBVerband
 {
-  public final static String BEZIRK = "BEZIRK";
-  public final static String BUND = "BUND";
-  public final static String KREIS = "KREIS";
-  public final static String LAND = "LAND";
+  public final static int BEZIRK = 2;
+  public final static int BUND = 0;
+  public final static int KREIS = 3;
+  public final static int LAND = 1;
   private final String _id;
-  private final String _level;
+  private final int _level;
   private final String _name;
   private final String _parentId;
   private final Map<String, DSBVerband> _verbaende = new HashMap<>();
   private final Map<String, DSBVerein> _vereine = new HashMap<>();
   private DSBVerein _asVerein;
 
-  public DSBVerband(@NotNull final String id_, @NotNull final String parentId_, @NotNull final String level,
+  public DSBVerband(@NotNull final String id_, @NotNull final String parentId_, @NotNull final int level,
                     @NotNull final String name_)
   {
     _id = id_;
@@ -74,7 +74,12 @@ public class DSBVerband
     return _asVerein;
   }
 
-  public String getLevel()
+  public String getId()
+  {
+    return _id;
+  }
+
+  public int getLevel()
   {
     return _level;
   }
@@ -142,15 +147,9 @@ public class DSBVerband
       "id='" + _id + '\'' +
       ", level='" + _level + '\'' +
       ", name='" + _name + '\'' +
-
       ", parentId='" + _parentId + '\'' +
       ", verbaende=" + _verbaende +
       ", vereine=" + _vereine +
       '}';
-  }
-
-  private String getId()
-  {
-    return _id;
   }
 }

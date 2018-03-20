@@ -146,6 +146,27 @@ public class DSBDataTransformer
   public static void updateDatabase(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
                                     final DSBSpielerDAO dsbSpielerDAO_, final DSBVerband dsbVerband_)
   {
+    dsbVerbandDAO_.insertOrUpdate(dsbVerband_);
+    for (final DSBVerein verein : dsbVerband_.getVereine().values())
+    {
+      dsbVereinDAO_.insertOrUpdate(verein);
+      for (final DSBSpieler spieler : verein.getSpieler())
+      {
+        dsbSpielerDAO_.insertOrUpdateSpieler(spieler);
+        if (spieler.getDwz() != null)
+        {
+          dsbSpielerDAO_.insertOrUpdateDWZ(spieler);
+          if (spieler.getFide() != null)
+          {
+            dsbSpielerDAO_.insertOrUpdateFIDE(spieler);
+          }
+        }
+      }
+    }
+    for (final DSBVerband verband : dsbVerband_.getVerbaende().values())
+    {
+      updateDatabase(dsbVerbandDAO_, dsbVereinDAO_, dsbSpielerDAO_, verband);
+    }
 
   }
 
@@ -206,7 +227,7 @@ public class DSBDataTransformer
         }
         if ('0' == (parentId.charAt(1)))
         {
-          final String level = DSBVerband.BEZIRK;
+          final int level = DSBVerband.BEZIRK;
           final DSBVerband dsbVerband = dsb_.getVerband(parentId);
           if (dsbVerband != null)
           {
@@ -231,7 +252,7 @@ public class DSBDataTransformer
         final String parentId = parent.trim() + "00";
         if ('0' != (parentId.charAt(1)))
         {
-          final String level = DSBVerband.KREIS;
+          final int level = DSBVerband.KREIS;
           final DSBVerband dsbVerband = dsb_.getVerband(parentId);
           dsbVerband.add(new DSBVerband(id, parentId, level, verband.getName()));
         }
@@ -295,7 +316,7 @@ public class DSBDataTransformer
       if (Converters.noNullsorEmpties(_dwz, _index, _lastEvaluation))
       {
         return new DWZ(Converters.integerFromString(_dwz), Converters.integerFromString(_index),
-                       Converters.dateFromString(_lastEvaluation, "YYYYMM"));
+                       Converters.dateFromString(_lastEvaluation, "YYYYww"));
       }
       return null;
     }

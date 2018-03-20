@@ -42,14 +42,14 @@ public class DSBVerein
     _verband = verband_;
   }
 
-  String getId()
-  {
-    return _id;
-  }
-
   public void add(@NotNull final DSBSpieler spieler_)
   {
     _spieler.add(spieler_);
+  }
+
+  public String getId()
+  {
+    return _id;
   }
 
   public String getName()
@@ -60,6 +60,11 @@ public class DSBVerein
   public List<DSBSpieler> getSpieler()
   {
     return _spieler;
+  }
+
+  public DSBVerband getVerband()
+  {
+    return _verband;
   }
 
   @Override

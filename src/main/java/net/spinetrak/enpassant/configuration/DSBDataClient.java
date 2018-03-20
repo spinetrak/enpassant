@@ -24,8 +24,6 @@
 
 package net.spinetrak.enpassant.configuration;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import net.spinetrak.enpassant.core.dsb.etl.DSBDataTransformer;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import org.joda.time.DateTime;
@@ -45,7 +43,6 @@ import java.util.Date;
 public class DSBDataClient implements Runnable
 {
   private final static String DSB_DATA_FILE = System.getProperty("java.io.tmpdir") + File.separator + "dsb_data.zip";
-  private final static String DSB_JSON_FILE = System.getProperty("java.io.tmpdir") + File.separator + "dsb_data.json";
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataClient.class);
   private final Object _lock = new Object();
   private final String _url;
@@ -98,8 +95,6 @@ public class DSBDataClient implements Runnable
     }
     _dsb = DSBDataTransformer.createDSBVerbandFromZIPFile(DSB_DATA_FILE);
 
-    writeJSONFile();
-
     _lastUpdate = new Date();
   }
 
@@ -114,24 +109,6 @@ public class DSBDataClient implements Runnable
     catch (final IOException ex_)
     {
       LOGGER.error("Error downloading ZIP file", ex_);
-    }
-  }
-
-  private void writeJSONFile()
-  {
-    final ObjectMapper mapper = new ObjectMapper();
-    try
-    {
-      mapper.writeValue(new File(DSB_JSON_FILE), _dsb);
-      LOGGER.info("Done converting to JSON: " + DSB_JSON_FILE);
-    }
-    catch (final JsonProcessingException ex_)
-    {
-      LOGGER.error("Error converting to JSON: " + ex_);
-    }
-    catch (final IOException ex_)
-    {
-      LOGGER.error("Error writing to JSON: " + ex_);
     }
   }
 

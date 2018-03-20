@@ -92,6 +92,13 @@ public class EnPassantApp extends Application<EnPassantConfig>
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi = factory.build(environment_, configuration_.getDataSourceFactory(), "postgresql");
 
+
+    final Flyway flyway = configuration_.getFlywayFactory().build(
+      configuration_.getDataSourceFactory().build(environment_.metrics(), "flyway"));
+    flyway.repair();
+    flyway.migrate();
+    flyway.validate();
+
     final DSBVerbandDAO dsbVerbandDAO = jdbi.onDemand(DSBVerbandDAO.class);
     final DSBVereinDAO dsbVereinDAO = jdbi.onDemand(DSBVereinDAO.class);
     final DSBSpielerDAO dsbSpielerDAO = jdbi.onDemand(DSBSpielerDAO.class);
@@ -103,11 +110,5 @@ public class EnPassantApp extends Application<EnPassantConfig>
 
     environment_.jersey().register(new DSBDataResource(dsbVerband, jdbi));
     environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataClient));
-
-    final Flyway flyway = configuration_.getFlywayFactory().build(
-      configuration_.getDataSourceFactory().build(environment_.metrics(), "flyway"));
-    flyway.repair();
-    flyway.migrate();
-    flyway.validate();
   }
 }

@@ -1,0 +1,15 @@
+ALTER TABLE FIDE
+  RENAME COLUMN fide_id TO id;
+ALTER TABLE FIDE
+  RENAME COLUMN fide_elo TO elo;
+ALTER TABLE FIDE
+  RENAME COLUMN fide_title TO title;
+ALTER TABLE FIDE
+  RENAME COLUMN lastupdate TO lasteval;
+ALTER TABLE DWZ
+  RENAME COLUMN dwz_index TO index;
+ALTER TABLE DWZ
+  RENAME COLUMN lastupdate TO lasteval;
+ALTER TABLE DSB_PLAYER
+  RENAME COLUMN member_number TO member;
+

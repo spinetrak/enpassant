@@ -55,4 +55,14 @@ public class DWZ
   {
     return _lastEvaluation;
   }
+
+  @Override
+  public String toString()
+  {
+    return "DWZ{" +
+      "dwz=" + _dwz +
+      ", index=" + _index +
+      ", lastEvaluation=" + _lastEvaluation +
+      '}';
+  }
 }

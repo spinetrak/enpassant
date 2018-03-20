@@ -1,0 +1,2 @@
+ALTER TABLE DSB_PLAYER
+  DROP CONSTRAINT dsb_player_dsbid_key
