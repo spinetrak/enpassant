@@ -61,11 +61,11 @@ class EnPassantConfig extends Configuration
   @JsonProperty("database")
   DataSourceFactory getDataSourceFactory()
   {
-    if (Converters.noNullsorEmpties(System.getenv("JDBC_DATABASE_URL")))
+    if (Converters.noNullsorEmpties(System.getenv("DATABASE_URL")))
     {
-      LOGGER.info("Using JDBC_DATABASE_URL from environment...");
+      LOGGER.info("Using DATABASE_URL from environment...");
       DatabaseConfiguration databaseConfiguration = EnPassantDBConfig.create(
-        System.getenv("JDBC_DATABASE_URL"));
+        System.getenv("DATABASE_URL"));
       database = (DataSourceFactory) databaseConfiguration.getDataSourceFactory(null);
     }
     return database;
