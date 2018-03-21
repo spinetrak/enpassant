@@ -110,12 +110,12 @@ public class DSBDataClient implements Runnable
     {
       LOGGER.error("Error downloading ZIP file", ex_);
     }
+    LOGGER.info("Down downloading ZIP file to " + DSB_DATA_FILE);
   }
 
   private boolean zipFileIsCurrent()
   {
     final File zipFile = new File(DSB_DATA_FILE);
-
     final DateTime now = new DateTime();
     final DateTime file = new DateTime(zipFile.lastModified());
     final Duration duration = new Duration(file, now);
