@@ -27,6 +27,8 @@ package net.spinetrak.enpassant.resources;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
 import org.jdbi.v3.core.Jdbi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -36,6 +38,7 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class DSBDataResource
 {
+  private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataResource.class);
   final private DSBVerband _dsbVerband;
   final private Jdbi _jdbi;
 
@@ -64,6 +67,7 @@ public class DSBDataResource
   @GET
   public DSBVerein getVerein(@PathParam("id") @DefaultValue("00000") String id_)
   {
+    LOGGER.info("Finding verein " + id_);
     final DSBVerein verein = _dsbVerband.getVerein(id_);
 
     if (verein != null)
