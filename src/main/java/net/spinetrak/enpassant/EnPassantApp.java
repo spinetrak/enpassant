@@ -38,10 +38,7 @@ import net.spinetrak.enpassant.configuration.DSBDataClient;
 import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
-import net.spinetrak.enpassant.core.dsb.etl.DSBDataTransformer;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import net.spinetrak.enpassant.health.DSBDataHealthCheck;
-import net.spinetrak.enpassant.resources.DSBDataResource;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -90,9 +87,6 @@ public class EnPassantApp extends Application<EnPassantConfig>
   public void run(final EnPassantConfig configuration_,
                   final Environment environment_)
   {
-
-    LOGGER.info("Starting setup with env: " + System.getenv());
-
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi = factory.build(environment_, configuration_.getDataSourceFactory(), "postgresql");
 
@@ -109,10 +103,10 @@ public class EnPassantApp extends Application<EnPassantConfig>
 
 
     final DSBDataClient dsbDataClient = configuration_.getDSBDataFactory().build(environment_);
-    final DSBVerband dsbVerband = dsbDataClient.getDSBVerband();
-    DSBDataTransformer.updateDatabase(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO, dsbVerband);
+    //final DSBVerband dsbVerband = dsbDataClient.getDSBVerband();
+    //DSBDataTransformer.updateDatabase(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO, dsbVerband);
 
-    environment_.jersey().register(new DSBDataResource(dsbVerband, jdbi));
+    //environment_.jersey().register(new DSBDataResource(dsbVerband, jdbi));
     environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataClient));
   }
 }
