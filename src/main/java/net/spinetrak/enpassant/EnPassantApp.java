@@ -34,11 +34,9 @@ import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import net.spinetrak.enpassant.configuration.DSBDataClient;
 import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
-import net.spinetrak.enpassant.health.DSBDataHealthCheck;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -102,11 +100,11 @@ public class EnPassantApp extends Application<EnPassantConfig>
     final DSBSpielerDAO dsbSpielerDAO = jdbi.onDemand(DSBSpielerDAO.class);
 
 
-    final DSBDataClient dsbDataClient = configuration_.getDSBDataFactory().build(environment_);
+    //final DSBDataClient dsbDataClient = configuration_.getDSBDataFactory().build(environment_);
     //final DSBVerband dsbVerband = dsbDataClient.getDSBVerband();
     //DSBDataTransformer.updateDatabase(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO, dsbVerband);
 
     //environment_.jersey().register(new DSBDataResource(dsbVerband, jdbi));
-    environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataClient));
+    //environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataClient));
   }
 }
