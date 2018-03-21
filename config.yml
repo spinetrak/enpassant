@@ -9,12 +9,11 @@ dsbData:
 
 server:
   rootPath: /api/
-  type: simple
-  applicationContextPath: /app
-  adminContextPath: /admin
-  connector:
-    type: http
-    port: ${PORT:-7777}
+  adminContextPath: /
+  applicationContextPath: /
+  applicationConnectors:
+    - type: http
+      port: ${PORT:-7777}
 
 database:
   driverClass: org.postgresql.Driver
