@@ -90,6 +90,9 @@ public class EnPassantApp extends Application<EnPassantConfig>
   public void run(final EnPassantConfig configuration_,
                   final Environment environment_)
   {
+
+    LOGGER.info("Starting setup with env: " + System.getenv());
+
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi = factory.build(environment_, configuration_.getDataSourceFactory(), "postgresql");
 
@@ -111,7 +114,5 @@ public class EnPassantApp extends Application<EnPassantConfig>
 
     environment_.jersey().register(new DSBDataResource(dsbVerband, jdbi));
     environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataClient));
-
-    LOGGER.info("Done setup with env: " + System.getenv());
   }
 }
