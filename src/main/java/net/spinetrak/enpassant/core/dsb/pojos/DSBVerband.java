@@ -42,13 +42,13 @@ public class DSBVerband
   private final Map<String, DSBVerein> _vereine = new HashMap<>();
   private DSBVerein _asVerein;
 
-  public DSBVerband(@NotNull final String id_, @NotNull final String parentId_, @NotNull final int level,
+  public DSBVerband(@NotNull final String id_, final String parentId_, final int level,
                     @NotNull final String name_)
   {
     _id = id_.trim();
-    _parentId = parentId_.trim();
-    _name = name_.trim();
+    _parentId = parentId_;
     _level = level;
+    _name = name_.trim();
   }
 
   public void add(@NotNull final DSBVerein verein_)
