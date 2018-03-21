@@ -45,9 +45,9 @@ public class DSBVerband
   public DSBVerband(@NotNull final String id_, @NotNull final String parentId_, @NotNull final int level,
                     @NotNull final String name_)
   {
-    _id = id_;
-    _parentId = parentId_;
-    _name = name_;
+    _id = id_.trim();
+    _parentId = parentId_.trim();
+    _name = name_.trim();
     _level = level;
   }
 

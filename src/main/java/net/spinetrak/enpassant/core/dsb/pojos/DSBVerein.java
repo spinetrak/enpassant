@@ -37,8 +37,8 @@ public class DSBVerein
 
   public DSBVerein(@NotNull final String id_, @NotNull final String name_, @NotNull final DSBVerband verband_)
   {
-    _id = id_;
-    _name = name_;
+    _id = id_.trim();
+    _name = name_.trim();
     _verband = verband_;
   }
 

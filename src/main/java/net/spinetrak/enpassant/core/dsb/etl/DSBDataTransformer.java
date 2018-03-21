@@ -24,9 +24,6 @@
 
 package net.spinetrak.enpassant.core.dsb.etl;
 
-import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
@@ -111,7 +108,6 @@ public class DSBDataTransformer
     }
     LOGGER.info("Done adding vereine.");
 
-    int i = 1;
     for (final Spieler spieler : spielers)
     {
 
@@ -141,33 +137,6 @@ public class DSBDataTransformer
     }
     LOGGER.info("Done adding spieler.");
     return dsb;
-  }
-
-  public static void updateDatabase(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
-                                    final DSBSpielerDAO dsbSpielerDAO_, final DSBVerband dsbVerband_)
-  {
-    dsbVerbandDAO_.insertOrUpdate(dsbVerband_);
-    for (final DSBVerein verein : dsbVerband_.getVereine().values())
-    {
-      dsbVereinDAO_.insertOrUpdate(verein);
-      for (final DSBSpieler spieler : verein.getSpieler())
-      {
-        dsbSpielerDAO_.insertOrUpdateSpieler(spieler);
-        if (spieler.getDwz() != null)
-        {
-          dsbSpielerDAO_.insertOrUpdateDWZ(spieler);
-          if (spieler.getFide() != null)
-          {
-            dsbSpielerDAO_.insertOrUpdateFIDE(spieler);
-          }
-        }
-      }
-    }
-    for (final DSBVerband verband : dsbVerband_.getVerbaende().values())
-    {
-      updateDatabase(dsbVerbandDAO_, dsbVereinDAO_, dsbSpielerDAO_, verband);
-    }
-
   }
 
   private static void updateDSBPlayers(final List<Spieler> spieler_s,

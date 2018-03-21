@@ -44,9 +44,9 @@ public class DSBSpieler
                     final Character gender_, final String eligibility_, final Integer yob_, final DWZ dwz_,
                     final FIDE fide_)
   {
-    _id = id_;
+    _id = id_.trim();
     _verein = verein_;
-    _name = name_;
+    _name = name_.trim();
     _status = status_;
     _gender = gender_;
     _eligibility = eligibility_;

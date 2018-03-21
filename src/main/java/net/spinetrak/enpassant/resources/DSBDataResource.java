@@ -24,28 +24,39 @@
 
 package net.spinetrak.enpassant.resources;
 
+import net.spinetrak.enpassant.configuration.DSBDataClient;
+import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
-import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Date;
 
 @Path("/dsb")
 @Produces(MediaType.APPLICATION_JSON)
 public class DSBDataResource
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataResource.class);
-  final private DSBVerband _dsbVerband;
-  final private Jdbi _jdbi;
+  private final DSBDataClient _dsbDataClient;
+  private final DSBSpielerDAO _dsbSpielerDAO;
+  private final DSBVerbandDAO _dsbVerbandDAO;
+  private final DSBVereinDAO _dsbVereinDAO;
+  private DSBVerband _dsbVerband = null;
 
-  public DSBDataResource(final DSBVerband dsbVerband_, final Jdbi jdbi_)
+  public DSBDataResource(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
+                         final DSBSpielerDAO dsbSpielerDAO_, final DSBDataClient dsbDataClient_)
   {
-    _dsbVerband = dsbVerband_;
-    _jdbi = jdbi_;
+    _dsbDataClient = dsbDataClient_;
+    _dsbSpielerDAO = dsbSpielerDAO_;
+    _dsbVerbandDAO = dsbVerbandDAO_;
+    _dsbVereinDAO = dsbVereinDAO_;
   }
 
   @Path("/verband/{id}")
@@ -53,11 +64,14 @@ public class DSBDataResource
   @GET
   public DSBVerband getVerband(@PathParam("id") @DefaultValue("00000") String id_)
   {
-    final DSBVerband verband = _dsbVerband.getVerband(id_);
-
-    if (verband != null)
+    if (_dsbVerband != null)
     {
-      return verband;
+      final DSBVerband verband = _dsbVerband.getVerband(id_);
+
+      if (verband != null)
+      {
+        return verband;
+      }
     }
     throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
@@ -67,13 +81,69 @@ public class DSBDataResource
   @GET
   public DSBVerein getVerein(@PathParam("id") @DefaultValue("00000") String id_)
   {
-    LOGGER.info("Finding verein " + id_);
-    final DSBVerein verein = _dsbVerband.getVerein(id_);
-
-    if (verein != null)
+    if (_dsbVerband != null)
     {
-      return verein;
+      final DSBVerein verein = _dsbVerband.getVerein(id_);
+
+      if (verein != null)
+      {
+        return verein;
+      }
     }
     throw new WebApplicationException(Response.Status.NOT_FOUND);
+  }
+
+  public boolean isUpToDate()
+  {
+    return _dsbDataClient.isUpToDate();
+  }
+
+  public Date lastUpdate()
+  {
+    return _dsbDataClient.lastUpdate();
+  }
+
+  @Path("/update")
+  @GET
+  public Response.Status update()
+  {
+    _dsbVerband = _dsbDataClient.getDSBVerband();
+
+    if (null == _dsbVerband)
+    {
+      LOGGER.error("Unable to update DSB.");
+      throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+    }
+
+    updateDatabase(_dsbVerbandDAO, _dsbVereinDAO, _dsbSpielerDAO, _dsbVerband);
+
+    return Response.Status.OK;
+  }
+
+  private void updateDatabase(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
+                              final DSBSpielerDAO dsbSpielerDAO_, final DSBVerband dsbVerband_)
+  {
+    LOGGER.info("Upserting verband: " + dsbVerband_.getName());
+    dsbVerbandDAO_.insertOrUpdate(dsbVerband_);
+    for (final DSBVerein verein : dsbVerband_.getVereine().values())
+    {
+      dsbVereinDAO_.insertOrUpdate(verein);
+      for (final DSBSpieler spieler : verein.getSpieler())
+      {
+        dsbSpielerDAO_.insertOrUpdateSpieler(spieler);
+        if (spieler.getDwz() != null)
+        {
+          dsbSpielerDAO_.insertOrUpdateDWZ(spieler);
+          if (spieler.getFide() != null)
+          {
+            dsbSpielerDAO_.insertOrUpdateFIDE(spieler);
+          }
+        }
+      }
+    }
+    for (final DSBVerband verband : dsbVerband_.getVerbaende().values())
+    {
+      updateDatabase(dsbVerbandDAO_, dsbVereinDAO_, dsbSpielerDAO_, verband);
+    }
   }
 }
