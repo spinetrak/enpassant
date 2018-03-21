@@ -44,10 +44,12 @@ import net.spinetrak.enpassant.health.DSBDataHealthCheck;
 import net.spinetrak.enpassant.resources.DSBDataResource;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EnPassantApp extends Application<EnPassantConfig>
 {
-
+  private final static Logger LOGGER = LoggerFactory.getLogger(EnPassantApp.class);
   public static void main(final String[] args_) throws Exception
   {
     new EnPassantApp().run(args_);
@@ -68,7 +70,6 @@ public class EnPassantApp extends Application<EnPassantConfig>
       )
     );
     bootstrap_.addBundle(new AssetsBundle("/assets/", "/"));
-
     bootstrap_.addBundle(new FlywayBundle<EnPassantConfig>()
     {
       @Override
@@ -110,5 +111,7 @@ public class EnPassantApp extends Application<EnPassantConfig>
 
     environment_.jersey().register(new DSBDataResource(dsbVerband, jdbi));
     environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataClient));
+
+    LOGGER.info("Done setup with env: " + System.getenv());
   }
 }
