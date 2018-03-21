@@ -62,7 +62,7 @@ public class DSBDataClient implements Runnable
       {
         try
         {
-          LOGGER.warn("Waiting dor data ...");
+          LOGGER.warn("Waiting for data ...");
           _lock.wait(1000);
         }
         catch (final InterruptedException ex_)
@@ -110,7 +110,7 @@ public class DSBDataClient implements Runnable
     {
       LOGGER.error("Error downloading ZIP file", ex_);
     }
-    LOGGER.info("Down downloading ZIP file to " + DSB_DATA_FILE);
+    LOGGER.info("Done downloading ZIP file to " + DSB_DATA_FILE);
   }
 
   private boolean zipFileIsCurrent()

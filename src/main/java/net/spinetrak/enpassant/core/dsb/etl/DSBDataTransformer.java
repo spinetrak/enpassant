@@ -52,13 +52,14 @@ public class DSBDataTransformer
 
   public static DSBVerband createDSBVerbandFromZIPFile(final String dataFile_)
   {
+    LOGGER.info("Creating DSB Verband");
     final DSBVerband dsb = new DSBVerband("00000", null, DSBVerband.BUND, "Deutscher Schachbund");
     final List<Spieler> spielers = new ArrayList<>();
     final List<Verein> vereine = new ArrayList<>();
     ZipInputStream zipIn;
     try
     {
-      LOGGER.debug("Processing ZIP file " + dataFile_);
+      LOGGER.info("Processing ZIP file " + dataFile_);
       zipIn = new ZipInputStream(new FileInputStream(new File(dataFile_)));
       ZipEntry entry;
       while ((entry = zipIn.getNextEntry()) != null)
@@ -96,7 +97,7 @@ public class DSBDataTransformer
         }
       }
     }
-    catch (final IOException ex_)
+    catch (final Exception ex_)
     {
       LOGGER.error("Error processing ZIP file", ex_);
     }
