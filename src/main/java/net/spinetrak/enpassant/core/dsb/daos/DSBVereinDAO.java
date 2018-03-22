@@ -34,7 +34,7 @@ import java.util.List;
 
 public interface DSBVereinDAO
 {
-  @SqlUpdate("INSERT INTO dsb_organization (zps, name, level, isclub, parent) VALUES (:v.id, :v.name, " + (-1) + ", " + true + ", :v.verband.id) ON CONFLICT (zps) DO UPDATE SET name = :v.name, level = " + (-1) + ", isClub = " + true + ", parent = :v.verband.id")
+  @SqlUpdate("INSERT INTO dsb_organization (zps, name, level, isclub, parent) VALUES (:v.id, :v.name, " + (-1) + ", " + true + ", :v.verband) ON CONFLICT (zps) DO UPDATE SET name = :v.name, level = " + (-1) + ", isClub = " + true + ", parent = :v.verband")
   void insertOrUpdate(@BindBean("v") final DSBVerein verein_);
 
   @SqlQuery("SELECT * FROM dsb_organization WHERE isClub=true")

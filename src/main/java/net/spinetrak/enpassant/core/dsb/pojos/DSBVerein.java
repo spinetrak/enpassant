@@ -33,13 +33,13 @@ public class DSBVerein
   private final String _id;
   private final String _name;
   private final List<DSBSpieler> _spieler = new ArrayList<>();
-  private final DSBVerband _verband;
+  private final String _verbandId;
 
-  public DSBVerein(@NotNull final String id_, @NotNull final String name_, @NotNull final DSBVerband verband_)
+  public DSBVerein(@NotNull final String id_, @NotNull final String name_, @NotNull final String verbandId_)
   {
     _id = id_.trim();
     _name = name_.trim();
-    _verband = verband_;
+    _verbandId = verbandId_;
   }
 
   public void add(@NotNull final DSBSpieler spieler_)
@@ -62,9 +62,9 @@ public class DSBVerein
     return _spieler;
   }
 
-  public DSBVerband getVerband()
+  public String getVerband()
   {
-    return _verband;
+    return _verbandId;
   }
 
   @Override

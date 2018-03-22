@@ -105,7 +105,7 @@ public class DSBDataTransformer
     {
       final String verbandsID = verein.getVerband();
       final DSBVerband verband = dsb.getVerband(verbandsID);
-      verband.add(new DSBVerein(verein.getID(), verein.getName(), verband));
+      verband.add(new DSBVerein(verein.getID(), verein.getName(), verband.getId()));
     }
     LOGGER.info("Done adding vereine.");
 
@@ -120,7 +120,7 @@ public class DSBDataTransformer
         if (null != verband)
         {
           final DSBVerein vereinslos = verband.asVerein();
-          final DSBSpieler dsbSpieler = new DSBSpieler(spieler.getID(), vereinslos, spieler.getName(),
+          final DSBSpieler dsbSpieler = new DSBSpieler(spieler.getID(), vereinslos.getId(), spieler.getName(),
                                                        spieler.getStatus(),
                                                        spieler.getGender(),
                                                        spieler.getEligibility(), spieler.getYOB(), spieler.getDWZ(),
@@ -129,7 +129,8 @@ public class DSBDataTransformer
         }
         continue;
       }
-      final DSBSpieler dsbSpieler = new DSBSpieler(spieler.getID(), verein, spieler.getName(), spieler.getStatus(),
+      final DSBSpieler dsbSpieler = new DSBSpieler(spieler.getID(), verein.getId(), spieler.getName(),
+                                                   spieler.getStatus(),
                                                    spieler.getGender(),
                                                    spieler.getEligibility(), spieler.getYOB(), spieler.getDWZ(),
                                                    spieler.getFIDE());

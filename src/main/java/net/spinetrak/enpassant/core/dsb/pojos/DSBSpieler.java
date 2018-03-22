@@ -37,15 +37,16 @@ public class DSBSpieler
   private final String _id;
   private final String _name;
   private final String _status;
-  private final DSBVerein _verein;
+  private final String _vereinId;
   private final Integer _yob;
-  public DSBSpieler(@NotNull final String id_, final DSBVerein verein_, @NotNull final String name_,
+
+  public DSBSpieler(@NotNull final String id_, final String vereinId_, @NotNull final String name_,
                     final String status_,
                     final Character gender_, final String eligibility_, final Integer yob_, final DWZ dwz_,
                     final FIDE fide_)
   {
     _id = id_.trim();
-    _verein = verein_;
+    _vereinId = vereinId_;
     _name = name_.trim();
     _status = status_;
     _gender = gender_;
@@ -90,9 +91,9 @@ public class DSBSpieler
     return _status;
   }
 
-  public DSBVerein getVerein()
+  public String getVerein()
   {
-    return _verein;
+    return _vereinId;
   }
 
   public Integer getYob()
@@ -111,7 +112,7 @@ public class DSBSpieler
       ", id='" + _id + '\'' +
       ", name='" + _name + '\'' +
       ", status='" + _status + '\'' +
-      ", verein=" + _verein +
+      ", verein=" + _vereinId +
       ", yob=" + _yob +
       '}';
   }

@@ -69,7 +69,7 @@ public class DSBVerband
     }
     else
     {
-      _asVerein = new DSBVerein(_id, _name, this);
+      _asVerein = new DSBVerein(_id, _name, _id);
     }
     return _asVerein;
   }
