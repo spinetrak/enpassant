@@ -34,15 +34,20 @@ import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
 import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
+import net.spinetrak.enpassant.db.DSBDataUpdater;
 import net.spinetrak.enpassant.health.DSBDataHealthCheck;
 import net.spinetrak.enpassant.resources.DSBDataResource;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class EnPassantApp extends Application<EnPassantConfig>
 {
@@ -101,9 +106,16 @@ public class EnPassantApp extends Application<EnPassantConfig>
     final DSBVereinDAO dsbVereinDAO = jdbi.onDemand(DSBVereinDAO.class);
     final DSBSpielerDAO dsbSpielerDAO = jdbi.onDemand(DSBSpielerDAO.class);
 
+    final DSBZipFileProcessor dsbZipFileProcessor = configuration_.getDSBDataFactory().build(environment_);
     final DSBDataResource dsbDataResource = new DSBDataResource(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO,
-                                                                configuration_.getDSBDataFactory().build(environment_));
+                                                                dsbZipFileProcessor);
     environment_.jersey().register(dsbDataResource);
     environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataResource));
+
+    final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService("dsbDataUpdater").build();
+    final DSBDataUpdater dsbDataUpdater = new DSBDataUpdater(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO,
+                                                             dsbZipFileProcessor);
+    ses.scheduleWithFixedDelay(dsbDataUpdater, 60, configuration_.getDSBDataFactory().getRefreshInterval(),
+                               TimeUnit.SECONDS);
   }
 }

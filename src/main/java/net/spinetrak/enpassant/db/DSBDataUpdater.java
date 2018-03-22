@@ -22,84 +22,65 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.resources;
+package net.spinetrak.enpassant.db;
 
 import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
 import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.*;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import java.util.Date;
-
-@Path("/dsb")
-@Produces(MediaType.APPLICATION_JSON)
-public class DSBDataResource
+public class DSBDataUpdater implements Runnable
 {
-  private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataResource.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataUpdater.class);
   private final DSBSpielerDAO _dsbSpielerDAO;
   private final DSBVerbandDAO _dsbVerbandDAO;
   private final DSBVereinDAO _dsbVereinDAO;
-  private final DSBZipFileProcessor _dsbZipFileProcessor;
-  private DSBVerband _dsbVerband = null;
+  private DSBZipFileProcessor _dsbZipFileProcessor;
 
-  public DSBDataResource(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
-                         final DSBSpielerDAO dsbSpielerDAO_, final DSBZipFileProcessor dsbZipFileProcessor_)
+  public DSBDataUpdater(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
+                        final DSBSpielerDAO dsbSpielerDAO_, final DSBZipFileProcessor dsbZipFileProcessor_)
   {
-    _dsbZipFileProcessor = dsbZipFileProcessor_;
-    _dsbSpielerDAO = dsbSpielerDAO_;
     _dsbVerbandDAO = dsbVerbandDAO_;
     _dsbVereinDAO = dsbVereinDAO_;
+    _dsbSpielerDAO = dsbSpielerDAO_;
+    _dsbZipFileProcessor = dsbZipFileProcessor_;
   }
 
-  @Path("/verband/{id}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @GET
-  public DSBVerband getVerband(@PathParam("id") @DefaultValue("00000") String id_)
-  {
-    if (_dsbVerband != null)
-    {
-      final DSBVerband verband = _dsbVerband.getVerband(id_);
 
-      if (verband != null)
+  @Override
+  public void run()
+  {
+    updateDatabase(_dsbZipFileProcessor.getDSBVerband());
+  }
+
+  private void updateDatabase(final DSBVerband dsbVerband_)
+  {
+    LOGGER.info("Upserting verband: " + dsbVerband_.getName());
+    _dsbVerbandDAO.insertOrUpdate(dsbVerband_);
+    for (final DSBVerein verein : dsbVerband_.getVereine().values())
+    {
+      _dsbVereinDAO.insertOrUpdate(verein);
+      for (final DSBSpieler spieler : verein.getSpieler())
       {
-        return verband;
+        _dsbSpielerDAO.insertOrUpdateSpieler(spieler);
+        if (spieler.getDwz() != null)
+        {
+          _dsbSpielerDAO.insertOrUpdateDWZ(spieler);
+          if (spieler.getFide() != null)
+          {
+            _dsbSpielerDAO.insertOrUpdateFIDE(spieler);
+          }
+        }
       }
     }
-    throw new WebApplicationException(Response.Status.NOT_FOUND);
-  }
-
-  @Path("/verein/{id}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @GET
-  public DSBVerein getVerein(@PathParam("id") @DefaultValue("00000") String id_)
-  {
-    if (_dsbVerband != null)
+    for (final DSBVerband verband : dsbVerband_.getVerbaende().values())
     {
-      final DSBVerein verein = _dsbVerband.getVerein(id_);
-
-      if (verein != null)
-      {
-        return verein;
-      }
+      updateDatabase(verband);
     }
-    throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
-
-  public boolean isUpToDate()
-  {
-    return _dsbZipFileProcessor.isUpToDate();
-  }
-
-  public Date lastUpdate()
-  {
-    return _dsbZipFileProcessor.lastUpdate();
-  }
-
 }

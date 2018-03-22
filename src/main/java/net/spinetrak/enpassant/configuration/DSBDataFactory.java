@@ -39,12 +39,19 @@ public class DSBDataFactory
   @NotEmpty
   private String url;
 
-  public DSBDataClient build(final Environment environment_)
+  public DSBZipFileProcessor build(final Environment environment_)
   {
-    final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService("dsbDataClient").build();
-    final DSBDataClient dsbDataClient = new DSBDataClient(getUrl());
-    ses.scheduleWithFixedDelay(dsbDataClient, 10, getRefreshInterval(), TimeUnit.SECONDS);
-    return dsbDataClient;
+    final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService(
+      "dsbZipFileProcessor").build();
+    final DSBZipFileProcessor dsbZipFileProcessor = new DSBZipFileProcessor(getUrl());
+    ses.scheduleWithFixedDelay(dsbZipFileProcessor, 10, getRefreshInterval(), TimeUnit.SECONDS);
+    return dsbZipFileProcessor;
+  }
+
+  @JsonProperty
+  public int getRefreshInterval()
+  {
+    return refreshInterval;
   }
 
   @JsonProperty
@@ -57,12 +64,6 @@ public class DSBDataFactory
   public void setUrl(final String url_)
   {
     url = url_;
-  }
-
-  @JsonProperty
-  private int getRefreshInterval()
-  {
-    return refreshInterval;
   }
 
   @JsonProperty

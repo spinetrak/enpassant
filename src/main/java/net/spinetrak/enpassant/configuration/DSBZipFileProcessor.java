@@ -40,16 +40,16 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Date;
 
-public class DSBDataClient implements Runnable
+public class DSBZipFileProcessor implements Runnable
 {
   private final static String DSB_DATA_FILE = System.getProperty("java.io.tmpdir") + File.separator + "dsb_data.zip";
-  private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataClient.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(DSBZipFileProcessor.class);
   private final Object _lock = new Object();
   private final String _url;
   private DSBVerband _dsb;
   private Date _lastUpdate;
 
-  DSBDataClient(final String url_)
+  DSBZipFileProcessor(final String url_)
   {
     _url = url_;
   }
