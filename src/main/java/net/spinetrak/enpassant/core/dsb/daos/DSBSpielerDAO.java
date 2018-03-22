@@ -26,6 +26,7 @@ package net.spinetrak.enpassant.core.dsb.daos;
 
 import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -46,4 +47,8 @@ public interface DSBSpielerDAO
   @SqlQuery("SELECT * FROM dsb_player")
   @RegisterRowMapper(DSBSpielerMapper.class)
   List<DSBSpieler> selectPlayers();
+
+  @SqlQuery("SELECT * FROM dsb_player where zps = :id")
+  @RegisterRowMapper(DSBSpielerMapper.class)
+  List<DSBSpieler> selectPlayers(@Bind("id") final String vereinId_);
 }

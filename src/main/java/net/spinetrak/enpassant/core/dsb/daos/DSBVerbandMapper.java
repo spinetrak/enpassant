@@ -31,11 +31,11 @@ import org.jdbi.v3.core.statement.StatementContext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class DSBVerbandMapper implements RowMapper<DSBVerband>
+public class DSBVerbandMapper implements RowMapper<DSBVerband>
 {
   @Override
-  public DSBVerband map(final ResultSet resultSet_, final StatementContext statementContext_) throws SQLException
+  public DSBVerband map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return null;
+    return new DSBVerband(rs_.getString("zps"), rs_.getString("parent"), rs_.getInt("level"), rs_.getString("name"));
   }
 }

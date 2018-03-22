@@ -26,6 +26,7 @@ package net.spinetrak.enpassant.core.dsb.daos;
 
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -40,4 +41,12 @@ public interface DSBVereinDAO
   @SqlQuery("SELECT * FROM dsb_organization WHERE isClub=true")
   @RegisterRowMapper(DSBVereinMapper.class)
   List<DSBVerein> select();
+
+  @SqlQuery("SELECT * from dsb_organization where isClub=true and zps = :id")
+  @RegisterRowMapper(DSBVereinMapper.class)
+  List<DSBVerein> select(@Bind("id") String id_);
+
+  @SqlQuery("SELECT * from dsb_organization where isClub=true and parent = :id")
+  @RegisterRowMapper(DSBVereinMapper.class)
+  List<DSBVerein> selectChildrenOf(@Bind("id") String id_);
 }

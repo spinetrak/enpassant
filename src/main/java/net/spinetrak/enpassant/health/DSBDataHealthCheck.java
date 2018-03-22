@@ -25,27 +25,27 @@
 package net.spinetrak.enpassant.health;
 
 import com.codahale.metrics.health.HealthCheck;
-import net.spinetrak.enpassant.resources.DSBDataResource;
+import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
 
 public class DSBDataHealthCheck extends HealthCheck
 {
-  private final DSBDataResource _dsbDataResource;
+  private final DSBZipFileProcessor _dsbZipFileProcessor;
 
-  public DSBDataHealthCheck(final DSBDataResource dsbDataClient_)
+  public DSBDataHealthCheck(final DSBZipFileProcessor dsbZipFileProcessor_)
   {
-    _dsbDataResource = dsbDataClient_;
+    _dsbZipFileProcessor = dsbZipFileProcessor_;
   }
 
   @Override
   protected Result check() throws Exception
   {
-    if (_dsbDataResource.isUpToDate())
+    if (_dsbZipFileProcessor.isUpToDate())
     {
       return Result.healthy();
     }
     else
     {
-      return Result.unhealthy("DSB data is stale: " + _dsbDataResource.lastUpdate());
+      return Result.unhealthy("DSB ZIP file is stale: " + _dsbZipFileProcessor.lastUpdate());
     }
   }
 }

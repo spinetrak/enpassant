@@ -120,7 +120,7 @@ public class DSBDataTransformer
         if (null != verband)
         {
           final DSBVerein vereinslos = verband.asVerein();
-          final DSBSpieler dsbSpieler = new DSBSpieler(spieler.getID(), vereinslos.getId(), spieler.getName(),
+          final DSBSpieler dsbSpieler = new DSBSpieler(vereinslos.getId(), spieler.getID(), spieler.getName(),
                                                        spieler.getStatus(),
                                                        spieler.getGender(),
                                                        spieler.getEligibility(), spieler.getYOB(), spieler.getDWZ(),
@@ -129,7 +129,7 @@ public class DSBDataTransformer
         }
         continue;
       }
-      final DSBSpieler dsbSpieler = new DSBSpieler(spieler.getID(), verein.getId(), spieler.getName(),
+      final DSBSpieler dsbSpieler = new DSBSpieler(verein.getId(), spieler.getID(), spieler.getName(),
                                                    spieler.getStatus(),
                                                    spieler.getGender(),
                                                    spieler.getEligibility(), spieler.getYOB(), spieler.getDWZ(),
@@ -308,11 +308,11 @@ public class DSBDataTransformer
       return null;
     }
 
-    Character getGender()
+    String getGender()
     {
       if (Converters.noNullsorEmpties(_gender))
       {
-        return _gender.trim().charAt(0);
+        return _gender.trim();
       }
       return null;
     }

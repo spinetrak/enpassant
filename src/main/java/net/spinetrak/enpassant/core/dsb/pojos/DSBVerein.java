@@ -47,6 +47,11 @@ public class DSBVerein
     _spieler.add(spieler_);
   }
 
+  public void add(@NotNull final List<DSBSpieler> dsbSpielers_)
+  {
+    _spieler.addAll(dsbSpielers_);
+  }
+
   public String getId()
   {
     return _id;

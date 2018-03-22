@@ -26,6 +26,7 @@ package net.spinetrak.enpassant.core.dsb.daos;
 
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
+import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
 import org.jdbi.v3.sqlobject.statement.SqlQuery;
 import org.jdbi.v3.sqlobject.statement.SqlUpdate;
@@ -38,8 +39,16 @@ public interface DSBVerbandDAO
   @SqlUpdate("INSERT INTO dsb_organization (zps, name, level, isclub, parent) VALUES (:v.id, :v.name, :v.level, " + false + ", :v.parentId) ON CONFLICT (zps) DO UPDATE SET name = :v.name, level = :v.level, isClub = " + false + ", parent = :v.parentId")
   void insertOrUpdate(@BindBean("v") final DSBVerband verband_);
 
-
   @SqlQuery("SELECT * from dsb_organization where isClub=false")
   @RegisterRowMapper(DSBVerbandMapper.class)
   List<DSBVerband> select();
+
+  @SqlQuery("SELECT * from dsb_organization where isClub=false and zps = :id")
+  @RegisterRowMapper(DSBVerbandMapper.class)
+  List<DSBVerband> select(@Bind("id") String id_);
+
+  @SqlQuery("SELECT * from dsb_organization where isClub=false and parent = :id")
+  @RegisterRowMapper(DSBVerbandMapper.class)
+  List<DSBVerband> selectChildrenOf(@Bind("id") String id_);
+
 }

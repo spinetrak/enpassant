@@ -107,10 +107,9 @@ public class EnPassantApp extends Application<EnPassantConfig>
     final DSBSpielerDAO dsbSpielerDAO = jdbi.onDemand(DSBSpielerDAO.class);
 
     final DSBZipFileProcessor dsbZipFileProcessor = configuration_.getDSBDataFactory().build(environment_);
-    final DSBDataResource dsbDataResource = new DSBDataResource(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO,
-                                                                dsbZipFileProcessor);
+    final DSBDataResource dsbDataResource = new DSBDataResource(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO);
     environment_.jersey().register(dsbDataResource);
-    environment_.healthChecks().register("dsbData", new DSBDataHealthCheck(dsbDataResource));
+    environment_.healthChecks().register("dsbZipFileProcessor", new DSBDataHealthCheck(dsbZipFileProcessor));
 
     final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService("dsbDataUpdater").build();
     final DSBDataUpdater dsbDataUpdater = new DSBDataUpdater(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO,

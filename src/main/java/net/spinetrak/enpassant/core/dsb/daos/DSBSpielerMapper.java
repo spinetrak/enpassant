@@ -31,11 +31,13 @@ import org.jdbi.v3.core.statement.StatementContext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class DSBSpielerMapper implements RowMapper<DSBSpieler>
+public class DSBSpielerMapper implements RowMapper<DSBSpieler>
 {
   @Override
-  public DSBSpieler map(final ResultSet resultSet_, final StatementContext statementContext_) throws SQLException
+  public DSBSpieler map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return null;
+    return new DSBSpieler(rs_.getString("zps"), rs_.getString("member"), rs_.getString("name"),
+                          rs_.getString("status"), rs_.getString("gender"), rs_.getString("eligibility"),
+                          rs_.getInt("yob"), null, null);
   }
 }

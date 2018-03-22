@@ -31,11 +31,11 @@ import org.jdbi.v3.core.statement.StatementContext;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-class DSBVereinMapper implements RowMapper<DSBVerein>
+public class DSBVereinMapper implements RowMapper<DSBVerein>
 {
   @Override
-  public DSBVerein map(final ResultSet resultSet_, final StatementContext statementContext_) throws SQLException
+  public DSBVerein map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return null;
+    return new DSBVerein(rs_.getString("zps"), rs_.getString("name"), rs_.getString("parent"));
   }
 }

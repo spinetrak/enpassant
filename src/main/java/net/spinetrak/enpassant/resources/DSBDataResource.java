@@ -24,35 +24,28 @@
 
 package net.spinetrak.enpassant.resources;
 
-import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
 import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.Date;
+import java.util.List;
 
 @Path("/dsb")
 @Produces(MediaType.APPLICATION_JSON)
 public class DSBDataResource
 {
-  private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataResource.class);
   private final DSBSpielerDAO _dsbSpielerDAO;
   private final DSBVerbandDAO _dsbVerbandDAO;
   private final DSBVereinDAO _dsbVereinDAO;
-  private final DSBZipFileProcessor _dsbZipFileProcessor;
-  private DSBVerband _dsbVerband = null;
 
   public DSBDataResource(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
-                         final DSBSpielerDAO dsbSpielerDAO_, final DSBZipFileProcessor dsbZipFileProcessor_)
+                         final DSBSpielerDAO dsbSpielerDAO_)
   {
-    _dsbZipFileProcessor = dsbZipFileProcessor_;
     _dsbSpielerDAO = dsbSpielerDAO_;
     _dsbVerbandDAO = dsbVerbandDAO_;
     _dsbVereinDAO = dsbVereinDAO_;
@@ -63,14 +56,16 @@ public class DSBDataResource
   @GET
   public DSBVerband getVerband(@PathParam("id") @DefaultValue("00000") String id_)
   {
-    if (_dsbVerband != null)
+    final List<DSBVerband> verbaende = _dsbVerbandDAO.select(id_);
+    if (!verbaende.isEmpty())
     {
-      final DSBVerband verband = _dsbVerband.getVerband(id_);
+      final DSBVerband dsbVerband = verbaende.get(0);
 
-      if (verband != null)
+      for (final DSBVerband child : getChildren(dsbVerband))
       {
-        return verband;
+        dsbVerband.add(child);
       }
+      return dsbVerband;
     }
     throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
@@ -80,26 +75,35 @@ public class DSBDataResource
   @GET
   public DSBVerein getVerein(@PathParam("id") @DefaultValue("00000") String id_)
   {
-    if (_dsbVerband != null)
+    final List<DSBVerein> vereine = _dsbVereinDAO.select(id_);
+    if (!vereine.isEmpty())
     {
-      final DSBVerein verein = _dsbVerband.getVerein(id_);
-
-      if (verein != null)
-      {
-        return verein;
-      }
+      final DSBVerein verein = vereine.get(0);
+      verein.add(_dsbSpielerDAO.selectPlayers(verein.getId()));
+      return verein;
     }
     throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
 
-  public boolean isUpToDate()
+  /**
+   * recursive lookup
+   **/
+  private List<DSBVerband> getChildren(final DSBVerband verband_)
   {
-    return _dsbZipFileProcessor.isUpToDate();
-  }
+    final List<DSBVerband> verbaende = _dsbVerbandDAO.selectChildrenOf(verband_.getId());
+    for (final DSBVerband verband : verbaende)
+    {
+      getChildren(verband);
+      verband_.add(verband);
+    }
 
-  public Date lastUpdate()
-  {
-    return _dsbZipFileProcessor.lastUpdate();
+    final List<DSBVerein> vereine = _dsbVereinDAO.selectChildrenOf(verband_.getId());
+    for (final DSBVerein verein : vereine)
+    {
+      verein.add(_dsbSpielerDAO.selectPlayers(verein.getId()));
+      verband_.add(verein);
+    }
+    return verbaende;
   }
 
 }
