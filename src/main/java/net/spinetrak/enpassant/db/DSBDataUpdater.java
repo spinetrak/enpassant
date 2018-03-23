@@ -25,29 +25,31 @@
 package net.spinetrak.enpassant.db;
 
 import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
-import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
+import net.spinetrak.enpassant.core.dsb.daos.DSBAssociationDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBClubDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
+import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
+import net.spinetrak.enpassant.core.fide.FIDE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class DSBDataUpdater implements Runnable
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataUpdater.class);
-  private final DSBSpielerDAO _dsbSpielerDAO;
-  private final DSBVerbandDAO _dsbVerbandDAO;
-  private final DSBVereinDAO _dsbVereinDAO;
+  private final DSBAssociationDAO _dsbAssociationDAO;
+  private final DSBClubDAO _dsbClubDAO;
+  private final DSBPlayerDAO _dsbPlayerDAO;
   private DSBZipFileProcessor _dsbZipFileProcessor;
 
-  public DSBDataUpdater(final DSBVerbandDAO dsbVerbandDAO_, final DSBVereinDAO dsbVereinDAO_,
-                        final DSBSpielerDAO dsbSpielerDAO_, final DSBZipFileProcessor dsbZipFileProcessor_)
+  public DSBDataUpdater(final DSBAssociationDAO dsbAssociationDAO_, final DSBClubDAO dsbClubDAO_,
+                        final DSBPlayerDAO dsbPlayerDAO_, final DSBZipFileProcessor dsbZipFileProcessor_)
   {
-    _dsbVerbandDAO = dsbVerbandDAO_;
-    _dsbVereinDAO = dsbVereinDAO_;
-    _dsbSpielerDAO = dsbSpielerDAO_;
+    _dsbAssociationDAO = dsbAssociationDAO_;
+    _dsbClubDAO = dsbClubDAO_;
+    _dsbPlayerDAO = dsbPlayerDAO_;
     _dsbZipFileProcessor = dsbZipFileProcessor_;
   }
 
@@ -55,32 +57,38 @@ public class DSBDataUpdater implements Runnable
   @Override
   public void run()
   {
-    updateDatabase(_dsbZipFileProcessor.getDSBVerband());
+    updateDatabase(_dsbZipFileProcessor.getDSBAssociation());
   }
 
-  private void updateDatabase(final DSBVerband dsbVerband_)
+  private void updateDatabase(final DSBAssociation dsbAssociation_)
   {
-    LOGGER.info("Upserting verband: " + dsbVerband_.getName());
-    _dsbVerbandDAO.insertOrUpdate(dsbVerband_);
-    for (final DSBVerein verein : dsbVerband_.getVereine().values())
+    LOGGER.info("Upserting association: " + dsbAssociation_.getName());
+    _dsbAssociationDAO.insertOrUpdate(dsbAssociation_);
+    for (final DSBClub club : dsbAssociation_.getClubs().values())
     {
-      _dsbVereinDAO.insertOrUpdate(verein);
-      for (final DSBSpieler spieler : verein.getSpieler())
+      _dsbClubDAO.insertOrUpdate(club);
+      for (final DSBPlayer player : club.getPlayers())
       {
-        _dsbSpielerDAO.insertOrUpdateSpieler(spieler);
-        if (spieler.getDwz() != null)
+        _dsbPlayerDAO.insertOrUpdatePlayer(player);
+        if (player.getDWZ() != null)
         {
-          _dsbSpielerDAO.insertOrUpdateDWZ(spieler);
-          if (spieler.getFide() != null)
+          for (final DWZ dwz : player.getDWZ())
           {
-            _dsbSpielerDAO.insertOrUpdateFIDE(spieler);
+            _dsbPlayerDAO.insertOrUpdateDWZ(dwz);
+          }
+        }
+        if (player.getFIDE() != null)
+        {
+          for (final FIDE fide : player.getFIDE())
+          {
+            _dsbPlayerDAO.insertOrUpdateFIDE(fide);
           }
         }
       }
     }
-    for (final DSBVerband verband : dsbVerband_.getVerbaende().values())
+    for (final DSBAssociation association : dsbAssociation_.getAssociations().values())
     {
-      updateDatabase(verband);
+      updateDatabase(association);
     }
   }
 }

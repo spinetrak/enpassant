@@ -24,20 +24,18 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DSBSpielerMapper implements RowMapper<DSBSpieler>
+public class DSBClubMapper implements RowMapper<DSBClub>
 {
   @Override
-  public DSBSpieler map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  public DSBClub map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return new DSBSpieler(rs_.getString("zps"), rs_.getString("member"), rs_.getString("name"),
-                          rs_.getString("status"), rs_.getString("gender"), rs_.getString("eligibility"),
-                          rs_.getInt("yob"), null, null);
+    return new DSBClub(rs_.getString("zps"), rs_.getString("name"), rs_.getString("parent"));
   }
 }

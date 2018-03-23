@@ -28,22 +28,22 @@ import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DSBVerband
+public class DSBAssociation
 {
   public final static int BEZIRK = 2;
   public final static int BUND = 0;
   public final static int KREIS = 3;
   public final static int LAND = 1;
+  private final Map<String, DSBAssociation> _associations = new HashMap<>();
+  private final Map<String, DSBClub> _clubs = new HashMap<>();
   private final String _id;
   private final int _level;
   private final String _name;
   private final String _parentId;
-  private final Map<String, DSBVerband> _verbaende = new HashMap<>();
-  private final Map<String, DSBVerein> _vereine = new HashMap<>();
-  private DSBVerein _asVerein;
+  private DSBClub _asClub;
 
-  public DSBVerband(@NotNull final String id_, final String parentId_, final int level,
-                    @NotNull final String name_)
+  public DSBAssociation(@NotNull final String id_, final String parentId_, final int level,
+                        @NotNull final String name_)
   {
     _id = id_.trim();
     _parentId = parentId_;
@@ -51,27 +51,73 @@ public class DSBVerband
     _name = name_.trim();
   }
 
-  public void add(@NotNull final DSBVerein verein_)
+  public void add(@NotNull final DSBClub club_)
   {
-    _vereine.put(verein_.getId(), verein_);
+    _clubs.put(club_.getId(), club_);
   }
 
-  public void add(@NotNull final DSBVerband dsbVerband_)
+  public void add(@NotNull final DSBAssociation dsbAssociation_)
   {
-    _verbaende.put(dsbVerband_.getId(), dsbVerband_);
+    _associations.put(dsbAssociation_.getId(), dsbAssociation_);
   }
 
-  public DSBVerein asVerein()
+  public DSBClub asClub()
   {
-    if (null != _asVerein)
+    if (null != _asClub)
     {
-      return _asVerein;
+      return _asClub;
     }
     else
     {
-      _asVerein = new DSBVerein(_id, _name, _id);
+      _asClub = new DSBClub(_id, _name, _id);
     }
-    return _asVerein;
+    return _asClub;
+  }
+
+  public DSBAssociation getAssociation(@NotNull final String id_)
+  {
+    final DSBAssociation association = _associations.get(id_);
+    if (association != null)
+    {
+      return association;
+    }
+    for (final DSBAssociation subAssociation : _associations.values())
+    {
+      final DSBAssociation v = subAssociation.getAssociation(id_);
+      if (v != null)
+      {
+        return v;
+      }
+    }
+    return null;
+  }
+
+  public Map<String, DSBAssociation> getAssociations()
+  {
+    return _associations;
+  }
+
+  public DSBClub getClub(@NotNull final String id_)
+  {
+    final DSBClub club = _clubs.get(id_);
+    if (club != null)
+    {
+      return club;
+    }
+    for (final DSBAssociation association : _associations.values())
+    {
+      final DSBClub v = association.getClub(id_);
+      if (v != null)
+      {
+        return v;
+      }
+    }
+    return null;
+  }
+
+  public Map<String, DSBClub> getClubs()
+  {
+    return _clubs;
   }
 
   public String getId()
@@ -94,62 +140,16 @@ public class DSBVerband
     return _parentId;
   }
 
-  public Map<String, DSBVerband> getVerbaende()
-  {
-    return _verbaende;
-  }
-
-  public DSBVerband getVerband(@NotNull final String id_)
-  {
-    final DSBVerband verband = _verbaende.get(id_);
-    if (verband != null)
-    {
-      return verband;
-    }
-    for (final DSBVerband subverband : _verbaende.values())
-    {
-      final DSBVerband v = subverband.getVerband(id_);
-      if (v != null)
-      {
-        return v;
-      }
-    }
-    return null;
-  }
-
-  public DSBVerein getVerein(@NotNull final String id_)
-  {
-    final DSBVerein verein = _vereine.get(id_);
-    if (verein != null)
-    {
-      return verein;
-    }
-    for (final DSBVerband verband : _verbaende.values())
-    {
-      final DSBVerein v = verband.getVerein(id_);
-      if (v != null)
-      {
-        return v;
-      }
-    }
-    return null;
-  }
-
-  public Map<String, DSBVerein> getVereine()
-  {
-    return _vereine;
-  }
-
   @Override
   public String toString()
   {
-    return "DSBVerband{" +
+    return "DSBAssociation{" +
       "id='" + _id + '\'' +
       ", level='" + _level + '\'' +
       ", name='" + _name + '\'' +
       ", parentId='" + _parentId + '\'' +
-      ", verbaende=" + _verbaende +
-      ", vereine=" + _vereine +
+      ", associations=" + _associations +
+      ", clubs=" + _clubs +
       '}';
   }
 }

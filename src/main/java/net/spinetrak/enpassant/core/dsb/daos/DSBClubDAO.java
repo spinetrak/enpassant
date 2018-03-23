@@ -24,7 +24,7 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -33,22 +33,20 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
 
-public interface DSBVerbandDAO
+public interface DSBClubDAO
 {
+  @SqlUpdate("INSERT INTO dsb_organization (zps, name, level, isclub, parent) VALUES (:c.id, :c.name, " + (-1) + ", " + true + ", :c.association) ON CONFLICT (zps) DO UPDATE SET name = :c.name, level = " + (-1) + ", isClub = " + true + ", parent = :c.association")
+  void insertOrUpdate(@BindBean("c") final DSBClub club_);
 
-  @SqlUpdate("INSERT INTO dsb_organization (zps, name, level, isclub, parent) VALUES (:v.id, :v.name, :v.level, " + false + ", :v.parentId) ON CONFLICT (zps) DO UPDATE SET name = :v.name, level = :v.level, isClub = " + false + ", parent = :v.parentId")
-  void insertOrUpdate(@BindBean("v") final DSBVerband verband_);
+  @SqlQuery("SELECT * FROM dsb_organization WHERE isClub=true")
+  @RegisterRowMapper(DSBClubMapper.class)
+  List<DSBClub> select();
 
-  @SqlQuery("SELECT * from dsb_organization where isClub=false")
-  @RegisterRowMapper(DSBVerbandMapper.class)
-  List<DSBVerband> select();
+  @SqlQuery("SELECT * from dsb_organization where isClub=true and zps = :id")
+  @RegisterRowMapper(DSBClubMapper.class)
+  List<DSBClub> select(@Bind("id") String id_);
 
-  @SqlQuery("SELECT * from dsb_organization where isClub=false and zps = :id")
-  @RegisterRowMapper(DSBVerbandMapper.class)
-  List<DSBVerband> select(@Bind("id") String id_);
-
-  @SqlQuery("SELECT * from dsb_organization where isClub=false and parent = :id")
-  @RegisterRowMapper(DSBVerbandMapper.class)
-  List<DSBVerband> selectChildrenOf(@Bind("id") String id_);
-
+  @SqlQuery("SELECT * from dsb_organization where isClub=true and parent = :id")
+  @RegisterRowMapper(DSBClubMapper.class)
+  List<DSBClub> selectChildrenOf(@Bind("id") String id_);
 }

@@ -22,20 +22,63 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.core.dsb.daos;
+package net.spinetrak.enpassant.core.dsb.pojos;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
-import org.jdbi.v3.core.mapper.RowMapper;
-import org.jdbi.v3.core.statement.StatementContext;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-public class DSBVereinMapper implements RowMapper<DSBVerein>
+public class DSBClub
 {
-  @Override
-  public DSBVerein map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  private final String _associationId;
+  private final String _id;
+  private final String _name;
+  private final List<DSBPlayer> _players = new ArrayList<>();
+
+  public DSBClub(@NotNull final String id_, @NotNull final String name_, @NotNull final String associationId_)
   {
-    return new DSBVerein(rs_.getString("zps"), rs_.getString("name"), rs_.getString("parent"));
+    _id = id_.trim();
+    _name = name_.trim();
+    _associationId = associationId_;
+  }
+
+  public void add(@NotNull final DSBPlayer player_)
+  {
+    _players.add(player_);
+  }
+
+  public void add(@NotNull final List<DSBPlayer> players_)
+  {
+    _players.addAll(players_);
+  }
+
+  public String getAssociation()
+  {
+    return _associationId;
+  }
+
+  public String getId()
+  {
+    return _id;
+  }
+
+  public String getName()
+  {
+    return _name;
+  }
+
+  public List<DSBPlayer> getPlayers()
+  {
+    return _players;
+  }
+
+  @Override
+  public String toString()
+  {
+    return "DSBClub{" +
+
+      "id='" + _id + '\'' +
+      ", name='" + _name + '\'' +
+      '}';
   }
 }

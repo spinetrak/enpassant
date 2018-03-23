@@ -22,65 +22,21 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.core.fide;
+package net.spinetrak.enpassant.core.dsb.daos;
 
-import org.joda.time.DateTime;
+import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
+import org.jdbi.v3.core.mapper.RowMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 
-import java.util.Date;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class FIDE
+public class DWZMapper implements RowMapper<DWZ>
 {
-  private final String _country;
-  private final Integer _elo;
-  private final Integer _id;
-  private final Date _lastEvaluation;
-  private final String _title;
-
-  public FIDE(final Integer id_, final Integer elo_, final String title_, final String country_,
-              final Date lastEvaluation_)
-  {
-    _id = id_;
-    _elo = elo_;
-    _title = title_;
-    _country = country_;
-    _lastEvaluation = (lastEvaluation_ == null) ? DateTime.now().dayOfMonth().withMaximumValue().toDate() : new Date(
-      lastEvaluation_.getTime());
-  }
-
-  public String getCountry()
-  {
-    return _country;
-  }
-
-  public Integer getElo()
-  {
-    return _elo;
-  }
-
-  public Integer getId()
-  {
-    return _id;
-  }
-
-  public Date getLastEvaluation()
-  {
-    return _lastEvaluation;
-  }
-
-  public String getTitle()
-  {
-    return _title;
-  }
-
   @Override
-  public String toString()
+  public DWZ map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return "FIDE{" +
-      "country='" + _country + '\'' +
-      ", elo=" + _elo +
-      ", id=" + _id +
-      ", title='" + _title + '\'' +
-      ", lastEvaluation=" + _lastEvaluation +
-      '}';
+    return new DWZ(rs_.getString("zps"), rs_.getString("member"), rs_.getInt("dwz"), rs_.getInt("index"),
+                   rs_.getDate("lasteval"));
   }
 }

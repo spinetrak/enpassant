@@ -39,7 +39,7 @@ public class DSBDataFactory
   @NotEmpty
   private String url;
 
-  public DSBZipFileProcessor build(final Environment environment_)
+  public DSBZipFileProcessor build(@NotNull final Environment environment_)
   {
     final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService(
       "dsbZipFileProcessor").build();

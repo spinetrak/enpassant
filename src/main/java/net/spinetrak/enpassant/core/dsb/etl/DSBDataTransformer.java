@@ -24,9 +24,9 @@
 
 package net.spinetrak.enpassant.core.dsb.etl;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBSpieler;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerein;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
 import net.spinetrak.enpassant.core.utils.Converters;
@@ -50,12 +50,12 @@ public class DSBDataTransformer
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataTransformer.class);
 
-  public static DSBVerband createDSBVerbandFromZIPFile(final String dataFile_)
+  public static DSBAssociation createDSBAssociationFromZIPFile(final String dataFile_)
   {
-    LOGGER.info("Creating DSB Verband");
-    final DSBVerband dsb = new DSBVerband("00000", null, DSBVerband.BUND, "Deutscher Schachbund");
-    final List<Spieler> spielers = new ArrayList<>();
-    final List<Verein> vereine = new ArrayList<>();
+    LOGGER.info("Creating DSB Association");
+    final DSBAssociation dsb = new DSBAssociation("00000", null, DSBAssociation.BUND, "Deutscher Schachbund");
+    final List<Player> players = new ArrayList<>();
+    final List<Club> clubs = new ArrayList<>();
     ZipInputStream zipIn;
     try
     {
@@ -80,15 +80,15 @@ public class DSBDataTransformer
 
           if ("verbaende.csv".equalsIgnoreCase(csvFileName))
           {
-            updateDSBVerbaende(dsb, records);
+            updateDSBAssociations(dsb, records);
           }
           else if ("vereine.csv".equalsIgnoreCase(csvFileName))
           {
-            updateDSBVereine(vereine, records);
+            updateDSBClubs(clubs, records);
           }
           else if ("spieler.csv".equalsIgnoreCase(csvFileName))
           {
-            updateDSBPlayers(spielers, records);
+            updateDSBPlayers(players, records);
           }
         }
         catch (final IOException ex_)
@@ -101,94 +101,77 @@ public class DSBDataTransformer
     {
       LOGGER.error("Error processing ZIP file", ex_);
     }
-    for (final Verein verein : vereine)
+    for (final Club club : clubs)
     {
-      final String verbandsID = verein.getVerband();
-      final DSBVerband verband = dsb.getVerband(verbandsID);
-      verband.add(new DSBVerein(verein.getID(), verein.getName(), verband.getId()));
+      final String associationId = club.getAssociation();
+      final DSBAssociation association = dsb.getAssociation(associationId);
+      association.add(new DSBClub(club.getID(), club.getName(), association.getId()));
     }
-    LOGGER.info("Done adding vereine.");
+    LOGGER.info("Done adding clubs.");
 
-    for (final Spieler spieler : spielers)
+    for (final Player player : players)
     {
 
-      final String spielerVerein = spieler.getVereinsID();
-      final DSBVerein verein = dsb.getVerein(spielerVerein);
-      if (null == verein)
+      final String playersClub = player.getClubId();
+      final DSBClub club = dsb.getClub(playersClub);
+      if (null == club)
       {
-        final DSBVerband verband = dsb.getVerband(spielerVerein);
-        if (null != verband)
+        final DSBAssociation association = dsb.getAssociation(playersClub);
+        if (null != association)
         {
-          final DSBVerein vereinslos = verband.asVerein();
-          final DSBSpieler dsbSpieler = new DSBSpieler(vereinslos.getId(), spieler.getID(), spieler.getName(),
-                                                       spieler.getStatus(),
-                                                       spieler.getGender(),
-                                                       spieler.getEligibility(), spieler.getYOB(), spieler.getDWZ(),
-                                                       spieler.getFIDE());
-          vereinslos.add(dsbSpieler);
+          final DSBClub withoutClub = association.asClub();
+          final DSBPlayer dsbPlayer = new DSBPlayer(withoutClub.getId(), player.getID(), player.getName(),
+                                                    player.getStatus(),
+                                                    player.getGender(),
+                                                    player.getEligibility(), player.getYOB(), player.getDWZ(),
+                                                    player.getFIDE());
+          withoutClub.add(dsbPlayer);
         }
         continue;
       }
-      final DSBSpieler dsbSpieler = new DSBSpieler(verein.getId(), spieler.getID(), spieler.getName(),
-                                                   spieler.getStatus(),
-                                                   spieler.getGender(),
-                                                   spieler.getEligibility(), spieler.getYOB(), spieler.getDWZ(),
-                                                   spieler.getFIDE());
-      verein.add(dsbSpieler);
+      final DSBPlayer dsbPlayer = new DSBPlayer(club.getId(), player.getID(), player.getName(),
+                                                player.getStatus(),
+                                                player.getGender(),
+                                                player.getEligibility(), player.getYOB(), player.getDWZ(),
+                                                player.getFIDE());
+      club.add(dsbPlayer);
 
     }
-    LOGGER.info("Done adding spieler.");
+    LOGGER.info("Done adding players.");
     return dsb;
   }
 
-  private static void updateDSBPlayers(final List<Spieler> spieler_s,
-                                       final List<CSVRecord> records_)
+  private static void updateDSBAssociations(final DSBAssociation dsb_, final List<CSVRecord> records_)
   {
-    for (final CSVRecord record : records_)
-    {
-      if ("ZPS".equalsIgnoreCase(record.get(0).trim()))
-      {
-        continue;
-      }
-      final Spieler spieler = new Spieler(record.get(0), record.get(1), record.get(2), record.get(3), record.get(4),
-                                          record.get(5), record.get(6), record.get(7),
-                                          record.get(8), record.get(9), record.get(10), record.get(11),
-                                          record.get(12), record.get(13));
-      spieler_s.add(spieler);
-    }
-  }
-
-  private static void updateDSBVerbaende(final DSBVerband dsb_, final List<CSVRecord> records_)
-  {
-    final List<Verband> verbaende = new ArrayList<>();
+    final List<Association> associations = new ArrayList<>();
     for (final CSVRecord record : records_)
     {
       if ("Verband".equalsIgnoreCase(record.get(0).trim()))
       {
         continue;
       }
-      final Verband verband = new Verband(record.get(0), record.get(1), record.get(2), record.get(3));
-      verbaende.add(verband);
+      final Association association = new Association(record.get(0), record.get(1), record.get(2), record.get(3));
+      associations.add(association);
     }
 
-    //first pass for DSBVerband.LAND
-    for (final Verband verband : verbaende)
+    //first pass for DSBAssociation.LAND
+    for (final Association association : associations)
     {
-      final String parent = verband.getParent();
-      final String id = verband.getId() + "00";
+      final String parent = association.getParent();
+      final String id = association.getId() + "00";
       if (parent != null && "000".equals(parent.trim()))
       {
         final String parentId = "00000";
-        dsb_.add(new DSBVerband(id, parentId, DSBVerband.LAND, verband.getName()));
+        dsb_.add(new DSBAssociation(id, parentId, DSBAssociation.LAND, association.getName()));
       }
     }
 
 
-    //second pass for DSBVerband.BEZIRK
-    for (final Verband verband : verbaende)
+    //second pass for DSBAssociation.BEZIRK
+    for (final Association association : associations)
     {
-      final String parent = verband.getParent();
-      final String id = verband.getId() + "00";
+      final String parent = association.getParent();
+      final String id = association.getId() + "00";
       if (parent != null)
       {
         final String parentId = parent.trim() + "00";
@@ -198,12 +181,12 @@ public class DSBDataTransformer
         }
         if ('0' == (parentId.charAt(1)))
         {
-          final int level = DSBVerband.BEZIRK;
-          final DSBVerband dsbVerband = dsb_.getVerband(parentId);
-          if (dsbVerband != null)
+          final int level = DSBAssociation.BEZIRK;
+          final DSBAssociation dsbAssociation = dsb_.getAssociation(parentId);
+          if (dsbAssociation != null)
           {
-            dsbVerband.add(
-              new DSBVerband(id, parentId, level, verband.getName()));
+            dsbAssociation.add(
+              new DSBAssociation(id, parentId, level, association.getName()));
           }
           else
           {
@@ -213,25 +196,25 @@ public class DSBDataTransformer
       }
     }
 
-    //third pass for DSBVerband.KREIS
-    for (final Verband verband : verbaende)
+    //third pass for DSBAssociation.KREIS
+    for (final Association association : associations)
     {
-      final String parent = verband.getParent();
-      final String id = verband.getId() + "00";
+      final String parent = association.getParent();
+      final String id = association.getId() + "00";
       if (parent != null)
       {
         final String parentId = parent.trim() + "00";
         if ('0' != (parentId.charAt(1)))
         {
-          final int level = DSBVerband.KREIS;
-          final DSBVerband dsbVerband = dsb_.getVerband(parentId);
-          dsbVerband.add(new DSBVerband(id, parentId, level, verband.getName()));
+          final int level = DSBAssociation.KREIS;
+          final DSBAssociation dsbAssociation = dsb_.getAssociation(parentId);
+          dsbAssociation.add(new DSBAssociation(id, parentId, level, association.getName()));
         }
       }
     }
   }
 
-  private static void updateDSBVereine(final List<Verein> verein_s, final List<CSVRecord> records_)
+  private static void updateDSBClubs(final List<Club> clubs_, final List<CSVRecord> records_)
   {
     for (final CSVRecord record : records_)
     {
@@ -239,12 +222,31 @@ public class DSBDataTransformer
       {
         continue;
       }
-      final Verein verein = new Verein(record.get(0), record.get(1) + "0000", record.get(2) + "00", record.get(3));
-      verein_s.add(verein);
+      final Club club = new Club(record.get(0), record.get(1) + "0000", record.get(2) + "00", record.get(3));
+      clubs_.add(club);
     }
+    LOGGER.info("Added " + clubs_.size() + " clubs");
   }
 
-  private static class Spieler
+  private static void updateDSBPlayers(final List<Player> players_,
+                                       final List<CSVRecord> records_)
+  {
+    for (final CSVRecord record : records_)
+    {
+      if ("ZPS".equalsIgnoreCase(record.get(0).trim()))
+      {
+        continue;
+      }
+      final Player player = new Player(record.get(0), record.get(1), record.get(2), record.get(3), record.get(4),
+                                       record.get(5), record.get(6), record.get(7),
+                                       record.get(8), record.get(9), record.get(10), record.get(11),
+                                       record.get(12), record.get(13));
+      players_.add(player);
+    }
+    LOGGER.info("Added " + players_.size() + " players");
+  }
+
+  private static class Player
   {
     final String _dwz;
     final String _eligibility;
@@ -261,13 +263,13 @@ public class DSBDataTransformer
     final String _yearOfBirth;
     final String _zps;
 
-    Spieler(final String zps_, final String membernr_, final String status_, final String name_,
-            final String gender_, final String eligibility_, final String yearOfBirth_,
-            final String lastEvaluation_, final String dwz_, final String index_, final String fideElo_,
-            final String fideTitle_, final String fideID, final String fideCountry_)
+    Player(final String zps_, final String membernr_, final String status_, final String name_,
+           final String gender_, final String eligibility_, final String yearOfBirth_,
+           final String lastEvaluation_, final String dwz_, final String index_, final String fideElo_,
+           final String fideTitle_, final String fideID, final String fideCountry_)
     {
       _zps = zps_;
-      _membernr = membernr_;
+      _membernr = leftPad(membernr_);
       _status = status_;
       _name = name_;
       _gender = gender_;
@@ -282,11 +284,16 @@ public class DSBDataTransformer
       _fideCountry = fideCountry_;
     }
 
+    String getClubId()
+    {
+      return _zps;
+    }
+
     DWZ getDWZ()
     {
       if (Converters.noNullsorEmpties(_dwz, _index, _lastEvaluation))
       {
-        return new DWZ(Converters.integerFromString(_dwz), Converters.integerFromString(_index),
+        return new DWZ(_zps, _membernr, Converters.integerFromString(_dwz), Converters.integerFromString(_index),
                        Converters.dateFromString(_lastEvaluation, "YYYYww"));
       }
       return null;
@@ -303,7 +310,7 @@ public class DSBDataTransformer
       {
         return new FIDE(Converters.integerFromString(_fideID),
                         Converters.integerFromString(_fideElo),
-                        _fideTitle, _fideCountry);
+                        _fideTitle, _fideCountry, null);
       }
       return null;
     }
@@ -325,11 +332,6 @@ public class DSBDataTransformer
     String getStatus()
     {
       return _status;
-    }
-
-    String getVereinsID()
-    {
-      return _zps;
     }
 
     Integer getYOB()
@@ -362,31 +364,40 @@ public class DSBDataTransformer
         ", fideCountry='" + _fideCountry + '\'' +
         '}';
     }
+
+    private String leftPad(final String str_)
+    {
+      if (str_ != null)
+      {
+        return String.format("%04d", Integer.parseInt(str_));
+      }
+      return null;
+    }
   }
 
-  private static class Verein
+  private static class Club
   {
-    private final String _landesverband;
+    private final String _association;
     private final String _name;
-    private final String _verband;
+    private final String _regionalAssociation;
     private final String _zps;
 
-    Verein(final String zps_, final String landesverband_, final String verband_, final String name_)
+    Club(final String zps_, final String regionalAssociation_, final String association_, final String name_)
     {
-      _verband = verband_;
-      _landesverband = landesverband_;
+      _association = association_;
+      _regionalAssociation = regionalAssociation_;
       _zps = zps_;
       _name = name_;
+    }
+
+    String getAssociation()
+    {
+      return _association;
     }
 
     String getID()
     {
       return _zps;
-    }
-
-    String getVerband()
-    {
-      return _verband;
     }
 
     public String getName()
@@ -398,27 +409,27 @@ public class DSBDataTransformer
     public String toString()
     {
       return "Club{" +
-        "landesverband='" + _landesverband + '\'' +
+        "landesverband='" + _regionalAssociation + '\'' +
         ", name='" + _name + '\'' +
         ", zps='" + _zps + '\'' +
-        ", verband='" + _verband + '\'' +
+        ", verband='" + _association + '\'' +
         '}';
     }
   }
 
-  private static class Verband
+  private static class Association
   {
     private final String _id;
     private final String _name;
     private final String _parent;
     private final String _region;
 
-    Verband(final String id_, final String region_, final String parentverband_,
-            final String name_)
+    Association(final String id_, final String region_, final String parent_,
+                final String name_)
     {
       _id = id_;
       _region = region_;
-      _parent = parentverband_;
+      _parent = parent_;
       _name = name_;
     }
 

@@ -27,36 +27,70 @@ package net.spinetrak.enpassant.core.dsb.pojos;
 import net.spinetrak.enpassant.core.fide.FIDE;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DSBSpieler
+public class DSBPlayer
 {
-  private final DWZ _dwz;
+  private final List<DWZ> _dwz = new ArrayList<>();
   private final String _eligibility;
-  private final FIDE _fide;
+  private final List<FIDE> _fide = new ArrayList<>();
   private final String _gender;
   private final String _id;
   private final String _name;
   private final String _status;
   private final Integer _yob;
   private final String _zps;
+  private Integer _fideId;
 
-  public DSBSpieler(final String zps_, @NotNull final String id_, @NotNull final String name_,
-                    final String status_,
-                    final String gender_, final String eligibility_, final Integer yob_, final DWZ dwz_,
-                    final FIDE fide_)
+  public DSBPlayer(final String zps_, @NotNull final String id_, @NotNull final String name_,
+                   final String status_,
+                   final String gender_, final String eligibility_, final Integer yob_, final DWZ dwz_,
+                   final FIDE fide_)
   {
-    _id = id_.trim();
+    this(zps_, id_, name_, status_, gender_, eligibility_, yob_, dwz_);
+
+    if (fide_ != null)
+    {
+      _fideId = fide_.getId();
+      _fide.add(fide_);
+    }
+    else
+    {
+      _fideId = -1;
+    }
+  }
+
+  public DSBPlayer(final String zps_, final String member_, final String name_, final String status_,
+                   final String gender_, final String eligibility_, final int yob_, final DWZ dwz_, final int fideId_)
+  {
+    this(zps_, member_, name_, status_, gender_, eligibility_, yob_, dwz_);
+    _fideId = fideId_;
+  }
+
+  private DSBPlayer(final String zps_, final String id_, final String name_, final String status_,
+                    final String gender_, final String eligibility_, final int yob_, final DWZ dwz_)
+  {
     _zps = zps_;
+    _id = id_.trim();
     _name = name_.trim();
     _status = status_;
     _gender = gender_;
     _eligibility = eligibility_;
     _yob = yob_;
-    _dwz = dwz_;
-    _fide = fide_;
+
+    if (dwz_ != null)
+    {
+      _dwz.add(dwz_);
+    }
   }
 
-  public DWZ getDwz()
+  public String getClub()
+  {
+    return _zps;
+  }
+
+  public List<DWZ> getDWZ()
   {
     return _dwz;
   }
@@ -66,9 +100,14 @@ public class DSBSpieler
     return _eligibility;
   }
 
-  public FIDE getFide()
+  public List<FIDE> getFIDE()
   {
     return _fide;
+  }
+
+  public Integer getFideId()
+  {
+    return _fideId;
   }
 
   public String getGender()
@@ -91,20 +130,25 @@ public class DSBSpieler
     return _status;
   }
 
-  public String getVerein()
-  {
-    return _zps;
-  }
-
   public Integer getYob()
   {
     return _yob;
   }
 
+  public void setDWZ(final List<DWZ> dwz_)
+  {
+    _dwz.addAll(dwz_);
+  }
+
+  public void setFIDE(final List<FIDE> fide_)
+  {
+    _fide.addAll(fide_);
+  }
+
   @Override
   public String toString()
   {
-    return "DSBSpieler{" +
+    return "DSBPlayer{" +
       "dwz=" + _dwz +
       ", eligibility='" + _eligibility + '\'' +
       ", fide=" + _fide +
@@ -112,7 +156,7 @@ public class DSBSpieler
       ", id='" + _id + '\'' +
       ", name='" + _name + '\'' +
       ", status='" + _status + '\'' +
-      ", verein=" + _zps +
+      ", club=" + _zps +
       ", yob=" + _yob +
       '}';
   }

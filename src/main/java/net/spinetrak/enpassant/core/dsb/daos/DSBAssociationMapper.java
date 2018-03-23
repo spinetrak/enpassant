@@ -24,18 +24,19 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBVerband;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DSBVerbandMapper implements RowMapper<DSBVerband>
+public class DSBAssociationMapper implements RowMapper<DSBAssociation>
 {
   @Override
-  public DSBVerband map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  public DSBAssociation map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return new DSBVerband(rs_.getString("zps"), rs_.getString("parent"), rs_.getInt("level"), rs_.getString("name"));
+    return new DSBAssociation(rs_.getString("zps"), rs_.getString("parent"), rs_.getInt("level"),
+                              rs_.getString("name"));
   }
 }

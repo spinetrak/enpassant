@@ -22,63 +22,21 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.core.dsb.pojos;
+package net.spinetrak.enpassant.core.dsb.daos;
 
-import javax.validation.constraints.NotNull;
-import java.util.ArrayList;
-import java.util.List;
+import net.spinetrak.enpassant.core.fide.FIDE;
+import org.jdbi.v3.core.mapper.RowMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 
-public class DSBVerein
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class FIDEMapper implements RowMapper<FIDE>
 {
-  private final String _id;
-  private final String _name;
-  private final List<DSBSpieler> _spieler = new ArrayList<>();
-  private final String _verbandId;
-
-  public DSBVerein(@NotNull final String id_, @NotNull final String name_, @NotNull final String verbandId_)
-  {
-    _id = id_.trim();
-    _name = name_.trim();
-    _verbandId = verbandId_;
-  }
-
-  public void add(@NotNull final DSBSpieler spieler_)
-  {
-    _spieler.add(spieler_);
-  }
-
-  public void add(@NotNull final List<DSBSpieler> dsbSpielers_)
-  {
-    _spieler.addAll(dsbSpielers_);
-  }
-
-  public String getId()
-  {
-    return _id;
-  }
-
-  public String getName()
-  {
-    return _name;
-  }
-
-  public List<DSBSpieler> getSpieler()
-  {
-    return _spieler;
-  }
-
-  public String getVerband()
-  {
-    return _verbandId;
-  }
-
   @Override
-  public String toString()
+  public FIDE map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return "DSBVerein{" +
-
-      "id='" + _id + '\'' +
-      ", name='" + _name + '\'' +
-      '}';
+    return new FIDE(rs_.getInt("id"), rs_.getInt("elo"), rs_.getString("title"), rs_.getString("country"),
+                    rs_.getDate("lasteval"));
   }
 }

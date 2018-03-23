@@ -35,9 +35,9 @@ import io.dropwizard.jdbi3.JdbiFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
-import net.spinetrak.enpassant.core.dsb.daos.DSBSpielerDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBVerbandDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBVereinDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBAssociationDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBClubDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
 import net.spinetrak.enpassant.db.DSBDataUpdater;
 import net.spinetrak.enpassant.health.DSBDataHealthCheck;
 import net.spinetrak.enpassant.resources.DSBDataResource;
@@ -102,17 +102,17 @@ public class EnPassantApp extends Application<EnPassantConfig>
     flyway.migrate();
     flyway.validate();
 
-    final DSBVerbandDAO dsbVerbandDAO = jdbi.onDemand(DSBVerbandDAO.class);
-    final DSBVereinDAO dsbVereinDAO = jdbi.onDemand(DSBVereinDAO.class);
-    final DSBSpielerDAO dsbSpielerDAO = jdbi.onDemand(DSBSpielerDAO.class);
+    final DSBAssociationDAO dsbAssociationDAO = jdbi.onDemand(DSBAssociationDAO.class);
+    final DSBClubDAO dsbClubDAO = jdbi.onDemand(DSBClubDAO.class);
+    final DSBPlayerDAO dsbPlayerDAO = jdbi.onDemand(DSBPlayerDAO.class);
 
     final DSBZipFileProcessor dsbZipFileProcessor = configuration_.getDSBDataFactory().build(environment_);
-    final DSBDataResource dsbDataResource = new DSBDataResource(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO);
+    final DSBDataResource dsbDataResource = new DSBDataResource(dsbAssociationDAO, dsbClubDAO, dsbPlayerDAO);
     environment_.jersey().register(dsbDataResource);
     environment_.healthChecks().register("dsbZipFileProcessor", new DSBDataHealthCheck(dsbZipFileProcessor));
 
     final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService("dsbDataUpdater").build();
-    final DSBDataUpdater dsbDataUpdater = new DSBDataUpdater(dsbVerbandDAO, dsbVereinDAO, dsbSpielerDAO,
+    final DSBDataUpdater dsbDataUpdater = new DSBDataUpdater(dsbAssociationDAO, dsbClubDAO, dsbPlayerDAO,
                                                              dsbZipFileProcessor);
     ses.scheduleWithFixedDelay(dsbDataUpdater, 60, configuration_.getDSBDataFactory().getRefreshInterval(),
                                TimeUnit.SECONDS);
