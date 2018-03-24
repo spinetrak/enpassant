@@ -32,23 +32,24 @@ import java.util.List;
 
 public class DSBPlayer
 {
+  private final String _clubId;
   private final List<DWZ> _dwz = new ArrayList<>();
   private final String _eligibility;
   private final List<FIDE> _fide = new ArrayList<>();
   private final String _gender;
-  private final String _id;
+  private final String _memberId;
   private final String _name;
   private final String _status;
   private final Integer _yob;
-  private final String _zps;
+  private int _dsbId;
   private Integer _fideId;
 
-  public DSBPlayer(final String zps_, @NotNull final String id_, @NotNull final String name_,
+  public DSBPlayer(final String clubId_, @NotNull final String memberId_, final int dsbId_, @NotNull final String name_,
                    final String status_,
                    final String gender_, final String eligibility_, final Integer yob_, final DWZ dwz_,
                    final FIDE fide_)
   {
-    this(zps_, id_, name_, status_, gender_, eligibility_, yob_, dwz_);
+    this(clubId_, memberId_, dsbId_, name_, status_, gender_, eligibility_, yob_, dwz_);
 
     if (fide_ != null)
     {
@@ -61,18 +62,21 @@ public class DSBPlayer
     }
   }
 
-  public DSBPlayer(final String zps_, final String member_, final String name_, final String status_,
+  public DSBPlayer(final String clubId_, final String memberId_, final int dsbId_, final String name_,
+                   final String status_,
                    final String gender_, final String eligibility_, final int yob_, final DWZ dwz_, final int fideId_)
   {
-    this(zps_, member_, name_, status_, gender_, eligibility_, yob_, dwz_);
+    this(clubId_, memberId_, dsbId_, name_, status_, gender_, eligibility_, yob_, dwz_);
     _fideId = fideId_;
   }
 
-  private DSBPlayer(final String zps_, final String id_, final String name_, final String status_,
+  private DSBPlayer(final String clubId_, final String memberId_, final int dsbId_, final String name_,
+                    final String status_,
                     final String gender_, final String eligibility_, final int yob_, final DWZ dwz_)
   {
-    _zps = zps_;
-    _id = id_.trim();
+    _clubId = clubId_;
+    _memberId = memberId_.trim();
+    _dsbId = dsbId_;
     _name = name_.trim();
     _status = status_;
     _gender = gender_;
@@ -85,14 +89,19 @@ public class DSBPlayer
     }
   }
 
-  public String getClub()
+  public String getClubId()
   {
-    return _zps;
+    return _clubId;
   }
 
   public List<DWZ> getDWZ()
   {
     return _dwz;
+  }
+
+  public int getDsbId()
+  {
+    return _dsbId;
   }
 
   public String getEligibility()
@@ -115,9 +124,9 @@ public class DSBPlayer
     return _gender;
   }
 
-  public String getId()
+  public String getMemberId()
   {
-    return _id;
+    return _memberId;
   }
 
   public String getName()
@@ -140,6 +149,11 @@ public class DSBPlayer
     _dwz.addAll(dwz_);
   }
 
+  public void setDsbId(final int dsbid_)
+  {
+    _dsbId = dsbid_;
+  }
+
   public void setFIDE(final List<FIDE> fide_)
   {
     _fide.addAll(fide_);
@@ -149,15 +163,17 @@ public class DSBPlayer
   public String toString()
   {
     return "DSBPlayer{" +
-      "dwz=" + _dwz +
+      "_dwz=" + _dwz +
       ", eligibility='" + _eligibility + '\'' +
       ", fide=" + _fide +
-      ", gender=" + _gender +
-      ", id='" + _id + '\'' +
+      ", gender='" + _gender + '\'' +
+      ", memberId='" + _memberId + '\'' +
       ", name='" + _name + '\'' +
       ", status='" + _status + '\'' +
-      ", club=" + _zps +
       ", yob=" + _yob +
+      ", clubId='" + _clubId + '\'' +
+      ", dsbId=" + _dsbId +
+      ", fideId=" + _fideId +
       '}';
   }
 }

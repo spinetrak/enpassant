@@ -36,18 +36,18 @@ import java.util.List;
 public interface DSBAssociationDAO
 {
 
-  @SqlUpdate("INSERT INTO dsb_organization (zps, name, level, isclub, parent) VALUES (:a.id, :a.name, :a.level, " + false + ", :a.parentId) ON CONFLICT (zps) DO UPDATE SET name = :a.name, level = :a.level, isClub = " + false + ", parent = :a.parentId")
+  @SqlUpdate("INSERT INTO dsb_organization (id, name, level, isclub, parentId) VALUES (:a.associationId, :a.name, :a.level, " + false + ", :a.parentId) ON CONFLICT (id) DO UPDATE SET name = :a.name, level = :a.level, isClub = " + false + ", parentId = :a.parentId")
   void insertOrUpdate(@BindBean("a") final DSBAssociation association_);
 
   @SqlQuery("SELECT * from dsb_organization where isClub=false")
   @RegisterRowMapper(DSBAssociationMapper.class)
   List<DSBAssociation> select();
 
-  @SqlQuery("SELECT * from dsb_organization where isClub=false and zps = :id")
+  @SqlQuery("SELECT * from dsb_organization where isClub=false and id = :id")
   @RegisterRowMapper(DSBAssociationMapper.class)
   List<DSBAssociation> select(@Bind("id") String id_);
 
-  @SqlQuery("SELECT * from dsb_organization where isClub=false and parent = :id")
+  @SqlQuery("SELECT * from dsb_organization where isClub=false and parentId = :id")
   @RegisterRowMapper(DSBAssociationMapper.class)
   List<DSBAssociation> selectChildrenOf(@Bind("id") String id_);
 

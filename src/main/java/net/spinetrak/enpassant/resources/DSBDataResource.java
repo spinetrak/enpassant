@@ -82,7 +82,7 @@ public class DSBDataResource
     if (!clubs.isEmpty())
     {
       final DSBClub club = clubs.get(0);
-      club.add(_dsbPlayerDAO.select(club.getId()));
+      club.add(_dsbPlayerDAO.select(club.getClubId()));
 
       for (final DSBPlayer player : club.getPlayers())
       {
@@ -123,17 +123,17 @@ public class DSBDataResource
    **/
   private List<DSBAssociation> getChildren(final DSBAssociation association_)
   {
-    final List<DSBAssociation> associations = _dsbAssociationDAO.selectChildrenOf(association_.getId());
+    final List<DSBAssociation> associations = _dsbAssociationDAO.selectChildrenOf(association_.getAssociationId());
     for (final DSBAssociation association : associations)
     {
       getChildren(association);
       association_.add(association);
     }
 
-    final List<DSBClub> clubs = _dsbClubDAO.selectChildrenOf(association_.getId());
+    final List<DSBClub> clubs = _dsbClubDAO.selectChildrenOf(association_.getAssociationId());
     for (final DSBClub club : clubs)
     {
-      club.add(_dsbPlayerDAO.select(club.getId()));
+      club.add(_dsbPlayerDAO.select(club.getClubId()));
       association_.add(club);
     }
     return associations;

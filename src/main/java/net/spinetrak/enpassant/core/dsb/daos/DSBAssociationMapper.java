@@ -36,7 +36,7 @@ public class DSBAssociationMapper implements RowMapper<DSBAssociation>
   @Override
   public DSBAssociation map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return new DSBAssociation(rs_.getString("zps"), rs_.getString("parent"), rs_.getInt("level"),
+    return new DSBAssociation(rs_.getString("id"), rs_.getString("parentId"), rs_.getInt("level"),
                               rs_.getString("name"));
   }
 }

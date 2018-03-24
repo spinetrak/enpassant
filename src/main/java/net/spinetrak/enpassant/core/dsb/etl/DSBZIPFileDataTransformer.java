@@ -46,9 +46,9 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class DSBDataTransformer
+public class DSBZIPFileDataTransformer
 {
-  private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataTransformer.class);
+  private final static Logger LOGGER = LoggerFactory.getLogger(DSBZIPFileDataTransformer.class);
 
   public static DSBAssociation createDSBAssociationFromZIPFile(final String dataFile_)
   {
@@ -76,7 +76,7 @@ public class DSBDataTransformer
           isr = new InputStreamReader(zipIn, Charset.forName("Cp1252"));
           final CSVParser csv = new CSVParser(isr, CSVFormat.DEFAULT);
           final List<CSVRecord> records = csv.getRecords();
-          LOGGER.info("Found records: " + records.size());
+          LOGGER.info("Found " + records.size() + " records in " + csvFileName);
 
           if ("verbaende.csv".equalsIgnoreCase(csvFileName))
           {
@@ -105,7 +105,7 @@ public class DSBDataTransformer
     {
       final String associationId = club.getAssociation();
       final DSBAssociation association = dsb.getAssociation(associationId);
-      association.add(new DSBClub(club.getID(), club.getName(), association.getId()));
+      association.add(new DSBClub(club.getID(), club.getName(), association.getAssociationId()));
     }
     LOGGER.info("Done adding clubs.");
 
@@ -120,7 +120,7 @@ public class DSBDataTransformer
         if (null != association)
         {
           final DSBClub withoutClub = association.asClub();
-          final DSBPlayer dsbPlayer = new DSBPlayer(withoutClub.getId(), player.getID(), player.getName(),
+          final DSBPlayer dsbPlayer = new DSBPlayer(withoutClub.getClubId(), player.getID(), -1, player.getName(),
                                                     player.getStatus(),
                                                     player.getGender(),
                                                     player.getEligibility(), player.getYOB(), player.getDWZ(),
@@ -129,7 +129,7 @@ public class DSBDataTransformer
         }
         continue;
       }
-      final DSBPlayer dsbPlayer = new DSBPlayer(club.getId(), player.getID(), player.getName(),
+      final DSBPlayer dsbPlayer = new DSBPlayer(club.getClubId(), player.getID(), -1, player.getName(),
                                                 player.getStatus(),
                                                 player.getGender(),
                                                 player.getEligibility(), player.getYOB(), player.getDWZ(),
@@ -269,7 +269,7 @@ public class DSBDataTransformer
            final String fideTitle_, final String fideID, final String fideCountry_)
     {
       _zps = zps_;
-      _membernr = leftPad(membernr_);
+      _membernr = Converters.leftPad(membernr_);
       _status = status_;
       _name = name_;
       _gender = gender_;
@@ -365,14 +365,6 @@ public class DSBDataTransformer
         '}';
     }
 
-    private String leftPad(final String str_)
-    {
-      if (str_ != null)
-      {
-        return String.format("%04d", Integer.parseInt(str_));
-      }
-      return null;
-    }
   }
 
   private static class Club

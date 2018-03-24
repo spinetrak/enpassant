@@ -28,6 +28,7 @@ import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
 import net.spinetrak.enpassant.core.dsb.daos.DSBAssociationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBClubDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
+import net.spinetrak.enpassant.core.dsb.etl.DSBCSVFileDataTransformer;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
@@ -35,6 +36,8 @@ import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 public class DSBDataUpdater implements Runnable
 {
@@ -62,33 +65,43 @@ public class DSBDataUpdater implements Runnable
 
   private void updateDatabase(final DSBAssociation dsbAssociation_)
   {
+
     LOGGER.info("Upserting association: " + dsbAssociation_.getName());
     _dsbAssociationDAO.insertOrUpdate(dsbAssociation_);
     for (final DSBClub club : dsbAssociation_.getClubs().values())
-    {
-      _dsbClubDAO.insertOrUpdate(club);
-      for (final DSBPlayer player : club.getPlayers())
       {
-        _dsbPlayerDAO.insertOrUpdatePlayer(player);
-        if (player.getDWZ() != null)
+        final Map<String, Integer> zpsToDSBIdMapping = new DSBCSVFileDataTransformer().getZPStoDSBIDMapping(
+          club.getClubId());
+        _dsbClubDAO.insertOrUpdate(club);
+        for (final DSBPlayer player : club.getPlayers())
         {
-          for (final DWZ dwz : player.getDWZ())
+          final Integer dsbid = zpsToDSBIdMapping.get(player.getClubId() + "-" + player.getMemberId());
+          if (dsbid != null)
           {
-            _dsbPlayerDAO.insertOrUpdateDWZ(dwz);
+            player.setDsbId(dsbid);
           }
-        }
-        if (player.getFIDE() != null)
-        {
-          for (final FIDE fide : player.getFIDE())
+          _dsbPlayerDAO.insertOrUpdatePlayer(player);
+
+          if (player.getDWZ() != null)
           {
-            _dsbPlayerDAO.insertOrUpdateFIDE(fide);
+            for (final DWZ dwz : player.getDWZ())
+            {
+              _dsbPlayerDAO.insertOrUpdateDWZ(dwz);
+            }
+          }
+          if (player.getFIDE() != null)
+          {
+            for (final FIDE fide : player.getFIDE())
+            {
+              _dsbPlayerDAO.insertOrUpdateFIDE(fide);
+            }
           }
         }
       }
-    }
     for (final DSBAssociation association : dsbAssociation_.getAssociations().values())
     {
       updateDatabase(association);
     }
+
   }
 }

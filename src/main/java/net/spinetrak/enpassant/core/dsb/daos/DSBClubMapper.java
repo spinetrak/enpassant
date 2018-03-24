@@ -36,6 +36,6 @@ public class DSBClubMapper implements RowMapper<DSBClub>
   @Override
   public DSBClub map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return new DSBClub(rs_.getString("zps"), rs_.getString("name"), rs_.getString("parent"));
+    return new DSBClub(rs_.getString("id"), rs_.getString("name"), rs_.getString("parentId"));
   }
 }

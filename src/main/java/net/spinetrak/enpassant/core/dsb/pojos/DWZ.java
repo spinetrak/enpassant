@@ -30,35 +30,30 @@ import java.util.Date;
 
 public class DWZ
 {
+  private final String _clubId;
   private final Integer _dwz;
-  private final String _id;
   private final Integer _index;
   private final Date _lastEvaluation;
-  private final String _zps;
+  private final String _memberId;
 
-  public DWZ(@NotNull final String zps_, @NotNull final String id_, @NotNull final Integer dwz_,
+  public DWZ(@NotNull final String clubId_, @NotNull final String memberId_, @NotNull final Integer dwz_,
              @NotNull final Integer index_, @NotNull final Date lastEvaluation_)
   {
-    _zps = zps_;
-    _id = id_;
+    _clubId = clubId_;
+    _memberId = memberId_;
     _dwz = dwz_;
     _index = index_;
     _lastEvaluation = new Date(lastEvaluation_.getTime());
   }
 
-  public String getClub()
+  public String getClubId()
   {
-    return _zps;
+    return _clubId;
   }
 
   public Integer getDwz()
   {
     return _dwz;
-  }
-
-  public String getId()
-  {
-    return _id;
   }
 
   public Integer getIndex()
@@ -71,15 +66,20 @@ public class DWZ
     return new Date(_lastEvaluation.getTime());
   }
 
+  public String getMemberId()
+  {
+    return _memberId;
+  }
+
   @Override
   public String toString()
   {
     return "DWZ{" +
       "dwz=" + _dwz +
-      ", id='" + _id + '\'' +
+      ", memberId='" + _memberId + '\'' +
       ", index=" + _index +
       ", lastEvaluation=" + _lastEvaluation +
-      ", zps='" + _zps + '\'' +
+      ", clubId='" + _clubId + '\'' +
       '}';
   }
 

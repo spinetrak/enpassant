@@ -37,28 +37,28 @@ import java.util.List;
 
 public interface DSBPlayerDAO
 {
-  @SqlUpdate("INSERT INTO dwz (zps, member, lasteval, dwz, index) VALUES (:d.club, :d.id, :d.lastEvaluation, :d.dwz, :d.index) ON CONFLICT (zps, member, lasteval) DO NOTHING")
+  @SqlUpdate("INSERT INTO dwz (clubId, memberId, lasteval, dwz, index) VALUES (:d.clubId, :d.memberId, :d.lastEvaluation, :d.dwz, :d.index) ON CONFLICT (clubId, memberId, lasteval) DO NOTHING")
   void insertOrUpdateDWZ(@BindBean("d") final DWZ dwz_);
 
   @SqlUpdate("INSERT INTO fide (id, elo, title, country, lasteval) VALUES (:f.id, :f.elo, :f.title, :f.country, :f.lastEvaluation) ON CONFLICT (id, lasteval) DO NOTHING")
   void insertOrUpdateFIDE(@BindBean("f") final FIDE fide_);
 
-  @SqlUpdate("INSERT INTO dsb_player (zps, member, dsbid, fideid, name, status, gender, yob, eligibility) VALUES (:p.club, :p.id, " + (-1) + ", :p.fideId, :p.name, :p.status, :p.gender, :p.yob, :p.eligibility) ON CONFLICT (zps,member) DO UPDATE SET dsbid = " + (-1) + ", fideid = :p.fideId, name = :p.name, status = :p.status, gender = :p.gender, yob = :p.yob")
+  @SqlUpdate("INSERT INTO dsb_player (clubId, memberId, dsbId, fideId, name, status, gender, yob, eligibility) VALUES (:p.clubId, :p.memberId, :p.dsbId, :p.fideId, :p.name, :p.status, :p.gender, :p.yob, :p.eligibility) ON CONFLICT (clubId,memberId) DO UPDATE SET dsbId = :p.dsbId, fideId = :p.fideId, name = :p.name, status = :p.status, gender = :p.gender, yob = :p.yob")
   void insertOrUpdatePlayer(@BindBean("p") final DSBPlayer player_);
 
   @SqlQuery("SELECT * FROM dsb_player")
   @RegisterRowMapper(DSBPlayerMapper.class)
   List<DSBPlayer> select();
 
-  @SqlQuery("SELECT * FROM dsb_player where zps = :club and member = :id")
+  @SqlQuery("SELECT * FROM dsb_player where clubId = :clubId and memberId = :memberId")
   @RegisterRowMapper(DSBPlayerMapper.class)
-  List<DSBPlayer> select(@Bind("club") final String clubId_, @Bind("id") final String memberId_);
+  List<DSBPlayer> select(@Bind("clubId") final String clubId_, @Bind("memberId") final String memberId_);
 
-  @SqlQuery("SELECT * FROM dsb_player where zps = :zps")
+  @SqlQuery("SELECT * FROM dsb_player where clubId = :clubId")
   @RegisterRowMapper(DSBPlayerMapper.class)
-  List<DSBPlayer> select(@Bind("zps") final String clubId_);
+  List<DSBPlayer> select(@Bind("clubId") final String clubId_);
 
-  @SqlQuery("SELECT * FROM dwz where zps = :p.club and member = :p.id")
+  @SqlQuery("SELECT * FROM dwz where clubId = :p.clubId and memberId = :p.memberId")
   @RegisterRowMapper(DWZMapper.class)
   List<DWZ> selectDWZ(@BindBean("p") final DSBPlayer player_);
 

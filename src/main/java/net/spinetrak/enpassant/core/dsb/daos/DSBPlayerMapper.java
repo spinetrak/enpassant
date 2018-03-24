@@ -36,8 +36,8 @@ public class DSBPlayerMapper implements RowMapper<DSBPlayer>
   @Override
   public DSBPlayer map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return new DSBPlayer(rs_.getString("zps"), rs_.getString("member"), rs_.getString("name"),
+    return new DSBPlayer(rs_.getString("clubId"), rs_.getString("memberId"), rs_.getInt("dsbId"), rs_.getString("name"),
                          rs_.getString("status"), rs_.getString("gender"), rs_.getString("eligibility"),
-                         rs_.getInt("yob"), null, rs_.getInt("fideid"));
+                         rs_.getInt("yob"), null, rs_.getInt("fideId"));
   }
 }

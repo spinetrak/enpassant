@@ -24,7 +24,7 @@
 
 package net.spinetrak.enpassant.configuration;
 
-import net.spinetrak.enpassant.core.dsb.etl.DSBDataTransformer;
+import net.spinetrak.enpassant.core.dsb.etl.DSBZIPFileDataTransformer;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -93,7 +93,7 @@ public class DSBZipFileProcessor implements Runnable
       LOGGER.info("Downloading " + _url);
       downloadZipFile();
     }
-    _dsb = DSBDataTransformer.createDSBAssociationFromZIPFile(DSB_DATA_FILE);
+    _dsb = DSBZIPFileDataTransformer.createDSBAssociationFromZIPFile(DSB_DATA_FILE);
 
     _lastUpdate = new Date();
   }

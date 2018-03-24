@@ -31,13 +31,13 @@ import java.util.List;
 public class DSBClub
 {
   private final String _associationId;
-  private final String _id;
+  private final String _clubId;
   private final String _name;
   private final List<DSBPlayer> _players = new ArrayList<>();
 
-  public DSBClub(@NotNull final String id_, @NotNull final String name_, @NotNull final String associationId_)
+  public DSBClub(@NotNull final String clubId_, @NotNull final String name_, @NotNull final String associationId_)
   {
-    _id = id_.trim();
+    _clubId = clubId_.trim();
     _name = name_.trim();
     _associationId = associationId_;
   }
@@ -52,14 +52,14 @@ public class DSBClub
     _players.addAll(players_);
   }
 
-  public String getAssociation()
+  public String getAssociationId()
   {
     return _associationId;
   }
 
-  public String getId()
+  public String getClubId()
   {
-    return _id;
+    return _clubId;
   }
 
   public String getName()
@@ -76,8 +76,8 @@ public class DSBClub
   public String toString()
   {
     return "DSBClub{" +
-
-      "id='" + _id + '\'' +
+      "associationId='" + _associationId + '\'' +
+      ", clubId='" + _clubId + '\'' +
       ", name='" + _name + '\'' +
       '}';
   }

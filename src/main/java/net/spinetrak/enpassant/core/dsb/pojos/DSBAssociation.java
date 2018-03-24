@@ -34,18 +34,18 @@ public class DSBAssociation
   public final static int BUND = 0;
   public final static int KREIS = 3;
   public final static int LAND = 1;
+  private final String _associationId;
   private final Map<String, DSBAssociation> _associations = new HashMap<>();
   private final Map<String, DSBClub> _clubs = new HashMap<>();
-  private final String _id;
   private final int _level;
   private final String _name;
   private final String _parentId;
   private DSBClub _asClub;
 
-  public DSBAssociation(@NotNull final String id_, final String parentId_, final int level,
+  public DSBAssociation(@NotNull final String associationId_, final String parentId_, final int level,
                         @NotNull final String name_)
   {
-    _id = id_.trim();
+    _associationId = associationId_.trim();
     _parentId = parentId_;
     _level = level;
     _name = name_.trim();
@@ -53,12 +53,12 @@ public class DSBAssociation
 
   public void add(@NotNull final DSBClub club_)
   {
-    _clubs.put(club_.getId(), club_);
+    _clubs.put(club_.getClubId(), club_);
   }
 
   public void add(@NotNull final DSBAssociation dsbAssociation_)
   {
-    _associations.put(dsbAssociation_.getId(), dsbAssociation_);
+    _associations.put(dsbAssociation_.getAssociationId(), dsbAssociation_);
   }
 
   public DSBClub asClub()
@@ -69,7 +69,7 @@ public class DSBAssociation
     }
     else
     {
-      _asClub = new DSBClub(_id, _name, _id);
+      _asClub = new DSBClub(_associationId, _name, _associationId);
     }
     return _asClub;
   }
@@ -90,6 +90,11 @@ public class DSBAssociation
       }
     }
     return null;
+  }
+
+  public String getAssociationId()
+  {
+    return _associationId;
   }
 
   public Map<String, DSBAssociation> getAssociations()
@@ -120,11 +125,6 @@ public class DSBAssociation
     return _clubs;
   }
 
-  public String getId()
-  {
-    return _id;
-  }
-
   public int getLevel()
   {
     return _level;
@@ -144,12 +144,12 @@ public class DSBAssociation
   public String toString()
   {
     return "DSBAssociation{" +
-      "id='" + _id + '\'' +
-      ", level='" + _level + '\'' +
+      "associations=" + _associations +
+      ", associationId='" + _associationId + '\'' +
+      ", level=" + _level +
       ", name='" + _name + '\'' +
       ", parentId='" + _parentId + '\'' +
-      ", associations=" + _associations +
-      ", clubs=" + _clubs +
+      ", asClub=" + _asClub +
       '}';
   }
 }
