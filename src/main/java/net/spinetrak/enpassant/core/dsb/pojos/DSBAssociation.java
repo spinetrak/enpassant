@@ -38,7 +38,7 @@ public class DSBAssociation
   private final Map<String, DSBClub> _clubs = new HashMap<>();
   private DSBClub _asClub;
   private String _associationId;
-  private int _level;
+  private int _level = -1;
   private String _name;
   private String _parentId;
 
@@ -134,11 +134,6 @@ public class DSBAssociation
   public String getParentId()
   {
     return _parentId;
-  }
-
-  public void setAsClub(final DSBClub asClub_)
-  {
-    _asClub = asClub_;
   }
 
   public void setAssociationId(final String associationId_)

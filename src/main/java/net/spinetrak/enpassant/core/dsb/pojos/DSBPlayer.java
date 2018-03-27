@@ -155,7 +155,10 @@ public class DSBPlayer
 
   public void setFideId(final Integer fideId_)
   {
-    _fideId = fideId_;
+    if (fideId_ != null)
+    {
+      _fideId = fideId_;
+    }
   }
 
   public void setGender(final String gender_)

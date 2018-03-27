@@ -52,7 +52,7 @@ public class DWZ
 
   public Date getLastEvaluation()
   {
-    return new Date(_lastEvaluation.getTime());
+    return _lastEvaluation != null ? new Date(_lastEvaluation.getTime()) : null;
   }
 
   public String getMemberId()
@@ -77,10 +77,7 @@ public class DWZ
 
   public void setLastEvaluation(final Date lastEvaluation_)
   {
-    if (lastEvaluation_ != null)
-    {
-      _lastEvaluation = new Date(lastEvaluation_.getTime());
-    }
+    _lastEvaluation = (lastEvaluation_ != null) ? new Date(lastEvaluation_.getTime()) : null;
   }
 
   public void setMemberId(final String memberId_)

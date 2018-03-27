@@ -94,4 +94,13 @@ public class Converters
     }
     return null;
   }
+
+  public static String rightPad(final String str_)
+  {
+    if (str_ != null)
+    {
+      return String.format("%-5s", str_).replace(' ', '0');
+    }
+    return null;
+  }
 }
