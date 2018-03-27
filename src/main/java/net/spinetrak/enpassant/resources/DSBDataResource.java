@@ -63,7 +63,6 @@ public class DSBDataResource
     if (!associations.isEmpty())
     {
       final DSBAssociation dsbAssociation = associations.get(0);
-
       for (final DSBAssociation child : getChildren(dsbAssociation))
       {
         dsbAssociation.add(child);

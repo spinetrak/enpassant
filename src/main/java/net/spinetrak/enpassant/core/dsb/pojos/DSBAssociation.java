@@ -34,22 +34,14 @@ public class DSBAssociation
   public final static int BUND = 0;
   public final static int KREIS = 3;
   public final static int LAND = 1;
-  private final String _associationId;
   private final Map<String, DSBAssociation> _associations = new HashMap<>();
   private final Map<String, DSBClub> _clubs = new HashMap<>();
-  private final int _level;
-  private final String _name;
-  private final String _parentId;
   private DSBClub _asClub;
+  private String _associationId;
+  private int _level;
+  private String _name;
+  private String _parentId;
 
-  public DSBAssociation(@NotNull final String associationId_, final String parentId_, final int level,
-                        @NotNull final String name_)
-  {
-    _associationId = associationId_.trim();
-    _parentId = parentId_;
-    _level = level;
-    _name = name_.trim();
-  }
 
   public void add(@NotNull final DSBClub club_)
   {
@@ -69,7 +61,11 @@ public class DSBAssociation
     }
     else
     {
-      _asClub = new DSBClub(_associationId, _name, _associationId);
+      final DSBClub dsbClub = new DSBClub();
+      dsbClub.setClubId(_associationId);
+      dsbClub.setName(_name);
+      dsbClub.setAssociationId(_associationId);
+      _asClub = dsbClub;
     }
     return _asClub;
   }
@@ -138,6 +134,31 @@ public class DSBAssociation
   public String getParentId()
   {
     return _parentId;
+  }
+
+  public void setAsClub(final DSBClub asClub_)
+  {
+    _asClub = asClub_;
+  }
+
+  public void setAssociationId(final String associationId_)
+  {
+    _associationId = associationId_;
+  }
+
+  public void setLevel(final int level_)
+  {
+    _level = level_;
+  }
+
+  public void setName(final String name_)
+  {
+    _name = name_;
+  }
+
+  public void setParentId(final String parentId_)
+  {
+    _parentId = parentId_;
   }
 
   @Override

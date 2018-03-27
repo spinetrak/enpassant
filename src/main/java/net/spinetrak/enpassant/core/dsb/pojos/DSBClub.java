@@ -30,17 +30,10 @@ import java.util.List;
 
 public class DSBClub
 {
-  private final String _associationId;
-  private final String _clubId;
-  private final String _name;
   private final List<DSBPlayer> _players = new ArrayList<>();
-
-  public DSBClub(@NotNull final String clubId_, @NotNull final String name_, @NotNull final String associationId_)
-  {
-    _clubId = clubId_.trim();
-    _name = name_.trim();
-    _associationId = associationId_;
-  }
+  private String _associationId;
+  private String _clubId;
+  private String _name;
 
   public void add(@NotNull final DSBPlayer player_)
   {
@@ -70,6 +63,21 @@ public class DSBClub
   public List<DSBPlayer> getPlayers()
   {
     return _players;
+  }
+
+  public void setAssociationId(final String associationId_)
+  {
+    _associationId = associationId_;
+  }
+
+  public void setClubId(final String clubId_)
+  {
+    _clubId = clubId_;
+  }
+
+  public void setName(final String name_)
+  {
+    _name = name_;
   }
 
   @Override

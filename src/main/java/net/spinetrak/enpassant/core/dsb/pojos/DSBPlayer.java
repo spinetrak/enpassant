@@ -26,66 +26,40 @@ package net.spinetrak.enpassant.core.dsb.pojos;
 
 import net.spinetrak.enpassant.core.fide.FIDE;
 
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DSBPlayer
 {
-  private final String _clubId;
   private final List<DWZ> _dwz = new ArrayList<>();
-  private final String _eligibility;
   private final List<FIDE> _fide = new ArrayList<>();
-  private final String _gender;
-  private final String _memberId;
-  private final String _name;
-  private final String _status;
-  private final Integer _yob;
+  private String _clubId;
   private int _dsbId;
-  private Integer _fideId;
+  private String _eligibility;
+  private Integer _fideId = -1;
+  private String _gender;
+  private String _memberId;
+  private String _name;
+  private String _status;
+  private Integer _yob;
 
-  public DSBPlayer(final String clubId_, @NotNull final String memberId_, final int dsbId_, @NotNull final String name_,
-                   final String status_,
-                   final String gender_, final String eligibility_, final Integer yob_, final DWZ dwz_,
-                   final FIDE fide_)
+  public void addDWZ(final DWZ dwz_)
   {
-    this(clubId_, memberId_, dsbId_, name_, status_, gender_, eligibility_, yob_, dwz_);
-
-    if (fide_ != null)
-    {
-      _fideId = fide_.getId();
-      _fide.add(fide_);
-    }
-    else
-    {
-      _fideId = -1;
-    }
-  }
-
-  public DSBPlayer(final String clubId_, final String memberId_, final int dsbId_, final String name_,
-                   final String status_,
-                   final String gender_, final String eligibility_, final int yob_, final DWZ dwz_, final int fideId_)
-  {
-    this(clubId_, memberId_, dsbId_, name_, status_, gender_, eligibility_, yob_, dwz_);
-    _fideId = fideId_;
-  }
-
-  private DSBPlayer(final String clubId_, final String memberId_, final int dsbId_, final String name_,
-                    final String status_,
-                    final String gender_, final String eligibility_, final int yob_, final DWZ dwz_)
-  {
-    _clubId = clubId_;
-    _memberId = memberId_.trim();
-    _dsbId = dsbId_;
-    _name = name_.trim();
-    _status = status_;
-    _gender = gender_;
-    _eligibility = eligibility_;
-    _yob = yob_;
-
     if (dwz_ != null)
     {
       _dwz.add(dwz_);
+    }
+  }
+
+  public void addFIDE(final FIDE fide_)
+  {
+    if (fide_ != null)
+    {
+      _fide.add(fide_);
+      if (_fideId == -1)
+      {
+        _fideId = fide_.getId();
+      }
     }
   }
 
@@ -139,14 +113,22 @@ public class DSBPlayer
     return _status;
   }
 
-  public Integer getYob()
+  public Integer getYoB()
   {
     return _yob;
   }
 
+  public void setClubId(final String clubId_)
+  {
+    _clubId = clubId_;
+  }
+
   public void setDWZ(final List<DWZ> dwz_)
   {
-    _dwz.addAll(dwz_);
+    if (dwz_ != null && dwz_.size() > 0)
+    {
+      _dwz.addAll(dwz_);
+    }
   }
 
   public void setDsbId(final int dsbid_)
@@ -154,9 +136,51 @@ public class DSBPlayer
     _dsbId = dsbid_;
   }
 
+  public void setEligibility(final String eligibility_)
+  {
+    _eligibility = eligibility_;
+  }
+
   public void setFIDE(final List<FIDE> fide_)
   {
-    _fide.addAll(fide_);
+    if (fide_ != null && fide_.size() > 0)
+    {
+      _fide.addAll(fide_);
+      if (_fideId == -1)
+      {
+        _fideId = fide_.get(0).getId();
+      }
+    }
+  }
+
+  public void setFideId(final Integer fideId_)
+  {
+    _fideId = fideId_;
+  }
+
+  public void setGender(final String gender_)
+  {
+    _gender = gender_;
+  }
+
+  public void setMemberId(final String memberId_)
+  {
+    _memberId = memberId_;
+  }
+
+  public void setName(final String name_)
+  {
+    _name = name_;
+  }
+
+  public void setStatus(final String status_)
+  {
+    _status = status_;
+  }
+
+  public void setYoB(final Integer yob_)
+  {
+    _yob = yob_;
   }
 
   @Override

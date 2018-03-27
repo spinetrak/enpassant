@@ -53,7 +53,12 @@ public class DSBZIPFileDataTransformer
   public static DSBAssociation createDSBAssociationFromZIPFile(final String dataFile_)
   {
     LOGGER.info("Creating DSB Association");
-    final DSBAssociation dsb = new DSBAssociation("00000", null, DSBAssociation.BUND, "Deutscher Schachbund");
+    final DSBAssociation dsb = new DSBAssociation();
+    dsb.setAssociationId("00000");
+    dsb.setParentId(null);
+    dsb.setLevel(DSBAssociation.BUND);
+    dsb.setName("Deutscher Schachbund");
+
     final List<Player> players = new ArrayList<>();
     final List<Club> clubs = new ArrayList<>();
     ZipInputStream zipIn;
@@ -105,7 +110,11 @@ public class DSBZIPFileDataTransformer
     {
       final String associationId = club.getAssociation();
       final DSBAssociation association = dsb.getAssociation(associationId);
-      association.add(new DSBClub(club.getID(), club.getName(), association.getAssociationId()));
+      final DSBClub dsbClub = new DSBClub();
+      dsbClub.setClubId(club.getID());
+      dsbClub.setName(club.getName());
+      dsbClub.setAssociationId(association.getAssociationId());
+      association.add(dsbClub);
     }
     LOGGER.info("Done adding clubs.");
 
@@ -120,26 +129,21 @@ public class DSBZIPFileDataTransformer
         if (null != association)
         {
           final DSBClub withoutClub = association.asClub();
-          final DSBPlayer dsbPlayer = new DSBPlayer(withoutClub.getClubId(), player.getID(), -1, player.getName(),
-                                                    player.getStatus(),
-                                                    player.getGender(),
-                                                    player.getEligibility(), player.getYOB(), player.getDWZ(),
-                                                    player.getFIDE());
+          final DSBPlayer dsbPlayer = player.toDSBPlayer();
+          dsbPlayer.setClubId(withoutClub.getClubId());
           withoutClub.add(dsbPlayer);
         }
         continue;
       }
-      final DSBPlayer dsbPlayer = new DSBPlayer(club.getClubId(), player.getID(), -1, player.getName(),
-                                                player.getStatus(),
-                                                player.getGender(),
-                                                player.getEligibility(), player.getYOB(), player.getDWZ(),
-                                                player.getFIDE());
-      club.add(dsbPlayer);
 
+      final DSBPlayer dsbPlayer = player.toDSBPlayer();
+      dsbPlayer.setClubId(club.getClubId());
+      club.add(dsbPlayer);
     }
     LOGGER.info("Done adding players.");
     return dsb;
   }
+
 
   private static void updateDSBAssociations(final DSBAssociation dsb_, final List<CSVRecord> records_)
   {
@@ -162,7 +166,12 @@ public class DSBZIPFileDataTransformer
       if (parent != null && "000".equals(parent.trim()))
       {
         final String parentId = "00000";
-        dsb_.add(new DSBAssociation(id, parentId, DSBAssociation.LAND, association.getName()));
+        final DSBAssociation dsbAssociation = new DSBAssociation();
+        dsbAssociation.setAssociationId(id);
+        dsbAssociation.setParentId(parentId);
+        dsbAssociation.setLevel(DSBAssociation.LAND);
+        dsbAssociation.setName(association.getName());
+        dsb_.add(dsbAssociation);
       }
     }
 
@@ -181,12 +190,15 @@ public class DSBZIPFileDataTransformer
         }
         if ('0' == (parentId.charAt(1)))
         {
-          final int level = DSBAssociation.BEZIRK;
           final DSBAssociation dsbAssociation = dsb_.getAssociation(parentId);
           if (dsbAssociation != null)
           {
-            dsbAssociation.add(
-              new DSBAssociation(id, parentId, level, association.getName()));
+            final DSBAssociation dsbAssoc = new DSBAssociation();
+            dsbAssoc.setAssociationId(id);
+            dsbAssoc.setParentId(parentId);
+            dsbAssoc.setLevel(DSBAssociation.BEZIRK);
+            dsbAssoc.setName(association.getName());
+            dsbAssociation.add(dsbAssoc);
           }
           else
           {
@@ -206,9 +218,13 @@ public class DSBZIPFileDataTransformer
         final String parentId = parent.trim() + "00";
         if ('0' != (parentId.charAt(1)))
         {
-          final int level = DSBAssociation.KREIS;
           final DSBAssociation dsbAssociation = dsb_.getAssociation(parentId);
-          dsbAssociation.add(new DSBAssociation(id, parentId, level, association.getName()));
+          final DSBAssociation dsbAssoc = new DSBAssociation();
+          dsbAssoc.setAssociationId(id);
+          dsbAssoc.setParentId(parentId);
+          dsbAssoc.setLevel(DSBAssociation.KREIS);
+          dsbAssoc.setName(association.getName());
+          dsbAssociation.add(dsbAssoc);
         }
       }
     }
@@ -252,7 +268,7 @@ public class DSBZIPFileDataTransformer
     final String _eligibility;
     final String _fideCountry;
     final String _fideElo;
-    final String _fideID;
+    final String _fideId;
     final String _fideTitle;
     final String _gender;
     final String _index;
@@ -266,7 +282,7 @@ public class DSBZIPFileDataTransformer
     Player(final String zps_, final String membernr_, final String status_, final String name_,
            final String gender_, final String eligibility_, final String yearOfBirth_,
            final String lastEvaluation_, final String dwz_, final String index_, final String fideElo_,
-           final String fideTitle_, final String fideID, final String fideCountry_)
+           final String fideTitle_, final String fideId_, final String fideCountry_)
     {
       _zps = zps_;
       _membernr = Converters.leftPad(membernr_);
@@ -280,7 +296,7 @@ public class DSBZIPFileDataTransformer
       _index = index_;
       _fideElo = fideElo_;
       _fideTitle = fideTitle_;
-      _fideID = fideID;
+      _fideId = fideId_;
       _fideCountry = fideCountry_;
     }
 
@@ -291,10 +307,15 @@ public class DSBZIPFileDataTransformer
 
     DWZ getDWZ()
     {
-      if (Converters.noNullsorEmpties(_dwz, _index, _lastEvaluation))
+      if (!Converters.hasNullsorEmpties(_dwz, _index, _lastEvaluation) && !Converters.hasInvalidIntegers(_dwz, _index))
       {
-        return new DWZ(_zps, _membernr, Converters.integerFromString(_dwz), Converters.integerFromString(_index),
-                       Converters.dateFromString(_lastEvaluation, "YYYYww"));
+        final DWZ dwz = new DWZ();
+        dwz.setClubId(_zps);
+        dwz.setMemberId(_membernr);
+        dwz.setDwz(Converters.integerFromString(_dwz));
+        dwz.setIndex(Converters.integerFromString(_index));
+        dwz.setLastEvaluation(Converters.dateFromString(_lastEvaluation, "YYYYww"));
+        return dwz;
       }
       return null;
     }
@@ -306,18 +327,22 @@ public class DSBZIPFileDataTransformer
 
     FIDE getFIDE()
     {
-      if (Converters.noNullsorEmpties(_fideID, _fideElo, _fideTitle, _fideCountry))
+      if (!Converters.hasNullsorEmpties(_fideId, _fideElo, _fideTitle, _fideCountry) && !Converters.hasInvalidIntegers(
+        _fideId, _fideElo))
       {
-        return new FIDE(Converters.integerFromString(_fideID),
-                        Converters.integerFromString(_fideElo),
-                        _fideTitle, _fideCountry, null);
+        final FIDE fide = new FIDE();
+        fide.setId(Converters.integerFromString(_fideId));
+        fide.setElo(Converters.integerFromString(_fideElo));
+        fide.setCountry(_fideCountry);
+        fide.setTitle(_fideTitle);
+        return fide;
       }
       return null;
     }
 
     String getGender()
     {
-      if (Converters.noNullsorEmpties(_gender))
+      if (!Converters.hasNullsorEmpties(_gender))
       {
         return _gender.trim();
       }
@@ -334,9 +359,24 @@ public class DSBZIPFileDataTransformer
       return _status;
     }
 
-    Integer getYOB()
+    Integer getYoB()
     {
       return Converters.integerFromString(_yearOfBirth);
+    }
+
+    DSBPlayer toDSBPlayer()
+    {
+      final DSBPlayer dsbPlayer = new DSBPlayer();
+      dsbPlayer.setMemberId(getID());
+      dsbPlayer.setDsbId(-1);
+      dsbPlayer.setName(getName());
+      dsbPlayer.setStatus(getStatus());
+      dsbPlayer.setGender(getGender());
+      dsbPlayer.setEligibility(getEligibility());
+      dsbPlayer.setYoB(getYoB());
+      dsbPlayer.addDWZ(getDWZ());
+      dsbPlayer.addFIDE(getFIDE());
+      return dsbPlayer;
     }
 
     public String getName()
@@ -360,7 +400,7 @@ public class DSBZIPFileDataTransformer
         ", index='" + _index + '\'' +
         ", fideElo='" + _fideElo + '\'' +
         ", fideTitle='" + _fideTitle + '\'' +
-        ", fideID='" + _fideID + '\'' +
+        ", fideId='" + _fideId + '\'' +
         ", fideCountry='" + _fideCountry + '\'' +
         '}';
     }

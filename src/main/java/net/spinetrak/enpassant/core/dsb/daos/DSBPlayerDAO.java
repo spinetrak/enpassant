@@ -43,7 +43,7 @@ public interface DSBPlayerDAO
   @SqlUpdate("INSERT INTO fide (id, elo, title, country, lasteval) VALUES (:f.id, :f.elo, :f.title, :f.country, :f.lastEvaluation) ON CONFLICT (id, lasteval) DO NOTHING")
   void insertOrUpdateFIDE(@BindBean("f") final FIDE fide_);
 
-  @SqlUpdate("INSERT INTO dsb_player (clubId, memberId, dsbId, fideId, name, status, gender, yob, eligibility) VALUES (:p.clubId, :p.memberId, :p.dsbId, :p.fideId, :p.name, :p.status, :p.gender, :p.yob, :p.eligibility) ON CONFLICT (clubId,memberId) DO UPDATE SET dsbId = :p.dsbId, fideId = :p.fideId, name = :p.name, status = :p.status, gender = :p.gender, yob = :p.yob")
+  @SqlUpdate("INSERT INTO dsb_player (clubId, memberId, dsbId, fideId, name, status, gender, yob, eligibility) VALUES (:p.clubId, :p.memberId, :p.dsbId, :p.fideId, :p.name, :p.status, :p.gender, :p.yoB, :p.eligibility) ON CONFLICT (clubId,memberId) DO UPDATE SET dsbId = :p.dsbId, fideId = :p.fideId, name = :p.name, status = :p.status, gender = :p.gender, yob = :p.yoB")
   void insertOrUpdatePlayer(@BindBean("p") final DSBPlayer player_);
 
   @SqlQuery("SELECT * FROM dsb_player")

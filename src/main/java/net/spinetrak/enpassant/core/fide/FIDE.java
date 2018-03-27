@@ -30,22 +30,11 @@ import java.util.Date;
 
 public class FIDE
 {
-  private final String _country;
-  private final Integer _elo;
-  private final Integer _id;
-  private final Date _lastEvaluation;
-  private final String _title;
-
-  public FIDE(final Integer id_, final Integer elo_, final String title_, final String country_,
-              final Date lastEvaluation_)
-  {
-    _id = id_;
-    _elo = elo_;
-    _title = title_;
-    _country = country_;
-    _lastEvaluation = (lastEvaluation_ == null) ? DateTime.now().dayOfMonth().withMaximumValue().toDate() : new Date(
-      lastEvaluation_.getTime());
-  }
+  private String _country;
+  private Integer _elo;
+  private Integer _id;
+  private Date _lastEvaluation;
+  private String _title;
 
   public String getCountry()
   {
@@ -64,12 +53,41 @@ public class FIDE
 
   public Date getLastEvaluation()
   {
-    return _lastEvaluation;
+    return (_lastEvaluation == null) ? DateTime.now().dayOfMonth().withMaximumValue().toDate() : new Date(
+      _lastEvaluation.getTime());
   }
 
   public String getTitle()
   {
     return _title;
+  }
+
+  public void setCountry(final String country_)
+  {
+    _country = country_;
+  }
+
+  public void setElo(final Integer elo_)
+  {
+    _elo = elo_;
+  }
+
+  public void setId(final Integer id_)
+  {
+    _id = id_;
+  }
+
+  public void setLastEvaluation(final Date lastEvaluation_)
+  {
+    if (lastEvaluation_ != null)
+    {
+      _lastEvaluation = new Date(lastEvaluation_.getTime());
+    }
+  }
+
+  public void setTitle(final String title_)
+  {
+    _title = title_;
   }
 
   @Override

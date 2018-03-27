@@ -24,27 +24,16 @@
 
 package net.spinetrak.enpassant.core.dsb.pojos;
 
-import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 
 public class DWZ
 {
-  private final String _clubId;
-  private final Integer _dwz;
-  private final Integer _index;
-  private final Date _lastEvaluation;
-  private final String _memberId;
-
-  public DWZ(@NotNull final String clubId_, @NotNull final String memberId_, @NotNull final Integer dwz_,
-             @NotNull final Integer index_, @NotNull final Date lastEvaluation_)
-  {
-    _clubId = clubId_;
-    _memberId = memberId_;
-    _dwz = dwz_;
-    _index = index_;
-    _lastEvaluation = new Date(lastEvaluation_.getTime());
-  }
+  private String _clubId;
+  private Integer _dwz;
+  private Integer _index;
+  private Date _lastEvaluation;
+  private String _memberId;
 
   public String getClubId()
   {
@@ -69,6 +58,34 @@ public class DWZ
   public String getMemberId()
   {
     return _memberId;
+  }
+
+  public void setClubId(final String clubId_)
+  {
+    _clubId = clubId_;
+  }
+
+  public void setDwz(final Integer dwz_)
+  {
+    _dwz = dwz_;
+  }
+
+  public void setIndex(final Integer index_)
+  {
+    _index = index_;
+  }
+
+  public void setLastEvaluation(final Date lastEvaluation_)
+  {
+    if (lastEvaluation_ != null)
+    {
+      _lastEvaluation = new Date(lastEvaluation_.getTime());
+    }
+  }
+
+  public void setMemberId(final String memberId_)
+  {
+    _memberId = memberId_;
   }
 
   @Override

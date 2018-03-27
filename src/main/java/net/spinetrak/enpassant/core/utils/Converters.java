@@ -46,6 +46,30 @@ public class Converters
     return null;
   }
 
+  public static boolean hasInvalidIntegers(final String... str_)
+  {
+    for (final String str : str_)
+    {
+      if (null == integerFromString(str))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public static boolean hasNullsorEmpties(final String... str_)
+  {
+    for (final String str : str_)
+    {
+      if (null == str || str.trim().isEmpty())
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public static Integer integerFromString(final String string_)
   {
     if (string_ != null && !string_.trim().isEmpty())
@@ -69,17 +93,5 @@ public class Converters
       return String.format("%04d", Integer.parseInt(str_));
     }
     return null;
-  }
-
-  public static boolean noNullsorEmpties(final String... str_)
-  {
-    for (final String str : str_)
-    {
-      if (null == str || str.trim().isEmpty())
-      {
-        return false;
-      }
-    }
-    return true;
   }
 }

@@ -65,17 +65,19 @@ public class DSBDataUpdater implements Runnable
 
   private void updateDatabase(final DSBAssociation dsbAssociation_)
   {
-
-    LOGGER.info("Upserting association: " + dsbAssociation_.getName());
-    _dsbAssociationDAO.insertOrUpdate(dsbAssociation_);
-    for (final DSBClub club : dsbAssociation_.getClubs().values())
+    try
+    {
+      LOGGER.info("Upserting association: " + dsbAssociation_.getName());
+      _dsbAssociationDAO.insertOrUpdate(dsbAssociation_);
+      for (final DSBClub club : dsbAssociation_.getClubs().values())
       {
         final Map<String, Integer> zpsToDSBIdMapping = new DSBCSVFileDataTransformer().getZPStoDSBIDMapping(
           club.getClubId());
         _dsbClubDAO.insertOrUpdate(club);
         for (final DSBPlayer player : club.getPlayers())
         {
-          final Integer dsbid = zpsToDSBIdMapping.get(player.getClubId() + "-" + player.getMemberId());
+          final Integer dsbid = zpsToDSBIdMapping.get(
+            player.getClubId() + "-" + player.getMemberId());
           if (dsbid != null)
           {
             player.setDsbId(dsbid);
@@ -86,22 +88,39 @@ public class DSBDataUpdater implements Runnable
           {
             for (final DWZ dwz : player.getDWZ())
             {
-              _dsbPlayerDAO.insertOrUpdateDWZ(dwz);
+              if (dwz != null)
+              {
+                _dsbPlayerDAO.insertOrUpdateDWZ(dwz);
+              }
             }
           }
           if (player.getFIDE() != null)
           {
             for (final FIDE fide : player.getFIDE())
             {
-              _dsbPlayerDAO.insertOrUpdateFIDE(fide);
+              try
+              {
+                if (fide != null)
+                {
+                  _dsbPlayerDAO.insertOrUpdateFIDE(fide);
+                }
+              }
+              catch (final Exception ex_)
+              {
+                LOGGER.error("Error updating FIDE for player " + player + " with FIDE " + fide, ex_);
+              }
             }
           }
         }
       }
-    for (final DSBAssociation association : dsbAssociation_.getAssociations().values())
-    {
-      updateDatabase(association);
+      for (final DSBAssociation association : dsbAssociation_.getAssociations().values())
+      {
+        updateDatabase(association);
+      }
     }
-
+    catch (final Exception ex_)
+    {
+      LOGGER.error("Error updating database.", ex_);
+    }
   }
 }

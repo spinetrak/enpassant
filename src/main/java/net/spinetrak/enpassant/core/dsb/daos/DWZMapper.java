@@ -36,7 +36,12 @@ public class DWZMapper implements RowMapper<DWZ>
   @Override
   public DWZ map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return new DWZ(rs_.getString("clubId"), rs_.getString("memberId"), rs_.getInt("dwz"), rs_.getInt("index"),
-                   rs_.getDate("lasteval"));
+    final DWZ dwz = new DWZ();
+    dwz.setClubId(rs_.getString("clubId"));
+    dwz.setMemberId(rs_.getString("memberId"));
+    dwz.setDwz(rs_.getInt("dwz"));
+    dwz.setIndex(rs_.getInt("index"));
+    dwz.setLastEvaluation(rs_.getDate("lasteval"));
+    return dwz;
   }
 }

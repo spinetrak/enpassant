@@ -36,7 +36,12 @@ public class FIDEMapper implements RowMapper<FIDE>
   @Override
   public FIDE map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    return new FIDE(rs_.getInt("id"), rs_.getInt("elo"), rs_.getString("title"), rs_.getString("country"),
-                    rs_.getDate("lasteval"));
+    final FIDE fide = new FIDE();
+    fide.setId(rs_.getInt("id"));
+    fide.setElo(rs_.getInt("elo"));
+    fide.setTitle(rs_.getString("title"));
+    fide.setCountry(rs_.getString("country"));
+    fide.setLastEvaluation(rs_.getDate("lasteval"));
+    return fide;
   }
 }
