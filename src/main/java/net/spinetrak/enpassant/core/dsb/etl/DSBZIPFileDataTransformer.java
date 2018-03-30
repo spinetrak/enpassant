@@ -217,7 +217,7 @@ public class DSBZIPFileDataTransformer
       dwz.setDwz(Converters.integerFromString(record.get(8)));
       dwz.setLastEvaluation(Converters.dateFromString(record.get(7), "YYYYww"));
       dwz.setIndex(Converters.integerFromString(record.get(9)));
-      if (dwz.getLastEvaluation() != null)
+      if (dwz.getDwz() != 0)
       {
         dsbPlayer.addDWZ(dwz);
       }
@@ -227,7 +227,7 @@ public class DSBZIPFileDataTransformer
       fide.setElo(Converters.integerFromString(record.get(10)));
       fide.setTitle(record.get(11));
       fide.setCountry(record.get(13));
-      if (fide.getId() != -1)
+      if (fide.getElo() != 0)
       {
         dsbPlayer.addFIDE(fide);
       }

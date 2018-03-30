@@ -31,9 +31,9 @@ import java.util.Date;
 public class FIDE
 {
   private String _country;
-  private Integer _elo;
-  private Integer _id;
-  private Date _lastEvaluation;
+  private Integer _elo = 0;
+  private Integer _id = 0;
+  private Date _lastEvaluation = DateTime.now().dayOfMonth().withMaximumValue().toDate();
   private String _title;
 
   public String getCountry()
@@ -53,8 +53,7 @@ public class FIDE
 
   public Date getLastEvaluation()
   {
-    return (_lastEvaluation == null) ? DateTime.now().dayOfMonth().withMaximumValue().toDate() : new Date(
-      _lastEvaluation.getTime());
+    return new Date(_lastEvaluation.getTime());
   }
 
   public String getTitle()
@@ -69,12 +68,18 @@ public class FIDE
 
   public void setElo(final Integer elo_)
   {
-    _elo = elo_;
+    if (elo_ != null)
+    {
+      _elo = elo_;
+    }
   }
 
   public void setId(final Integer id_)
   {
-    _id = id_;
+    if (id_ != null)
+    {
+      _id = id_;
+    }
   }
 
   public void setLastEvaluation(final Date lastEvaluation_)

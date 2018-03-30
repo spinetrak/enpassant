@@ -27,6 +27,8 @@ package net.spinetrak.enpassant.core.dsb.pojos;
 import net.spinetrak.enpassant.core.fide.FIDE;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class DSBPlayer
@@ -34,18 +36,18 @@ public class DSBPlayer
   private final List<DWZ> _dwz = new ArrayList<>();
   private final List<FIDE> _fide = new ArrayList<>();
   private String _clubId;
-  private int _dsbId;
+  private Integer _dsbId = 0;
   private String _eligibility;
-  private Integer _fideId = -1;
+  private Integer _fideId = 0;
   private String _gender;
   private String _memberId;
   private String _name;
   private String _status;
-  private Integer _yob;
+  private Integer _yob = 0;
 
   public void addDWZ(final DWZ dwz_)
   {
-    if (dwz_ != null)
+    if (dwz_ != null && !dwz_.getDwz().equals(0))
     {
       _dwz.add(dwz_);
     }
@@ -53,10 +55,10 @@ public class DSBPlayer
 
   public void addFIDE(final FIDE fide_)
   {
-    if (fide_ != null)
+    if (fide_ != null && !fide_.getId().equals(0) && !fide_.getElo().equals(0))
     {
       _fide.add(fide_);
-      if (_fideId == -1)
+      if (_fideId.equals(0))
       {
         _fideId = fide_.getId();
       }
@@ -68,12 +70,40 @@ public class DSBPlayer
     return _clubId;
   }
 
+  public Integer getCurrentDWZ()
+  {
+    if (_dwz.isEmpty())
+    {
+      return 0;
+    }
+    Collections.sort(_dwz, (dwz1_, dwz2_) -> {
+      final Date date1 = dwz1_.getLastEvaluation();
+      final Date date2 = dwz2_.getLastEvaluation();
+      return date1.compareTo(date2);
+    });
+    return _dwz.get(0).getDwz();
+  }
+
+  public Integer getCurrentELO()
+  {
+    if (_fide.isEmpty())
+    {
+      return 0;
+    }
+    Collections.sort(_fide, (fide1_, fide2_) -> {
+      final Date date1 = fide1_.getLastEvaluation();
+      final Date date2 = fide2_.getLastEvaluation();
+      return date1.compareTo(date2);
+    });
+    return _fide.get(0).getElo();
+  }
+
   public List<DWZ> getDWZ()
   {
     return _dwz;
   }
 
-  public int getDsbId()
+  public Integer getDsbId()
   {
     return _dsbId;
   }
@@ -127,13 +157,19 @@ public class DSBPlayer
   {
     if (dwz_ != null && dwz_.size() > 0)
     {
-      _dwz.addAll(dwz_);
+      for (final DWZ dwz : dwz_)
+      {
+        addDWZ(dwz);
+      }
     }
   }
 
-  public void setDsbId(final int dsbid_)
+  public void setDsbId(final Integer dsbid_)
   {
-    _dsbId = dsbid_;
+    if (dsbid_ != null && !dsbid_.equals(0))
+    {
+      _dsbId = dsbid_;
+    }
   }
 
   public void setEligibility(final String eligibility_)
@@ -145,17 +181,16 @@ public class DSBPlayer
   {
     if (fide_ != null && fide_.size() > 0)
     {
-      _fide.addAll(fide_);
-      if (_fideId == -1)
+      for (final FIDE fide : fide_)
       {
-        _fideId = fide_.get(0).getId();
+        addFIDE(fide);
       }
     }
   }
 
   public void setFideId(final Integer fideId_)
   {
-    if (fideId_ != null)
+    if (fideId_ != null && !fideId_.equals(0))
     {
       _fideId = fideId_;
     }
@@ -183,7 +218,10 @@ public class DSBPlayer
 
   public void setYoB(final Integer yob_)
   {
-    _yob = yob_;
+    if (yob_ != null && !yob_.equals(0))
+    {
+      _yob = yob_;
+    }
   }
 
   @Override

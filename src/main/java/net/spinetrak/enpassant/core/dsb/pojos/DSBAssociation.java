@@ -25,7 +25,9 @@
 package net.spinetrak.enpassant.core.dsb.pojos;
 
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DSBAssociation
@@ -134,6 +136,20 @@ public class DSBAssociation
   public String getParentId()
   {
     return _parentId;
+  }
+
+  public List<DSBPlayer> getPlayers()
+  {
+    final List<DSBPlayer> players = new ArrayList<>();
+    for (final DSBClub club : _clubs.values())
+    {
+      players.addAll(club.getPlayers());
+    }
+    for (final DSBAssociation association : _associations.values())
+    {
+      players.addAll(association.getPlayers());
+    }
+    return players;
   }
 
   public void setAssociationId(final String associationId_)

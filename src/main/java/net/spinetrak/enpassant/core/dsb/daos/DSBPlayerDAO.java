@@ -48,21 +48,26 @@ public interface DSBPlayerDAO
 
   @SqlQuery("SELECT * FROM dsb_player")
   @RegisterRowMapper(DSBPlayerMapper.class)
-  List<DSBPlayer> select();
-
-  @SqlQuery("SELECT * FROM dsb_player where clubId = :clubId and memberId = :memberId")
-  @RegisterRowMapper(DSBPlayerMapper.class)
-  List<DSBPlayer> select(@Bind("clubId") final String clubId_, @Bind("memberId") final String memberId_);
+  List<DSBPlayer> selectAllPlayers();
 
   @SqlQuery("SELECT * FROM dsb_player where clubId = :clubId")
   @RegisterRowMapper(DSBPlayerMapper.class)
-  List<DSBPlayer> select(@Bind("clubId") final String clubId_);
+  List<DSBPlayer> selectByClubId(@Bind("clubId") final String clubId_);
+
+  @SqlQuery("SELECT * FROM dsb_player where clubId = :clubId and memberId = :memberId")
+  @RegisterRowMapper(DSBPlayerMapper.class)
+  List<DSBPlayer> selectByClubIdAndMemberId(@Bind("clubId") final String clubId_,
+                                            @Bind("memberId") final String memberId_);
+
+  @SqlQuery("SELECT * FROM dsb_player where dsbId = :dsbId")
+  @RegisterRowMapper(DSBPlayerMapper.class)
+  List<DSBPlayer> selectByDSBId(@Bind("dsbId") final String dsbId_);
 
   @SqlQuery("SELECT * FROM dwz where clubId = :p.clubId and memberId = :p.memberId")
   @RegisterRowMapper(DWZMapper.class)
-  List<DWZ> selectDWZ(@BindBean("p") final DSBPlayer player_);
+  List<DWZ> selectDWZByPlayer(@BindBean("p") final DSBPlayer player_);
 
   @SqlQuery("SELECT * FROM fide where id = :p.fideId")
   @RegisterRowMapper(FIDEMapper.class)
-  List<FIDE> selectFIDE(@BindBean("p") final DSBPlayer player_);
+  List<FIDE> selectFIDEByPlayer(@BindBean("p") final DSBPlayer player_);
 }

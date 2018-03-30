@@ -32,6 +32,7 @@ import io.dropwizard.db.DataSourceFactory;
 import io.dropwizard.flyway.FlywayBundle;
 import io.dropwizard.flyway.FlywayFactory;
 import io.dropwizard.jdbi3.JdbiFactory;
+import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
@@ -116,5 +117,6 @@ public class EnPassantApp extends Application<EnPassantConfig>
                                                              dsbZipFileProcessor);
     ses.scheduleWithFixedDelay(dsbDataUpdater, 60, configuration_.getDSBDataFactory().getRefreshInterval(),
                                TimeUnit.SECONDS);
+    environment_.jersey().register(new JsonProcessingExceptionMapper(true));
   }
 }
