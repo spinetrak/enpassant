@@ -51,4 +51,7 @@ public interface DSBAssociationDAO
   @RegisterRowMapper(DSBAssociationMapper.class)
   List<DSBAssociation> selectChildrenOf(@Bind("id") String id_);
 
+  @SqlQuery("WITH RECURSIVE rec (id) as (SELECT o.id, o.name, o.isclub from dsb_organization as o where id = :id UNION ALL SELECT o.id, o.name, o.isclub from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec where isclub=true order by id")
+  @RegisterRowMapper(DSBAssociationMapper.class)
+  List<DSBAssociation> selectClubsFor(@Bind("id") String id_);
 }

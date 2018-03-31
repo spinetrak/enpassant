@@ -39,6 +39,7 @@ import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
 import net.spinetrak.enpassant.core.dsb.daos.DSBAssociationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBClubDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
+import net.spinetrak.enpassant.db.DSBDataCache;
 import net.spinetrak.enpassant.db.DSBDataUpdater;
 import net.spinetrak.enpassant.health.DSBDataHealthCheck;
 import net.spinetrak.enpassant.resources.DSBDataResource;
@@ -108,7 +109,8 @@ public class EnPassantApp extends Application<EnPassantConfig>
     final DSBPlayerDAO dsbPlayerDAO = jdbi.onDemand(DSBPlayerDAO.class);
 
     final DSBZipFileProcessor dsbZipFileProcessor = configuration_.getDSBDataFactory().build(environment_);
-    final DSBDataResource dsbDataResource = new DSBDataResource(dsbAssociationDAO, dsbClubDAO, dsbPlayerDAO);
+    final DSBDataCache dsbDataCache = new DSBDataCache(dsbAssociationDAO, dsbClubDAO, dsbPlayerDAO);
+    final DSBDataResource dsbDataResource = new DSBDataResource(dsbDataCache);
     environment_.jersey().register(dsbDataResource);
     environment_.healthChecks().register("dsbZipFileProcessor", new DSBDataHealthCheck(dsbZipFileProcessor));
 

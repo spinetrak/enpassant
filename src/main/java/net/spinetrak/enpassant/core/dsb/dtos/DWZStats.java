@@ -34,17 +34,22 @@ import java.util.Map;
 public class DWZStats
 {
   private final List<DWZStats> _data = new ArrayList<>();
-  private Map<Integer, Integer> _stats;
-  private Integer _x;
-  private Integer _y;
-
+  private Integer _age;
+  private Integer _dwz;
+  private Integer _dwzDSB;
+  private Map<Integer, Integer[]> _stats;
   public DWZStats()
   {
     _stats = new HashMap<>();
     for (int i = 0; i <= 100; i++)
     {
-      _stats.put(i, 0);
+      _stats.put(i, new Integer[]{0, 0});
     }
+  }
+
+  public Integer getAge()
+  {
+    return _age;
   }
 
   @JsonIgnore
@@ -53,54 +58,49 @@ public class DWZStats
     return _data;
   }
 
-  public Integer getX()
+  public Integer getDwz()
   {
-    return _x;
+    return _dwz;
   }
 
-  public Integer getY()
+  public Integer getDwzDSB()
   {
-    return _y;
+    return _dwzDSB;
   }
 
-  public void setStats(final Map<Integer, Integer> stats_)
+  public void setDwz(final Integer dwz_)
+  {
+    _dwz = dwz_;
+  }
+
+  public void setStats(final Map<Integer, Integer[]> stats_)
   {
     if (null != stats_)
     {
       _stats.putAll(stats_);
     }
 
-    for (final Map.Entry<Integer, Integer> entry : _stats.entrySet())
+    for (final Map.Entry<Integer, Integer[]> entry : _stats.entrySet())
     {
-      final Integer x = entry.getKey();
-      final Integer y = entry.getValue();
+      final Integer age = entry.getKey();
+      final Integer[] dwz = entry.getValue();
 
       final DWZStats dwzStats = new DWZStats();
-      dwzStats.setX(x);
-      dwzStats.setY(y);
+      dwzStats.setAge(age);
+      dwzStats.setDwzDSB(dwz[0]);
+      dwzStats.setDwz(dwz[1]);
       _data.add(dwzStats);
     }
   }
 
-  public void setX(final Integer x_)
+  private void setAge(final Integer age_)
   {
-    _x = x_;
+    _age = age_;
   }
 
-  public void setY(final Integer y_)
+  private void setDwzDSB(final Integer dwzDSB_)
   {
-    _y = y_;
+    _dwzDSB = dwzDSB_;
   }
 
-  public String toString()
-  {
-    final StringBuilder sb = new StringBuilder("[");
-
-    for (final DWZStats stats : getData())
-    {
-      sb.append(stats.getY()).append(",");
-    }
-
-    return sb.deleteCharAt(sb.length() - 1).append("]").toString();
-  }
 }

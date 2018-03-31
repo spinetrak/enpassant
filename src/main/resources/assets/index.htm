@@ -235,11 +235,12 @@
         url: '/app/api/dsb/stats/dwz/40000',
         dataType: 'json'
     }).done(function (results) {
-        var labels = [], mydata = [];
+        var labels = [], dwzByAge = [], dwzDSBByAge = [];
         for (var i = 0; i < results.length; i++) {
-            var stat = results[i];
-            labels.push(stat.x);
-            mydata.push(stat.y);
+            var stats = results[i];
+            labels.push(stats.age);
+            dwzByAge.push(stats.dwz);
+            dwzDSBByAge.push(stats.dwzDSB);
         }
 
         var myChart = new Chart(ctx, {
@@ -247,13 +248,21 @@
             data: {
                 labels: labels,
                 datasets: [{
-                    data: mydata,
+                    data: dwzByAge,
                     lineTension: 0,
                     label: "Avg. DWZ by Age",
                     backgroundColor: 'transparent',
                     borderColor: '#007bff',
                     borderWidth: 1,
                     pointBackgroundColor: '#007bff'
+                }, {
+                    data: dwzDSBByAge,
+                    lineTension: 0,
+                    label: "Avg. DSB DWZ by Age",
+                    backgroundColor: 'transparent',
+                    borderColor: '#ff7bff',
+                    borderWidth: 1,
+                    pointBackgroundColor: '#ff7bff'
                 }]
             }
         })
