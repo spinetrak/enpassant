@@ -25,7 +25,7 @@
 package net.spinetrak.enpassant.resources;
 
 import net.spinetrak.enpassant.core.dsb.dtos.DSBAssociationTree;
-import net.spinetrak.enpassant.core.dsb.dtos.DWZStats;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
@@ -89,19 +89,6 @@ public class DSBDataResource
     throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
 
-  @Path("/stats/dwz/{associationId}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @GET
-  public List<DWZStats> getDWZStats(@PathParam("associationId") final String clubOrAssociationId_)
-  {
-    final Map<Integer, Float[]> finalResults = _dsbDataCache.getStats(clubOrAssociationId_);
-
-    final DWZStats dwzStats = new DWZStats();
-    dwzStats.setStats(finalResults);
-
-    return dwzStats.getData();
-  }
-
   @Path("/player/{playerId}")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
@@ -128,5 +115,18 @@ public class DSBDataResource
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
     return players;
+  }
+
+  @Path("/stats/{associationId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @GET
+  public List<DSBStats> getStats(@PathParam("associationId") final String clubOrAssociationId_)
+  {
+    final Map<Integer, Float[]> finalResults = _dsbDataCache.getStats(clubOrAssociationId_);
+
+    final DSBStats dsbStats = new DSBStats();
+    dsbStats.setStats(finalResults);
+
+    return dsbStats.getData();
   }
 }

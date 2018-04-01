@@ -192,11 +192,16 @@ public class DSBDataCache
     try
     {
       return _dsbStatsCache.get(clubOrAssociationId_, () -> {
-        final List<Stats> clubStats = _dsbPlayerDAO.selectDWZsFor(clubOrAssociationId_);
-        final List<Stats> dsbStats = _dsbPlayerDAO.selectDWZsFor("00000");
-        final Map<Integer, Stats> club = Stats.asMap(clubStats);
-        final Map<Integer, Stats> dsb = Stats.asMap(dsbStats);
-        return mergeStats(club, dsb);
+        final List<Stats> clubDWZStats = _dsbPlayerDAO.selectDWZsFor(clubOrAssociationId_);
+        final List<Stats> dsbDWZStats = _dsbPlayerDAO.selectDWZsFor("00000");
+        final List<Stats> clubELOStats = _dsbPlayerDAO.selectELOsFor(clubOrAssociationId_);
+        final List<Stats> dsbELOStats = _dsbPlayerDAO.selectELOsFor("00000");
+
+        final Map<Integer, Stats> clubDWZ = Stats.asMap(clubDWZStats);
+        final Map<Integer, Stats> dsbDWZ = Stats.asMap(dsbDWZStats);
+        final Map<Integer, Stats> clubELO = Stats.asMap(clubELOStats);
+        final Map<Integer, Stats> dsbELO = Stats.asMap(dsbELOStats);
+        return mergeStats(clubDWZ, dsbDWZ, clubELO, dsbELO);
       });
     }
     catch (final ExecutionException ex_)
@@ -228,19 +233,24 @@ public class DSBDataCache
     return associations;
   }
 
-  private Map<Integer, Float[]> mergeStats(final Map<Integer, Stats> clubResults_,
-                                           final Map<Integer, Stats> dsbResults_)
+  private Map<Integer, Float[]> mergeStats(final Map<Integer, Stats> clubDWZ_, final Map<Integer, Stats> dsbDWZ_,
+                                           final Map<Integer, Stats> clubELO_,
+                                           final Map<Integer, Stats> dsbELO_)
   {
     final Map<Integer, Float[]> results = new HashMap<>();
     for (int i = 0; i < 100; i++)
     {
-      final Stats clubStats = clubResults_.get(i);
-      final Stats dsbStats = dsbResults_.get(i);
+      final Stats clubDWZStats = clubDWZ_.get(i);
+      final Stats dsbDWZStats = dsbDWZ_.get(i);
+      final Float clubDWZ = clubDWZStats == null ? 0f : clubDWZStats.getAvg();
+      final Float dsbDWZ = dsbDWZStats == null ? 0f : dsbDWZStats.getAvg();
 
-      final Float club = clubStats == null ? 0 : clubStats.getAvg();
-      final Float dsb = dsbStats == null ? 0 : dsbStats.getAvg();
+      final Stats clubELOStats = clubELO_.get(i);
+      final Stats dsbELOStats = dsbELO_.get(i);
+      final Float clubELO = clubELOStats == null ? 0f : clubELOStats.getAvg();
+      final Float dsbELO = dsbELOStats == null ? 0f : dsbELOStats.getAvg();
 
-      results.put(i, new Float[]{dsb, club});
+      results.put(i, new Float[]{dsbDWZ, clubDWZ, dsbELO, clubELO});
     }
     return results;
   }

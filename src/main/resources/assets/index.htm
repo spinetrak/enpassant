@@ -140,19 +140,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#">
                             <span data-feather="file-text"></span>
-                            DWZ by age
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span>
                             Members by age
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">
-                            <span data-feather="file-text"></span>
-                            ELO by Age
                         </a>
                     </li>
                     <li class="nav-item">
@@ -232,15 +220,17 @@
     var ctx = document.getElementById("myChart");
 
     var jsonData = $.ajax({
-        url: '/app/api/dsb/stats/dwz/40000',
+        url: '/app/api/dsb/stats/40000',
         dataType: 'json'
     }).done(function (results) {
-        var labels = [], dwzByAge = [], dwzDSBByAge = [];
+        var labels = [], dwzByAge = [], dwzDSBByAge = [], eloByAge = [], eloDSBByAge = [];
         for (var i = 0; i < results.length; i++) {
             var stats = results[i];
             labels.push(stats.age);
             dwzByAge.push(stats.dwz);
             dwzDSBByAge.push(stats.dwzDSB);
+            eloByAge.push(stats.elo);
+            eloDSBByAge.push(stats.eloDSB);
         }
 
         var myChart = new Chart(ctx, {
@@ -252,17 +242,33 @@
                     lineTension: 0,
                     label: "Avg. DWZ by Age",
                     backgroundColor: 'transparent',
-                    borderColor: '#007bff',
+                    borderColor: '#637fed',
                     borderWidth: 1,
-                    pointBackgroundColor: '#007bff'
+                    pointBackgroundColor: '#637fed'
                 }, {
                     data: dwzDSBByAge,
                     lineTension: 0,
                     label: "Avg. DSB DWZ by Age",
                     backgroundColor: 'transparent',
-                    borderColor: '#ff7bff',
+                    borderColor: '#09279b',
                     borderWidth: 1,
-                    pointBackgroundColor: '#ff7bff'
+                    pointBackgroundColor: '#09279b'
+                }, {
+                    data: eloByAge,
+                    lineTension: 0,
+                    label: "Avg. ELO by Age",
+                    backgroundColor: 'transparent',
+                    borderColor: '#f44250',
+                    borderWidth: 1,
+                    pointBackgroundColor: '#f44250'
+                }, {
+                    data: eloDSBByAge,
+                    lineTension: 0,
+                    label: "Avg. DSB ELO by Age",
+                    backgroundColor: 'transparent',
+                    borderColor: '#63040c',
+                    borderWidth: 1,
+                    pointBackgroundColor: '#63040c'
                 }]
             }
         })

@@ -31,19 +31,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DWZStats
+public class DSBStats
 {
-  private final List<DWZStats> _data = new ArrayList<>();
+  private final List<DSBStats> _data = new ArrayList<>();
   private Integer _age;
   private Float _dwz;
   private Float _dwzDSB;
+  private Float _elo;
+  private Float _eloDSB;
   private Map<Integer, Float[]> _stats;
-  public DWZStats()
+
+  public DSBStats()
   {
     _stats = new HashMap<>();
     for (int i = 0; i <= 100; i++)
     {
-      _stats.put(i, new Float[]{0f, 0f});
+      _stats.put(i, new Float[]{0f, 0f, 0f, 0f});
     }
   }
 
@@ -53,7 +56,7 @@ public class DWZStats
   }
 
   @JsonIgnore
-  public List<DWZStats> getData()
+  public List<DSBStats> getData()
   {
     return _data;
   }
@@ -68,9 +71,14 @@ public class DWZStats
     return _dwzDSB;
   }
 
-  public void setDwz(final Float dwz_)
+  public Float getElo()
   {
-    _dwz = dwz_;
+    return _elo;
+  }
+
+  public Float getEloDSB()
+  {
+    return _eloDSB;
   }
 
   public void setStats(final Map<Integer, Float[]> stats_)
@@ -83,13 +91,15 @@ public class DWZStats
     for (final Map.Entry<Integer, Float[]> entry : _stats.entrySet())
     {
       final Integer age = entry.getKey();
-      final Float[] dwz = entry.getValue();
+      final Float[] stats = entry.getValue();
 
-      final DWZStats dwzStats = new DWZStats();
-      dwzStats.setAge(age);
-      dwzStats.setDwzDSB(dwz[0]);
-      dwzStats.setDwz(dwz[1]);
-      _data.add(dwzStats);
+      final DSBStats DSBStats = new DSBStats();
+      DSBStats.setAge(age);
+      DSBStats.setDwzDSB(stats[0]);
+      DSBStats.setDwz(stats[1]);
+      DSBStats.setEloDSB(stats[2]);
+      DSBStats.setElo(stats[3]);
+      _data.add(DSBStats);
     }
   }
 
@@ -98,9 +108,23 @@ public class DWZStats
     _age = age_;
   }
 
+  private void setDwz(final Float dwz_)
+  {
+    _dwz = dwz_;
+  }
+
   private void setDwzDSB(final Float dwzDSB_)
   {
     _dwzDSB = dwzDSB_;
   }
 
+  private void setElo(final Float elo_)
+  {
+    _elo = elo_;
+  }
+
+  private void setEloDSB(final Float eloDSB_)
+  {
+    _eloDSB = eloDSB_;
+  }
 }

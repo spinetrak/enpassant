@@ -75,6 +75,10 @@ public interface DSBPlayerDAO
   @RegisterRowMapper(StatsMapper.class)
   List<Stats> selectDWZsFor(@Bind("id") String id_);
 
+  @SqlQuery("select * from getELOStatsByAgeForAssociationOrClub (:id)")
+  @RegisterRowMapper(StatsMapper.class)
+  List<Stats> selectELOsFor(@Bind("id") String id_);
+
   @SqlQuery("SELECT * FROM fide where id = :p.fideId")
   @RegisterRowMapper(FIDEMapper.class)
   List<FIDE> selectFIDEByPlayer(@BindBean("p") final DSBPlayer player_);
