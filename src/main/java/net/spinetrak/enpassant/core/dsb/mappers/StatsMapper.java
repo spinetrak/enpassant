@@ -22,25 +22,23 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.core.dsb.daos;
+package net.spinetrak.enpassant.core.dsb.mappers;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
+import net.spinetrak.enpassant.core.dsb.daos.Stats;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DSBAssociationMapper implements RowMapper<DSBAssociation>
+public class StatsMapper implements RowMapper<Stats>
 {
   @Override
-  public DSBAssociation map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  public Stats map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    final DSBAssociation dsbAssociation = new DSBAssociation();
-    dsbAssociation.setAssociationId(rs_.getString("id"));
-    dsbAssociation.setParentId(rs_.getString("parentId"));
-    dsbAssociation.setLevel(rs_.getInt("level"));
-    dsbAssociation.setName(rs_.getString("name"));
-    return dsbAssociation;
+    final Stats stats = new Stats();
+    stats.setAverage(rs_.getFloat("avg"));
+    stats.setYoB(rs_.getInt("yob"));
+    return stats;
   }
 }

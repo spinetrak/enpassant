@@ -94,7 +94,7 @@ public class DSBDataResource
   @GET
   public List<DWZStats> getDWZStats(@PathParam("associationId") final String clubOrAssociationId_)
   {
-    final Map<Integer, Integer[]> finalResults = _dsbDataCache.getStats(clubOrAssociationId_);
+    final Map<Integer, Float[]> finalResults = _dsbDataCache.getStats(clubOrAssociationId_);
 
     final DWZStats dwzStats = new DWZStats();
     dwzStats.setStats(finalResults);

@@ -22,7 +22,7 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.core.dsb.daos;
+package net.spinetrak.enpassant.core.dsb.mappers;
 
 import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
 import org.jdbi.v3.core.mapper.RowMapper;

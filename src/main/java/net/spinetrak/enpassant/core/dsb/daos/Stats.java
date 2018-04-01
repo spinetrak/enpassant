@@ -24,24 +24,52 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
-import net.spinetrak.enpassant.core.fide.FIDE;
-import org.jdbi.v3.core.mapper.RowMapper;
-import org.jdbi.v3.core.statement.StatementContext;
+import org.joda.time.DateTime;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class FIDEMapper implements RowMapper<FIDE>
+public class Stats
 {
-  @Override
-  public FIDE map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  private final static int TODAY = DateTime.now().getYear();
+  private Float _avg;
+  private Integer _yoB;
+
+  public static Map<Integer, Stats> asMap(final List<Stats> stats_)
   {
-    final FIDE fide = new FIDE();
-    fide.setId(rs_.getInt("id"));
-    fide.setElo(rs_.getInt("elo"));
-    fide.setTitle(rs_.getString("title"));
-    fide.setCountry(rs_.getString("country"));
-    fide.setLastEvaluation(rs_.getDate("lasteval"));
-    return fide;
+    final Map<Integer, Stats> map = new HashMap<>();
+    if (stats_ == null)
+    {
+      return map;
+    }
+    for (final Stats stats : stats_)
+    {
+      if (stats != null && stats.getYoB() != null)
+      {
+        map.put(TODAY - stats.getYoB(), stats);
+      }
+    }
+    return map;
+  }
+
+  public Float getAvg()
+  {
+    return _avg;
+  }
+
+  public Integer getYoB()
+  {
+    return _yoB;
+  }
+
+  public void setAverage(final float avg_)
+  {
+    _avg = avg_;
+  }
+
+  public void setYoB(final int yoB_)
+  {
+    _yoB = yoB_;
   }
 }

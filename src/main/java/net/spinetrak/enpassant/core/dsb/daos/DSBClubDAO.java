@@ -24,6 +24,8 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
+import net.spinetrak.enpassant.core.dsb.mappers.DSBAssociationMapper;
+import net.spinetrak.enpassant.core.dsb.mappers.DSBClubMapper;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -49,4 +51,8 @@ public interface DSBClubDAO
   @SqlQuery("SELECT * from dsb_organization where isClub=true and parentId = :id")
   @RegisterRowMapper(DSBClubMapper.class)
   List<DSBClub> selectChildrenOf(@Bind("id") String id_);
+
+  @SqlQuery("WITH RECURSIVE rec (id) as (SELECT o.id, o.name, o.isclub from dsb_organization as o where id = :id UNION ALL SELECT o.id, o.name, o.isclub from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec where isclub=true order by id")
+  @RegisterRowMapper(DSBAssociationMapper.class)
+  List<DSBClub> selectClubsFor(@Bind("id") String id_);
 }

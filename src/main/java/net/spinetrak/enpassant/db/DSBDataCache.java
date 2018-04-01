@@ -29,12 +29,12 @@ import com.google.common.cache.CacheBuilder;
 import net.spinetrak.enpassant.core.dsb.daos.DSBAssociationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBClubDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
+import net.spinetrak.enpassant.core.dsb.daos.Stats;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,7 +63,7 @@ public class DSBDataCache
   private final Cache<String, List<DSBPlayer>> _dsbPlayersCache = CacheBuilder.newBuilder()
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
-  private final Cache<String, Map<Integer, Integer[]>> _dsbStatsCache = CacheBuilder.newBuilder()
+  private final Cache<String, Map<Integer, Float[]>> _dsbStatsCache = CacheBuilder.newBuilder()
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
 
@@ -176,24 +176,9 @@ public class DSBDataCache
 
   public List<DSBPlayer> getDSBPlayers(final String clubOrAssociationId_)
   {
-    final DSBAssociation association = getDSBAssociation(clubOrAssociationId_);
-    final DSBClub club = getDSBClub(clubOrAssociationId_);
-
     try
     {
-      return _dsbPlayersCache.get(clubOrAssociationId_, () -> {
-
-        final List<DSBPlayer> players = new ArrayList<>();
-        if (null != association)
-        {
-          players.addAll(association.getPlayers());
-        }
-        if (null != club)
-        {
-          players.addAll(club.getPlayers());
-        }
-        return players;
-      });
+      return _dsbPlayersCache.get(clubOrAssociationId_, () -> _dsbPlayerDAO.selectPlayersFor(clubOrAssociationId_));
     }
     catch (final ExecutionException ex_)
     {
@@ -202,14 +187,16 @@ public class DSBDataCache
     return new ArrayList<>();
   }
 
-  public Map<Integer, Integer[]> getStats(final String clubOrAssociationId_)
+  public Map<Integer, Float[]> getStats(final String clubOrAssociationId_)
   {
     try
     {
       return _dsbStatsCache.get(clubOrAssociationId_, () -> {
-        final Map<Integer, Integer> clubOrAssociationResults = getDWZStatsAsMap(clubOrAssociationId_);
-        final Map<Integer, Integer> dsbResults = getDWZStatsAsMap("00000");
-        return mergeStats(clubOrAssociationResults, dsbResults);
+        final List<Stats> clubStats = _dsbPlayerDAO.selectDWZsFor(clubOrAssociationId_);
+        final List<Stats> dsbStats = _dsbPlayerDAO.selectDWZsFor("00000");
+        final Map<Integer, Stats> club = Stats.asMap(clubStats);
+        final Map<Integer, Stats> dsb = Stats.asMap(dsbStats);
+        return mergeStats(club, dsb);
       });
     }
     catch (final ExecutionException ex_)
@@ -219,54 +206,6 @@ public class DSBDataCache
     return new HashMap<>();
   }
 
-  private Map<Integer, Integer> calculateDWZAveragesByAgeGroup(final Map<Integer, List<Integer>> ageGroups_)
-  {
-    final Map<Integer, Integer> results = new HashMap<>();
-
-    for (final Map.Entry<Integer, List<Integer>> entry : ageGroups_.entrySet())
-    {
-      final Integer age = entry.getKey();
-      final List<Integer> dwzs = entry.getValue();
-
-      int result = 0;
-      for (final Integer dwz : dwzs)
-      {
-        result += dwz;
-      }
-      result = result / dwzs.size();
-
-      results.put(age, result);
-    }
-    return results;
-  }
-
-  private Map<Integer, List<Integer>> collectDWZByAgeGroups(final List<DSBPlayer> players_)
-  {
-    final Map<Integer, List<Integer>> ageGroups = new HashMap<>();
-
-    for (final DSBPlayer player : players_)
-    {
-      final Integer yob = player.getYoB();
-      if (null == yob || Integer.valueOf(0).equals(yob))
-      {
-        continue;
-      }
-      final Integer dwz = player.getCurrentDWZ();
-      if (null == dwz || Integer.valueOf(0).equals(dwz))
-      {
-        continue;
-      }
-      final Integer age = DateTime.now().getYear() - player.getYoB();
-      List<Integer> dwzs = ageGroups.get(age);
-      if (null == dwzs)
-      {
-        dwzs = new ArrayList<>();
-      }
-      dwzs.add(dwz);
-      ageGroups.put(age, dwzs);
-    }
-    return ageGroups;
-  }
 
   /**
    * recursive lookup
@@ -289,36 +228,19 @@ public class DSBDataCache
     return associations;
   }
 
-  private Map<Integer, Integer> getDWZStatsAsMap(final String clubOrAssociationId_)
+  private Map<Integer, Float[]> mergeStats(final Map<Integer, Stats> clubResults_,
+                                           final Map<Integer, Stats> dsbResults_)
   {
-    final List<DSBPlayer> players = getDSBPlayers(clubOrAssociationId_);
-    for (final DSBPlayer player : players)
-    {
-      final List<DWZ> dwzs = _dsbPlayerDAO.selectDWZByPlayer(player);
-      player.setDWZ(dwzs);
-    }
-
-    final Map<Integer, List<Integer>> ageGroups = collectDWZByAgeGroups(players);
-    return calculateDWZAveragesByAgeGroup(ageGroups);
-  }
-
-  private Map<Integer, Integer[]> mergeStats(final Map<Integer, Integer> clubResults_,
-                                             final Map<Integer, Integer> dsbResults_)
-  {
-    final Map<Integer, Integer[]> results = new HashMap<>();
+    final Map<Integer, Float[]> results = new HashMap<>();
     for (int i = 0; i < 100; i++)
     {
-      Integer club = clubResults_.get(i);
-      if (club == null)
-      {
-        club = 0;
-      }
-      Integer dsb = dsbResults_.get(i);
-      if (dsb == null)
-      {
-        dsb = 0;
-      }
-      results.put(i, new Integer[]{dsb, club});
+      final Stats clubStats = clubResults_.get(i);
+      final Stats dsbStats = dsbResults_.get(i);
+
+      final Float club = clubStats == null ? 0 : clubStats.getAvg();
+      final Float dsb = dsbStats == null ? 0 : dsbStats.getAvg();
+
+      results.put(i, new Float[]{dsb, club});
     }
     return results;
   }

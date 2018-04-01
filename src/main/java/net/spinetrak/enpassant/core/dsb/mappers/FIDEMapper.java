@@ -22,30 +22,26 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.core.dsb.daos;
+package net.spinetrak.enpassant.core.dsb.mappers;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
+import net.spinetrak.enpassant.core.fide.FIDE;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DSBPlayerMapper implements RowMapper<DSBPlayer>
+public class FIDEMapper implements RowMapper<FIDE>
 {
   @Override
-  public DSBPlayer map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  public FIDE map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    final DSBPlayer dsbPlayer = new DSBPlayer();
-    dsbPlayer.setClubId(rs_.getString("clubId"));
-    dsbPlayer.setMemberId(rs_.getString("memberId"));
-    dsbPlayer.setDsbId(rs_.getInt("dsbId"));
-    dsbPlayer.setName(rs_.getString("name"));
-    dsbPlayer.setStatus(rs_.getString("status"));
-    dsbPlayer.setGender(rs_.getString("gender"));
-    dsbPlayer.setEligibility(rs_.getString("eligibility"));
-    dsbPlayer.setYoB(rs_.getInt("yob"));
-    dsbPlayer.setFideId(rs_.getInt("fideId"));
-    return dsbPlayer;
+    final FIDE fide = new FIDE();
+    fide.setId(rs_.getInt("id"));
+    fide.setElo(rs_.getInt("elo"));
+    fide.setTitle(rs_.getString("title"));
+    fide.setCountry(rs_.getString("country"));
+    fide.setLastEvaluation(rs_.getDate("lasteval"));
+    return fide;
   }
 }

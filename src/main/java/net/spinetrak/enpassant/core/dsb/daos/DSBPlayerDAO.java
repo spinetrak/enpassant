@@ -24,6 +24,10 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
+import net.spinetrak.enpassant.core.dsb.mappers.DSBPlayerMapper;
+import net.spinetrak.enpassant.core.dsb.mappers.DWZMapper;
+import net.spinetrak.enpassant.core.dsb.mappers.FIDEMapper;
+import net.spinetrak.enpassant.core.dsb.mappers.StatsMapper;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
@@ -67,7 +71,15 @@ public interface DSBPlayerDAO
   @RegisterRowMapper(DWZMapper.class)
   List<DWZ> selectDWZByPlayer(@BindBean("p") final DSBPlayer player_);
 
+  @SqlQuery("select * from getDWZStatsByAgeForAssociationOrClub (:id)")
+  @RegisterRowMapper(StatsMapper.class)
+  List<Stats> selectDWZsFor(@Bind("id") String id_);
+
   @SqlQuery("SELECT * FROM fide where id = :p.fideId")
   @RegisterRowMapper(FIDEMapper.class)
   List<FIDE> selectFIDEByPlayer(@BindBean("p") final DSBPlayer player_);
+
+  @SqlQuery("select * from dsb_player where clubid in (WITH RECURSIVE rec (id) as (SELECT o.id from dsb_organization as o where id = :id UNION ALL SELECT o.id from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec order by id)")
+  @RegisterRowMapper(DSBPlayerMapper.class)
+  List<DSBPlayer> selectPlayersFor(@Bind("id") String id_);
 }

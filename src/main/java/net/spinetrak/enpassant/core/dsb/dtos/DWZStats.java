@@ -35,15 +35,15 @@ public class DWZStats
 {
   private final List<DWZStats> _data = new ArrayList<>();
   private Integer _age;
-  private Integer _dwz;
-  private Integer _dwzDSB;
-  private Map<Integer, Integer[]> _stats;
+  private Float _dwz;
+  private Float _dwzDSB;
+  private Map<Integer, Float[]> _stats;
   public DWZStats()
   {
     _stats = new HashMap<>();
     for (int i = 0; i <= 100; i++)
     {
-      _stats.put(i, new Integer[]{0, 0});
+      _stats.put(i, new Float[]{0f, 0f});
     }
   }
 
@@ -58,32 +58,32 @@ public class DWZStats
     return _data;
   }
 
-  public Integer getDwz()
+  public Float getDwz()
   {
     return _dwz;
   }
 
-  public Integer getDwzDSB()
+  public Float getDwzDSB()
   {
     return _dwzDSB;
   }
 
-  public void setDwz(final Integer dwz_)
+  public void setDwz(final Float dwz_)
   {
     _dwz = dwz_;
   }
 
-  public void setStats(final Map<Integer, Integer[]> stats_)
+  public void setStats(final Map<Integer, Float[]> stats_)
   {
     if (null != stats_)
     {
       _stats.putAll(stats_);
     }
 
-    for (final Map.Entry<Integer, Integer[]> entry : _stats.entrySet())
+    for (final Map.Entry<Integer, Float[]> entry : _stats.entrySet())
     {
       final Integer age = entry.getKey();
-      final Integer[] dwz = entry.getValue();
+      final Float[] dwz = entry.getValue();
 
       final DWZStats dwzStats = new DWZStats();
       dwzStats.setAge(age);
@@ -98,7 +98,7 @@ public class DWZStats
     _age = age_;
   }
 
-  private void setDwzDSB(final Integer dwzDSB_)
+  private void setDwzDSB(final Float dwzDSB_)
   {
     _dwzDSB = dwzDSB_;
   }
