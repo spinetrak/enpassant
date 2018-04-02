@@ -43,59 +43,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
           integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
-    <!-- Required Javascript -->
-    <script src="https://cdn.jsdelivr.net/npm/gijgo@1.9.4/combined/js/gijgo.min.js" type="text/javascript"></script>
-
     <!-- Custom styles for this template -->
     <link href="dashboard.css" type="text/css" rel="stylesheet">
     <link href="gijgo.css" type="text/css" rel="stylesheet">
 </head>
 
 <body>
-
-<script type="text/javascript" class="init">
-    $(document).ready(function () {
-        $('#example').DataTable({
-            "lengthMenu": [[10, 50, 100, -1], [10, 50, 100, "All"]],
-            "ajax": {
-                "url": "/app/api/dsb/association/40000",
-                "dataSrc": "players"
-            },
-            "columns": [
-                {
-                    data: null, render: function (data, type, row) {
-                    return data.clubId + '-' + data.memberId;
-                }
-                },
-                {
-                    data: "dsbId", "render": function (data, type, row) {
-                    return data === 0 ? '' : data;
-                }
-                },
-                {
-                    "data": "fideId", "render": function (data, type, row) {
-                    return data === 0 ? '' : data;
-                }
-                },
-                {"data": "name"},
-                {"data": "gender"},
-                {"data": "yoB"},
-                {
-                    "data": "currentDWZ", "render": function (data, type, row) {
-                    return data === 0 ? '' : data;
-                }
-                },
-                {
-                    "data": "currentELO", "render": function (data, type, row) {
-                    return data === 0 ? '' : data;
-                }
-                },
-                {"data": "status"},
-                {"data": "eligibility"}
-            ]
-        });
-    });
-</script>
 
 <nav class="navbar navbar-dark sticky-top bg-dark flex-md-nowrap p-0">
     <a class="navbar-brand bg-dark col-md-2 mr-0" href="#">En Passant</a>
@@ -110,23 +63,6 @@
                         <div class="container-fluid">
                             <div id="tree" class="h-25 small"></div>
                         </div>
-                        <script type="text/javascript">
-                            $(document).ready(function () {
-                                $.getJSON("/app/api/dsb/associationTree/00000", function (data) {
-                                    var myData = [data];
-                                    var tree = $('#tree').tree({
-                                        primaryKey: 'id',
-                                        dataSource: myData,
-                                        icons: {
-                                            expand: '<i>+</i>',
-                                            collapse: '<i>-</i>'
-                                        }
-                                    });
-                                    tree.expand(tree.getNodeById("00000"));
-                                    tree.select(tree.getNodeById("40000"))
-                                });
-                            });
-                        </script>
                     </li>
                 </ul>
 
@@ -213,66 +149,10 @@
     feather.replace()
 </script>
 
-
-<!-- Graphs -->
+<!-- Gijgo Tree -->
+<script src="https://cdn.jsdelivr.net/npm/gijgo@1.9.4/combined/js/gijgo.min.js" type="text/javascript"></script>
+<!-- ChartJS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.min.js"></script>
-<script>
-    var ctx = document.getElementById("myChart");
-
-    var jsonData = $.ajax({
-        url: '/app/api/dsb/stats/40000',
-        dataType: 'json'
-    }).done(function (results) {
-        var labels = [], dwzByAge = [], dwzDSBByAge = [], eloByAge = [], eloDSBByAge = [];
-        for (var i = 0; i < results.length; i++) {
-            var stats = results[i];
-            labels.push(stats.age);
-            dwzByAge.push(stats.dwz);
-            dwzDSBByAge.push(stats.dwzDSB);
-            eloByAge.push(stats.elo);
-            eloDSBByAge.push(stats.eloDSB);
-        }
-
-        var myChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    data: dwzByAge,
-                    lineTension: 0,
-                    label: "Avg. DWZ by Age",
-                    backgroundColor: 'transparent',
-                    borderColor: '#637fed',
-                    borderWidth: 1,
-                    pointBackgroundColor: '#637fed'
-                }, {
-                    data: dwzDSBByAge,
-                    lineTension: 0,
-                    label: "Avg. DSB DWZ by Age",
-                    backgroundColor: 'transparent',
-                    borderColor: '#09279b',
-                    borderWidth: 1,
-                    pointBackgroundColor: '#09279b'
-                }, {
-                    data: eloByAge,
-                    lineTension: 0,
-                    label: "Avg. ELO by Age",
-                    backgroundColor: 'transparent',
-                    borderColor: '#f44250',
-                    borderWidth: 1,
-                    pointBackgroundColor: '#f44250'
-                }, {
-                    data: eloDSBByAge,
-                    lineTension: 0,
-                    label: "Avg. DSB ELO by Age",
-                    backgroundColor: 'transparent',
-                    borderColor: '#63040c',
-                    borderWidth: 1,
-                    pointBackgroundColor: '#63040c'
-                }]
-            }
-        })
-    });
-</script>
+<script type="text/javascript" class="init" src="enpassant.js"></script>
 </body>
 </html>
