@@ -206,13 +206,13 @@ public class DSBDataCache
     {
       final Stats clubDWZStats = clubDWZ_.get(i);
       final Stats dsbDWZStats = dsbDWZ_.get(i);
-      final Float clubDWZ = clubDWZStats == null ? 0f : clubDWZStats.getAvg();
-      final Float dsbDWZ = dsbDWZStats == null ? 0f : dsbDWZStats.getAvg();
+      final float clubDWZ = clubDWZStats == null ? 0f : clubDWZStats.getAvg();
+      final float dsbDWZ = dsbDWZStats == null ? 0f : dsbDWZStats.getAvg();
 
       final Stats clubELOStats = clubELO_.get(i);
       final Stats dsbELOStats = dsbELO_.get(i);
-      final Float clubELO = clubELOStats == null ? 0f : clubELOStats.getAvg();
-      final Float dsbELO = dsbELOStats == null ? 0f : dsbELOStats.getAvg();
+      final float clubELO = clubELOStats == null ? 0f : clubELOStats.getAvg();
+      final float dsbELO = dsbELOStats == null ? 0f : dsbELOStats.getAvg();
 
       results.put(i, new Float[]{dsbDWZ, clubDWZ, dsbELO, clubELO});
     }
