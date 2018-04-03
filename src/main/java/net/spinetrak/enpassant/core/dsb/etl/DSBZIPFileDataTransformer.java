@@ -24,8 +24,7 @@
 
 package net.spinetrak.enpassant.core.dsb.etl;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
@@ -50,17 +49,17 @@ public class DSBZIPFileDataTransformer
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBZIPFileDataTransformer.class);
 
-  public static DSBAssociation createDSBAssociationFromZIPFile(final String dataFile_)
+  public static DSBOrganization createDSBOrganizationFromZIPFile(final String dataFile_)
   {
-    LOGGER.info("Creating DSB Association");
-    final DSBAssociation dsb = new DSBAssociation();
-    dsb.setAssociationId("00000");
+    LOGGER.info("Creating DSB Organization");
+    final DSBOrganization dsb = new DSBOrganization();
+    dsb.setOrganizationId("00000");
     dsb.setParentId(null);
-    dsb.setLevel(DSBAssociation.BUND);
+    dsb.setLevel(DSBOrganization.BUND);
     dsb.setName("Deutscher Schachbund");
 
     final List<DSBPlayer> players = new ArrayList<>();
-    final List<DSBClub> clubs = new ArrayList<>();
+    final List<DSBOrganization> clubs = new ArrayList<>();
     ZipInputStream zipIn;
     try
     {
@@ -85,7 +84,7 @@ public class DSBZIPFileDataTransformer
 
           if ("verbaende.csv".equalsIgnoreCase(csvFileName))
           {
-            updateDSBAssociations(dsb, records);
+            updateDSBOrganizations(dsb, records);
           }
           else if ("vereine.csv".equalsIgnoreCase(csvFileName))
           {
@@ -106,39 +105,49 @@ public class DSBZIPFileDataTransformer
     {
       LOGGER.error("Error processing ZIP file", ex_);
     }
-    for (final DSBClub club : clubs)
+    for (final DSBOrganization club : clubs)
     {
-      final String associationId = club.getAssociationId();
-      final DSBAssociation association = dsb.getAssociation(associationId);
-      association.add(club);
+      final String organizationId = club.getParentId();
+      final DSBOrganization organization = dsb.getOrganization(organizationId);
+      organization.add(club);
     }
     LOGGER.info("Done adding clubs.");
 
     for (final DSBPlayer player : players)
     {
       final String playersClub = player.getClubId();
-      final DSBClub club = dsb.getClub(playersClub);
+      final DSBOrganization club = dsb.getOrganization(playersClub);
       if (null == club)
       {
-        final DSBAssociation association = dsb.getAssociation(playersClub);
-        if (null != association)
-        {
-          final DSBClub withoutClub = association.asClub();
-          player.setClubId(withoutClub.getClubId());
-          withoutClub.add(player);
-        }
         continue;
       }
-
-      player.setClubId(club.getClubId());
+      player.setClubId(club.getOrganizationId());
       club.add(player);
     }
     LOGGER.info("Done adding players.");
     return dsb;
   }
 
+  private static void updateDSBClubs(final List<DSBOrganization> clubs_, final List<CSVRecord> records_)
+  {
+    for (final CSVRecord record : records_)
+    {
+      if ("ZPS".equalsIgnoreCase(record.get(0).trim()))
+      {
+        continue;
+      }
+      final DSBOrganization club = new DSBOrganization();
+      club.setIsClub(true);
+      club.setOrganizationId(record.get(0));
+      club.setParentId(record.get(2) + "00");
+      club.setName(record.get(3));
+      club.setLevel(DSBOrganization.VEREIN);
+      clubs_.add(club);
+    }
+    LOGGER.info("Added " + clubs_.size() + " clubs");
+  }
 
-  private static void updateDSBAssociations(final DSBAssociation dsb_, final List<CSVRecord> records_)
+  private static void updateDSBOrganizations(final DSBOrganization dsb_, final List<CSVRecord> records_)
   {
     for (final CSVRecord record : records_)
     {
@@ -147,48 +156,31 @@ public class DSBZIPFileDataTransformer
         continue;
       }
 
-      final DSBAssociation dsbAssociation = new DSBAssociation();
-      dsbAssociation.setAssociationId(record.get(0).trim() + "00");
-      dsbAssociation.setName(record.get(3).trim());
+      final DSBOrganization dsbOrganization = new DSBOrganization();
+      dsbOrganization.setIsClub(false);
+      dsbOrganization.setOrganizationId(record.get(0).trim() + "00");
+      dsbOrganization.setName(record.get(3).trim());
 
       final String parentId = Converters.rightPad(record.get(2));
-      dsbAssociation.setParentId(parentId);
+      dsbOrganization.setParentId(parentId);
       if ("00000".equals(parentId))
       {
-        dsbAssociation.setLevel(DSBAssociation.LAND);
-        dsb_.add(dsbAssociation);
+        dsbOrganization.setLevel(DSBOrganization.LAND);
+        dsb_.add(dsbOrganization);
       }
       else if ('0' == parentId.charAt(1))
       {
-        dsbAssociation.setLevel(DSBAssociation.BEZIRK);
-        final DSBAssociation land = dsb_.getAssociation(parentId);
-        land.add(dsbAssociation);
+        dsbOrganization.setLevel(DSBOrganization.BEZIRK);
+        final DSBOrganization land = dsb_.getOrganization(parentId);
+        land.add(dsbOrganization);
       }
       else if ('0' != parentId.charAt(1))
       {
-        dsbAssociation.setLevel(DSBAssociation.KREIS);
-        final DSBAssociation bezirk = dsb_.getAssociation(parentId);
-        bezirk.add(dsbAssociation);
+        dsbOrganization.setLevel(DSBOrganization.KREIS);
+        final DSBOrganization bezirk = dsb_.getOrganization(parentId);
+        bezirk.add(dsbOrganization);
       }
     }
-  }
-
-  private static void updateDSBClubs(final List<DSBClub> clubs_, final List<CSVRecord> records_)
-  {
-    for (final CSVRecord record : records_)
-    {
-      if ("ZPS".equalsIgnoreCase(record.get(0).trim()))
-      {
-        continue;
-      }
-
-      final DSBClub club = new DSBClub();
-      club.setClubId(record.get(0));
-      club.setAssociationId(record.get(2) + "00");
-      club.setName(record.get(3));
-      clubs_.add(club);
-    }
-    LOGGER.info("Added " + clubs_.size() + " clubs");
   }
 
   private static void updateDSBPlayers(final List<DSBPlayer> players_,

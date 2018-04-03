@@ -24,9 +24,8 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
-import net.spinetrak.enpassant.core.dsb.mappers.DSBAssociationMapper;
-import net.spinetrak.enpassant.core.dsb.mappers.DSBClubMapper;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
+import net.spinetrak.enpassant.core.dsb.mappers.DSBOrganizationMapper;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
 import org.jdbi.v3.sqlobject.customizer.BindBean;
@@ -35,24 +34,25 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
 
-public interface DSBClubDAO
+public interface DSBOrganizationDAO
 {
-  @SqlUpdate("INSERT INTO dsb_organization (id, name, level, isclub, parentId) VALUES (:c.clubId, :c.name, " + (-1) + ", " + true + ", :c.associationId) ON CONFLICT (id) DO UPDATE SET name = :c.name, level = " + (-1) + ", isClub = " + true + ", parentId = :c.associationId")
-  void insertOrUpdate(@BindBean("c") final DSBClub club_);
 
-  @SqlQuery("SELECT * FROM dsb_organization WHERE isClub=true")
-  @RegisterRowMapper(DSBClubMapper.class)
-  List<DSBClub> select();
+  @SqlUpdate("INSERT INTO dsb_organization (id, name, level, isclub, parentId) VALUES (:o.organizationId, :o.name, :o.level, :o.isClub, :o.parentId) ON CONFLICT (id) DO UPDATE SET name = :o.name, level = :o.level, isClub = :o.isClub, parentId = :o.parentId")
+  void insertOrUpdate(@BindBean("o") final DSBOrganization organization_);
 
-  @SqlQuery("SELECT * from dsb_organization where isClub=true and id = :id")
-  @RegisterRowMapper(DSBClubMapper.class)
-  List<DSBClub> select(@Bind("id") String id_);
+  @SqlQuery("SELECT * from dsb_organization")
+  @RegisterRowMapper(DSBOrganizationMapper.class)
+  List<DSBOrganization> selectAll();
 
-  @SqlQuery("SELECT * from dsb_organization where isClub=true and parentId = :id")
-  @RegisterRowMapper(DSBClubMapper.class)
-  List<DSBClub> selectChildrenOf(@Bind("id") String id_);
+  @SqlQuery("SELECT * from dsb_organization where id = :id")
+  @RegisterRowMapper(DSBOrganizationMapper.class)
+  List<DSBOrganization> selectById(@Bind("id") String id_);
+
+  @SqlQuery("SELECT * from dsb_organization where parentId = :id")
+  @RegisterRowMapper(DSBOrganizationMapper.class)
+  List<DSBOrganization> selectChildrenOf(@Bind("id") String id_);
 
   @SqlQuery("WITH RECURSIVE rec (id) as (SELECT o.id, o.name, o.isclub from dsb_organization as o where id = :id UNION ALL SELECT o.id, o.name, o.isclub from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec where isclub=true order by id")
-  @RegisterRowMapper(DSBAssociationMapper.class)
-  List<DSBClub> selectClubsFor(@Bind("id") String id_);
+  @RegisterRowMapper(DSBOrganizationMapper.class)
+  List<DSBOrganization> selectClubsFor(@Bind("id") String id_);
 }

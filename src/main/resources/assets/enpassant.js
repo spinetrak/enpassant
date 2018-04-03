@@ -1,6 +1,6 @@
 /*
  *  The MIT License (MIT)
- *
+ *  
  *  Copyright (c) 2018 spinetrak
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -9,10 +9,10 @@
  *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  *  copies of the Software, and to permit persons to whom the Software is
  *  furnished to do so, subject to the following conditions:
- *
+ *  
  *  The above copyright notice and this permission notice shall be included in all
  *  copies or substantial portions of the Software.
- *
+ *  
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -28,9 +28,12 @@ $(document).ready(function () {
 
 var buildPage = function (id) {
 
-    var myLabel = "";
+    console.log("buildPage caled with ID " + id);
 
-    $.getJSON("/app/api/dsb/associationTree/00000", function (data) {
+    var myLabel = "";
+    var myChart = null;
+
+    $.getJSON("/app/api/dsb/organizationTree/00000", function (data) {
         var myData = [data];
         var tree = $('#tree').tree({
             primaryKey: 'id',
@@ -45,21 +48,24 @@ var buildPage = function (id) {
         myLabel = myNode.find('span[data-role~="display"]').html();
         tree.select(myNode);
 
-        tree.on('select', function (e, node, id) {
+        tree.off().on('select', function (e, node, id) {
+            if (myChart != null) {
+                myChart.destroy();
+            }
             buildPage(id);
         });
     });
 
 
-    if ($.fn.dataTable.isDataTable('#example')) {
-        var table = $('#example').DataTable();
-        table.ajax.url("/app/api/dsb/association/" + id).load();
+    if ($.fn.dataTable.isDataTable('#playerTable')) {
+        var table = $('#playerTable').DataTable();
+        table.ajax.url("/app/api/dsb/players/" + id).load();
     }
     else {
-        var table = $('#example').DataTable({
-            "lengthMenu": [[10, 50, 100, -1], [10, 50, 100, "All"]],
+        $('#playerTable').DataTable({
+            "lengthMenu": [[100, 500, 1000, -1], [100, 500, 1000, "All"]],
             "ajax": {
-                "url": "/app/api/dsb/association/" + id,
+                "url": "/app/api/dsb/players/" + id,
                 "dataSrc": "players"
             },
             "columns": [
@@ -97,8 +103,8 @@ var buildPage = function (id) {
         });
     }
 
-    var ctx = document.getElementById("myChart");
-    var jsonData = $.ajax({
+    var ctx = document.getElementById("chessCharts");
+    $.ajax({
         url: '/app/api/dsb/stats/' + id,
         dataType: 'json'
     }).done(function (results) {
@@ -112,12 +118,15 @@ var buildPage = function (id) {
             eloDSBByAge.push(stats.eloDSB);
         }
 
-        var myChart = new Chart(ctx, {
+        myChart = new Chart(ctx, {
             type: 'line',
             options: {
                 title: {
                     display: true,
                     text: "Chess Statistics for " + myLabel
+                },
+                legend: {
+                    display: false
                 }
             },
             data: {
@@ -125,7 +134,7 @@ var buildPage = function (id) {
                 datasets: [{
                     data: dwzByAge,
                     lineTension: 0,
-                    label: "Avg. DWZ by Age",
+                    label: "Avg. DWZ by Age (" + myLabel + ")",
                     backgroundColor: 'transparent',
                     borderColor: '#637fed',
                     borderWidth: 1,
@@ -133,7 +142,7 @@ var buildPage = function (id) {
                 }, {
                     data: dwzDSBByAge,
                     lineTension: 0,
-                    label: "Avg. DSB DWZ by Age",
+                    label: "Avg. DWZ by Age (00000: Deutscher Schachbund)",
                     backgroundColor: 'transparent',
                     borderColor: '#09279b',
                     borderWidth: 1,
@@ -141,7 +150,7 @@ var buildPage = function (id) {
                 }, {
                     data: eloByAge,
                     lineTension: 0,
-                    label: "Avg. ELO by Age",
+                    label: "Avg. ELO by Age (" + myLabel + ")",
                     backgroundColor: 'transparent',
                     borderColor: '#f44250',
                     borderWidth: 1,
@@ -149,7 +158,7 @@ var buildPage = function (id) {
                 }, {
                     data: eloDSBByAge,
                     lineTension: 0,
-                    label: "Avg. DSB ELO by Age",
+                    label: "Avg. ELO by Age (00000: Deutscher Schachbund)",
                     backgroundColor: 'transparent',
                     borderColor: '#63040c',
                     borderWidth: 1,

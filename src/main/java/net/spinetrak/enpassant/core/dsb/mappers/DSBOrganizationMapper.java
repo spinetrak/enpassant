@@ -24,22 +24,24 @@
 
 package net.spinetrak.enpassant.core.dsb.mappers;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class DSBClubMapper implements RowMapper<DSBClub>
+public class DSBOrganizationMapper implements RowMapper<DSBOrganization>
 {
   @Override
-  public DSBClub map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  public DSBOrganization map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    final DSBClub dsbClub = new DSBClub();
-    dsbClub.setClubId(rs_.getString("id"));
-    dsbClub.setName(rs_.getString("name"));
-    dsbClub.setAssociationId(rs_.getString("parentId"));
-    return dsbClub;
+    final DSBOrganization dsbOrganization = new DSBOrganization();
+    dsbOrganization.setOrganizationId(rs_.getString("id"));
+    dsbOrganization.setParentId(rs_.getString("parentId"));
+    dsbOrganization.setLevel(rs_.getInt("level"));
+    dsbOrganization.setName(rs_.getString("name"));
+    dsbOrganization.setIsClub(rs_.getBoolean("isclub"));
+    return dsbOrganization;
   }
 }

@@ -65,17 +65,17 @@ public interface DSBPlayerDAO
 
   @SqlQuery("SELECT * FROM dsb_player where dsbId = :dsbId")
   @RegisterRowMapper(DSBPlayerMapper.class)
-  List<DSBPlayer> selectByDSBId(@Bind("dsbId") final String dsbId_);
+  List<DSBPlayer> selectByDSBId(@Bind("dsbId") final int dsbId_);
 
   @SqlQuery("SELECT * FROM dwz where clubId = :p.clubId and memberId = :p.memberId")
   @RegisterRowMapper(DWZMapper.class)
   List<DWZ> selectDWZByPlayer(@BindBean("p") final DSBPlayer player_);
 
-  @SqlQuery("select * from getDWZStatsByAgeForAssociationOrClub (:id)")
+  @SqlQuery("SELECT * from getDWZStatsByAgeForAssociationOrClub (:id)")
   @RegisterRowMapper(StatsMapper.class)
   List<Stats> selectDWZsFor(@Bind("id") String id_);
 
-  @SqlQuery("select * from getELOStatsByAgeForAssociationOrClub (:id)")
+  @SqlQuery("SELECT * from getELOStatsByAgeForAssociationOrClub (:id)")
   @RegisterRowMapper(StatsMapper.class)
   List<Stats> selectELOsFor(@Bind("id") String id_);
 
@@ -83,7 +83,7 @@ public interface DSBPlayerDAO
   @RegisterRowMapper(FIDEMapper.class)
   List<FIDE> selectFIDEByPlayer(@BindBean("p") final DSBPlayer player_);
 
-  @SqlQuery("select * from dsb_player where clubid in (WITH RECURSIVE rec (id) as (SELECT o.id from dsb_organization as o where id = :id UNION ALL SELECT o.id from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec order by id)")
+  @SqlQuery("SELECT * from dsb_player where clubid in (WITH RECURSIVE rec (id) as (SELECT o.id from dsb_organization as o where id = :id UNION ALL SELECT o.id from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec order by id)")
   @RegisterRowMapper(DSBPlayerMapper.class)
   List<DSBPlayer> selectPlayersFor(@Bind("id") String id_);
 }

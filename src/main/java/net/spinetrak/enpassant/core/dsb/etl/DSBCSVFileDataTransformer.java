@@ -58,10 +58,14 @@ public class DSBCSVFileDataTransformer
     {
       LOGGER.error("Error retrieving players for club " + club_);
     }
+    catch (final DSBCSVFileParseException ex_)
+    {
+      LOGGER.error("Error parsing CSV file for club " + club_);
+    }
     return mapping;
   }
 
-  private Map<String, Integer> processRecords(final List<CSVRecord> records_)
+  private Map<String, Integer> processRecords(final List<CSVRecord> records_) throws DSBCSVFileParseException
   {
     final Map<String, Integer> mapping = new HashMap<>();
     for (final CSVRecord record : records_)
@@ -76,9 +80,17 @@ public class DSBCSVFileDataTransformer
       }
       catch (final Exception ex_)
       {
-        LOGGER.error("Error reading record " + record.toString());
+        throw new DSBCSVFileParseException("Error reading record " + record.toString());
       }
     }
     return mapping;
+  }
+
+  private static class DSBCSVFileParseException extends Exception
+  {
+    DSBCSVFileParseException(final String str_)
+    {
+      super(str_);
+    }
   }
 }

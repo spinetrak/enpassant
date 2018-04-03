@@ -25,7 +25,7 @@
 package net.spinetrak.enpassant.configuration;
 
 import net.spinetrak.enpassant.core.dsb.etl.DSBZIPFileDataTransformer;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
@@ -46,7 +46,7 @@ public class DSBZipFileProcessor implements Runnable
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBZipFileProcessor.class);
   private final Object _lock = new Object();
   private final String _url;
-  private DSBAssociation _dsb;
+  private DSBOrganization _dsb;
   private Date _lastUpdate;
 
   DSBZipFileProcessor(final String url_)
@@ -54,7 +54,7 @@ public class DSBZipFileProcessor implements Runnable
     _url = url_;
   }
 
-  public DSBAssociation getDSBAssociation()
+  public DSBOrganization getDSBOrganization()
   {
     synchronized (_lock)
     {
@@ -76,7 +76,7 @@ public class DSBZipFileProcessor implements Runnable
 
   public boolean isUpToDate()
   {
-    return zipFileIsCurrent() && _dsb != null && _lastUpdate != null && _dsb.getAssociations().size() > 10;
+    return zipFileIsCurrent() && _dsb != null && _lastUpdate != null && _dsb.getOrganizations().size() > 10;
   }
 
   public Date lastUpdate()
@@ -93,7 +93,7 @@ public class DSBZipFileProcessor implements Runnable
       LOGGER.info("Downloading " + _url);
       downloadZipFile();
     }
-    _dsb = DSBZIPFileDataTransformer.createDSBAssociationFromZIPFile(DSB_DATA_FILE);
+    _dsb = DSBZIPFileDataTransformer.createDSBOrganizationFromZIPFile(DSB_DATA_FILE);
 
     _lastUpdate = new Date();
   }

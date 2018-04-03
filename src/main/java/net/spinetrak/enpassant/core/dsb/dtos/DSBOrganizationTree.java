@@ -24,21 +24,21 @@
 
 package net.spinetrak.enpassant.core.dsb.dtos;
 
-import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class DSBAssociationTree
+public class DSBOrganizationTree
 {
-  private DSBAssociation _dsbAssociation;
-  private List<DSBAssociationTree> children = new ArrayList<>();
+  private DSBOrganization _dsbOrganization;
+  private List<DSBOrganizationTree> children = new ArrayList<>();
   private String id = null;
   private String text = null;
 
-  public List<DSBAssociationTree> getChildren()
+  public List<DSBOrganizationTree> getChildren()
   {
     Collections.sort(children, (tree1_, tree2_) -> tree1_.getId().compareTo(tree2_.getId()));
     return children;
@@ -54,25 +54,25 @@ public class DSBAssociationTree
     return text;
   }
 
-  public void setDsbAssociation(final DSBAssociation dsbAssociation_)
+  public void setDsbOrganization(final DSBOrganization dsbOrganization_)
   {
-    _dsbAssociation = dsbAssociation_;
-    if (_dsbAssociation != null)
+    _dsbOrganization = dsbOrganization_;
+    if (_dsbOrganization != null)
     {
-      id = _dsbAssociation.getAssociationId();
-      text = _dsbAssociation.getAssociationId() + ": " + _dsbAssociation.getName();
-      children.addAll(makeNestedList(_dsbAssociation.getAssociations()));
+      id = _dsbOrganization.getOrganizationId();
+      text = _dsbOrganization.getOrganizationId() + ": " + _dsbOrganization.getName();
+      children.addAll(makeNestedList(_dsbOrganization.getOrganizations()));
     }
   }
 
-  private List<DSBAssociationTree> makeNestedList(final Map<String, DSBAssociation> associations_)
+  private List<DSBOrganizationTree> makeNestedList(final Map<String, DSBOrganization> organizations_)
   {
-    final List<DSBAssociationTree> nestedList = new ArrayList<>();
-    for (final DSBAssociation dsbAssociation : associations_.values())
+    final List<DSBOrganizationTree> nestedList = new ArrayList<>();
+    for (final DSBOrganization dsbOrganization : organizations_.values())
     {
-      final DSBAssociationTree dsbAssociationTree = new DSBAssociationTree();
-      dsbAssociationTree.setDsbAssociation(dsbAssociation);
-      nestedList.add(dsbAssociationTree);
+      final DSBOrganizationTree dsbOrganizationTree = new DSBOrganizationTree();
+      dsbOrganizationTree.setDsbOrganization(dsbOrganization);
+      nestedList.add(dsbOrganizationTree);
     }
     return nestedList;
   }

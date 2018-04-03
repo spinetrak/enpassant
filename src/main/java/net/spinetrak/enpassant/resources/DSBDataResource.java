@@ -24,16 +24,16 @@
 
 package net.spinetrak.enpassant.resources;
 
-import net.spinetrak.enpassant.core.dsb.dtos.DSBAssociationTree;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBOrganizationTree;
 import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.db.DSBDataCache;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,43 +48,30 @@ public class DSBDataResource
     _dsbDataCache = dsbDataCache_;
   }
 
-  @Path("/association/{associationId}")
+  @Path("/organization/{organizationId}")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
-  public DSBAssociation getAssociation(@PathParam("associationId") final String associationId_)
+  public DSBOrganization getOrganization(@PathParam("organizationId") final String organizationId_)
   {
-    final DSBAssociation dsbAssociation = _dsbDataCache.getDSBAssociation(associationId_);
-    if (null != dsbAssociation)
+    final DSBOrganization dsbOrganization = _dsbDataCache.getDSBOrganization(organizationId_);
+    if (null != dsbOrganization)
     {
-      return dsbAssociation;
+      return dsbOrganization;
     }
     throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
 
-  @Path("/associationTree/{associationId}")
+  @Path("/organizationTree/{organizationId}")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
-  public DSBAssociationTree getAssociationTree(@PathParam("associationId") final String associationId_)
+  public DSBOrganizationTree getOrganizationTree(@PathParam("organizationId") final String organizationId_)
   {
-    final DSBAssociation dsbAssociation = _dsbDataCache.getDSBAssociation(associationId_);
-    if (null != dsbAssociation)
+    final DSBOrganization dsbOrganization = _dsbDataCache.getDSBOrganization(organizationId_);
+    if (null != dsbOrganization)
     {
-      final DSBAssociationTree dsbAssociationTree = new DSBAssociationTree();
-      dsbAssociationTree.setDsbAssociation(dsbAssociation);
-      return dsbAssociationTree;
-    }
-    throw new WebApplicationException(Response.Status.NOT_FOUND);
-  }
-
-  @Path("/club/{clubId}")
-  @Produces(MediaType.APPLICATION_JSON)
-  @GET
-  public DSBClub getClub(@PathParam("clubId") final String clubId_)
-  {
-    final DSBClub club = _dsbDataCache.getDSBClub(clubId_);
-    if (club != null)
-    {
-      return club;
+      final DSBOrganizationTree dsbOrganizationTree = new DSBOrganizationTree();
+      dsbOrganizationTree.setDsbOrganization(dsbOrganization);
+      return dsbOrganizationTree;
     }
     throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
@@ -104,25 +91,27 @@ public class DSBDataResource
     throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
 
-  @Path("/players/{clubOrAssociationId_}")
+  @Path("/players/{organizationId_}")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
-  public List<DSBPlayer> getPlayers(@PathParam("clubOrAssociationId_") final String clubOrAssociationId_)
+  public Map<String, List<DSBPlayer>> getPlayers(@PathParam("organizationId_") final String organizationId_)
   {
-    final List<DSBPlayer> players = _dsbDataCache.getDSBPlayers(clubOrAssociationId_);
+    final List<DSBPlayer> players = _dsbDataCache.getDSBPlayers(organizationId_);
     if (players.isEmpty())
     {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
-    return players;
+    final Map<String, List<DSBPlayer>> map = new HashMap<>();
+    map.put("players", players);
+    return map;
   }
 
-  @Path("/stats/{associationId}")
+  @Path("/stats/{organizationId}")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
-  public List<DSBStats> getStats(@PathParam("associationId") final String clubOrAssociationId_)
+  public List<DSBStats> getStats(@PathParam("organizationId") final String organizationId_)
   {
-    final Map<Integer, Float[]> finalResults = _dsbDataCache.getStats(clubOrAssociationId_);
+    final Map<Integer, Float[]> finalResults = _dsbDataCache.getStats(organizationId_);
 
     final DSBStats dsbStats = new DSBStats();
     dsbStats.setStats(finalResults);

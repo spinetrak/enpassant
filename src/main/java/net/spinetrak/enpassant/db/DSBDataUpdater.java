@@ -25,12 +25,10 @@
 package net.spinetrak.enpassant.db;
 
 import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
-import net.spinetrak.enpassant.core.dsb.daos.DSBAssociationDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBClubDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBOrganizationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
 import net.spinetrak.enpassant.core.dsb.etl.DSBCSVFileDataTransformer;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
@@ -42,16 +40,14 @@ import java.util.Map;
 public class DSBDataUpdater implements Runnable
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataUpdater.class);
-  private final DSBAssociationDAO _dsbAssociationDAO;
-  private final DSBClubDAO _dsbClubDAO;
+  private final DSBOrganizationDAO _dsbOrganizationDAO;
   private final DSBPlayerDAO _dsbPlayerDAO;
   private DSBZipFileProcessor _dsbZipFileProcessor;
 
-  public DSBDataUpdater(final DSBAssociationDAO dsbAssociationDAO_, final DSBClubDAO dsbClubDAO_,
+  public DSBDataUpdater(final DSBOrganizationDAO dsbOrganizationDAO_,
                         final DSBPlayerDAO dsbPlayerDAO_, final DSBZipFileProcessor dsbZipFileProcessor_)
   {
-    _dsbAssociationDAO = dsbAssociationDAO_;
-    _dsbClubDAO = dsbClubDAO_;
+    _dsbOrganizationDAO = dsbOrganizationDAO_;
     _dsbPlayerDAO = dsbPlayerDAO_;
     _dsbZipFileProcessor = dsbZipFileProcessor_;
   }
@@ -60,21 +56,20 @@ public class DSBDataUpdater implements Runnable
   @Override
   public void run()
   {
-    updateDatabase(_dsbZipFileProcessor.getDSBAssociation());
+    updateDatabase(_dsbZipFileProcessor.getDSBOrganization());
   }
 
-  private void updateDatabase(final DSBAssociation dsbAssociation_)
+  private void updateDatabase(final DSBOrganization dsbOrganization_)
   {
     try
     {
-      LOGGER.info("Upserting association: " + dsbAssociation_.getName());
-      _dsbAssociationDAO.insertOrUpdate(dsbAssociation_);
-      for (final DSBClub club : dsbAssociation_.getClubs().values())
+      _dsbOrganizationDAO.insertOrUpdate(dsbOrganization_);
+
+      if (dsbOrganization_.getIsClub())
       {
         final Map<String, Integer> zpsToDSBIdMapping = new DSBCSVFileDataTransformer().getZPStoDSBIDMapping(
-          club.getClubId());
-        _dsbClubDAO.insertOrUpdate(club);
-        for (final DSBPlayer player : club.getPlayers())
+          dsbOrganization_.getOrganizationId());
+        for (final DSBPlayer player : dsbOrganization_.getPlayers())
         {
           final Integer dsbid = zpsToDSBIdMapping.get(
             player.getClubId() + "-" + player.getMemberId());
@@ -113,9 +108,14 @@ public class DSBDataUpdater implements Runnable
           }
         }
       }
-      for (final DSBAssociation association : dsbAssociation_.getAssociations().values())
+      if (!dsbOrganization_.getIsClub() && dsbOrganization_.getLevel() == DSBOrganization.LAND)
       {
-        updateDatabase(association);
+        LOGGER.info("Upserting organization: " + dsbOrganization_.getName());
+      }
+
+      for (final DSBOrganization organization : dsbOrganization_.getOrganizations().values())
+      {
+        updateDatabase(organization);
       }
     }
     catch (final Exception ex_)

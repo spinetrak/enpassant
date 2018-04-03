@@ -26,12 +26,10 @@ package net.spinetrak.enpassant.db;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.spinetrak.enpassant.core.dsb.daos.DSBAssociationDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBClubDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBOrganizationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
 import net.spinetrak.enpassant.core.dsb.daos.Stats;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBAssociation;
-import net.spinetrak.enpassant.core.dsb.pojos.DSBClub;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
@@ -48,14 +46,10 @@ import java.util.concurrent.TimeUnit;
 public class DSBDataCache
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(DSBDataCache.class);
-  private final Cache<String, DSBAssociation> _dsbAssociationCache = CacheBuilder.newBuilder()
+  private final Cache<String, DSBOrganization> _dsbOrganizationCache = CacheBuilder.newBuilder()
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
-  private final DSBAssociationDAO _dsbAssociationDAO;
-  private final Cache<String, DSBClub> _dsbClubCache = CacheBuilder.newBuilder()
-    .expireAfterWrite(12, TimeUnit.HOURS)
-    .build();
-  private final DSBClubDAO _dsbClubDAO;
+  private final DSBOrganizationDAO _dsbOrganizationDAO;
   private final Cache<String, DSBPlayer> _dsbPlayerCache = CacheBuilder.newBuilder()
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
@@ -67,56 +61,34 @@ public class DSBDataCache
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
 
-  public DSBDataCache(final DSBAssociationDAO dsbAssociationDAO_, final DSBClubDAO dsbClubDAO_,
+  public DSBDataCache(final DSBOrganizationDAO dsbOrganizationDAO_,
                       final DSBPlayerDAO dsbPlayerDAO_)
   {
     _dsbPlayerDAO = dsbPlayerDAO_;
-    _dsbAssociationDAO = dsbAssociationDAO_;
-    _dsbClubDAO = dsbClubDAO_;
+    _dsbOrganizationDAO = dsbOrganizationDAO_;
   }
 
-  public DSBAssociation getDSBAssociation(final String associationId_)
+  public DSBOrganization getDSBOrganization(final String organizationId_)
   {
     try
     {
-      return _dsbAssociationCache.get(associationId_, () -> {
-        final List<DSBAssociation> associations = _dsbAssociationDAO.select(associationId_);
-        if (!associations.isEmpty())
+      return _dsbOrganizationCache.get(organizationId_, () -> {
+        final List<DSBOrganization> organizations = _dsbOrganizationDAO.selectById(organizationId_);
+        if (!organizations.isEmpty())
         {
-          final DSBAssociation dsbAssociation = associations.get(0);
-          for (final DSBAssociation child : getChildrenForAssociation(dsbAssociation))
+          final DSBOrganization dsbOrganization = organizations.get(0);
+          for (final DSBOrganization child : getChildrenForOrganization(dsbOrganization))
           {
-            dsbAssociation.add(child);
-          }
-          return dsbAssociation;
-        }
-        throw new ExecutionException(new Throwable("Not found"));
-      });
-    }
-    catch (final ExecutionException ex_)
-    {
-      //ignore
-    }
-    return null;
-  }
+            child.add(_dsbPlayerDAO.selectByClubId(child.getOrganizationId()));
 
-  public DSBClub getDSBClub(final String clubId_)
-  {
-    try
-    {
-      return _dsbClubCache.get(clubId_, () -> {
-        final List<DSBClub> clubs = _dsbClubDAO.select(clubId_);
-        if (!clubs.isEmpty())
-        {
-          final DSBClub club = clubs.get(0);
-          club.add(_dsbPlayerDAO.selectByClubId(club.getClubId()));
-
-          for (final DSBPlayer player : club.getPlayers())
-          {
-            player.setDWZ(_dsbPlayerDAO.selectDWZByPlayer(player));
-            player.setFIDE(_dsbPlayerDAO.selectFIDEByPlayer(player));
+            for (final DSBPlayer player : child.getPlayers())
+            {
+              player.setDWZ(_dsbPlayerDAO.selectDWZByPlayer(player));
+              player.setFIDE(_dsbPlayerDAO.selectFIDEByPlayer(player));
+            }
+            dsbOrganization.add(child);
           }
-          return club;
+          return dsbOrganization;
         }
         throw new ExecutionException(new Throwable("Not found"));
       });
@@ -141,26 +113,18 @@ public class DSBDataCache
           if (!players.isEmpty())
           {
             final DSBPlayer player = players.get(0);
-            final List<DWZ> dwzs = _dsbPlayerDAO.selectDWZByPlayer(player);
-            player.setDWZ(dwzs);
-
-            final List<FIDE> fides = _dsbPlayerDAO.selectFIDEByPlayer(player);
-            player.setFIDE(fides);
+            setDWZandELO(player);
             return player;
           }
         }
         //DSBID (integer)
         else
         {
-          final List<DSBPlayer> players = _dsbPlayerDAO.selectByDSBId(playerId_);
+          final List<DSBPlayer> players = _dsbPlayerDAO.selectByDSBId(Integer.parseInt(playerId_));
           if (!players.isEmpty())
           {
             final DSBPlayer player = players.get(0);
-            final List<DWZ> dwzs = _dsbPlayerDAO.selectDWZByPlayer(player);
-            player.setDWZ(dwzs);
-
-            final List<FIDE> fides = _dsbPlayerDAO.selectFIDEByPlayer(player);
-            player.setFIDE(fides);
+            setDWZandELO(player);
             return player;
           }
         }
@@ -174,11 +138,18 @@ public class DSBDataCache
     return null;
   }
 
-  public List<DSBPlayer> getDSBPlayers(final String clubOrAssociationId_)
+  public List<DSBPlayer> getDSBPlayers(final String organizationId_)
   {
     try
     {
-      return _dsbPlayersCache.get(clubOrAssociationId_, () -> _dsbPlayerDAO.selectPlayersFor(clubOrAssociationId_));
+      return _dsbPlayersCache.get(organizationId_, () -> {
+        final List<DSBPlayer> players = _dsbPlayerDAO.selectPlayersFor(organizationId_);
+        for (final DSBPlayer dsbPlayer : players)
+        {
+          setDWZandELO(dsbPlayer);
+        }
+        return players;
+      });
     }
     catch (final ExecutionException ex_)
     {
@@ -187,14 +158,14 @@ public class DSBDataCache
     return new ArrayList<>();
   }
 
-  public Map<Integer, Float[]> getStats(final String clubOrAssociationId_)
+  public Map<Integer, Float[]> getStats(final String organizationId_)
   {
     try
     {
-      return _dsbStatsCache.get(clubOrAssociationId_, () -> {
-        final List<Stats> clubDWZStats = _dsbPlayerDAO.selectDWZsFor(clubOrAssociationId_);
+      return _dsbStatsCache.get(organizationId_, () -> {
+        final List<Stats> clubDWZStats = _dsbPlayerDAO.selectDWZsFor(organizationId_);
         final List<Stats> dsbDWZStats = _dsbPlayerDAO.selectDWZsFor("00000");
-        final List<Stats> clubELOStats = _dsbPlayerDAO.selectELOsFor(clubOrAssociationId_);
+        final List<Stats> clubELOStats = _dsbPlayerDAO.selectELOsFor(organizationId_);
         final List<Stats> dsbELOStats = _dsbPlayerDAO.selectELOsFor("00000");
 
         final Map<Integer, Stats> clubDWZ = Stats.asMap(clubDWZStats);
@@ -211,26 +182,19 @@ public class DSBDataCache
     return new HashMap<>();
   }
 
-
   /**
    * recursive lookup
    **/
-  private List<DSBAssociation> getChildrenForAssociation(final DSBAssociation association_)
+  private List<DSBOrganization> getChildrenForOrganization(final DSBOrganization organization_)
   {
-    final List<DSBAssociation> associations = _dsbAssociationDAO.selectChildrenOf(association_.getAssociationId());
-    for (final DSBAssociation association : associations)
+    final List<DSBOrganization> organizations = _dsbOrganizationDAO.selectChildrenOf(organization_.getOrganizationId());
+    for (final DSBOrganization organization : organizations)
     {
-      getChildrenForAssociation(association);
-      association_.add(association);
+      organization.add(_dsbPlayerDAO.selectByClubId(organization.getOrganizationId()));
+      getChildrenForOrganization(organization);
+      organization_.add(organization);
     }
-
-    final List<DSBClub> clubs = _dsbClubDAO.selectChildrenOf(association_.getAssociationId());
-    for (final DSBClub club : clubs)
-    {
-      club.add(_dsbPlayerDAO.selectByClubId(club.getClubId()));
-      association_.add(club);
-    }
-    return associations;
+    return organizations;
   }
 
   private Map<Integer, Float[]> mergeStats(final Map<Integer, Stats> clubDWZ_, final Map<Integer, Stats> dsbDWZ_,
@@ -255,5 +219,13 @@ public class DSBDataCache
     return results;
   }
 
+  private void setDWZandELO(final DSBPlayer player_)
+  {
+    final List<DWZ> dwzs = _dsbPlayerDAO.selectDWZByPlayer(player_);
+    player_.setDWZ(dwzs);
+
+    final List<FIDE> fides = _dsbPlayerDAO.selectFIDEByPlayer(player_);
+    player_.setFIDE(fides);
+  }
 
 }

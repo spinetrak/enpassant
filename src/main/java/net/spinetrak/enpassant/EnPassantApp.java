@@ -36,8 +36,7 @@ import io.dropwizard.jersey.jackson.JsonProcessingExceptionMapper;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
-import net.spinetrak.enpassant.core.dsb.daos.DSBAssociationDAO;
-import net.spinetrak.enpassant.core.dsb.daos.DSBClubDAO;
+import net.spinetrak.enpassant.core.dsb.daos.DSBOrganizationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
 import net.spinetrak.enpassant.db.DSBDataCache;
 import net.spinetrak.enpassant.db.DSBDataUpdater;
@@ -104,18 +103,17 @@ public class EnPassantApp extends Application<EnPassantConfig>
     flyway.migrate();
     flyway.validate();
 
-    final DSBAssociationDAO dsbAssociationDAO = jdbi.onDemand(DSBAssociationDAO.class);
-    final DSBClubDAO dsbClubDAO = jdbi.onDemand(DSBClubDAO.class);
+    final DSBOrganizationDAO dsbOrganizationDAO = jdbi.onDemand(DSBOrganizationDAO.class);
     final DSBPlayerDAO dsbPlayerDAO = jdbi.onDemand(DSBPlayerDAO.class);
 
     final DSBZipFileProcessor dsbZipFileProcessor = configuration_.getDSBDataFactory().build(environment_);
-    final DSBDataCache dsbDataCache = new DSBDataCache(dsbAssociationDAO, dsbClubDAO, dsbPlayerDAO);
+    final DSBDataCache dsbDataCache = new DSBDataCache(dsbOrganizationDAO, dsbPlayerDAO);
     final DSBDataResource dsbDataResource = new DSBDataResource(dsbDataCache);
     environment_.jersey().register(dsbDataResource);
     environment_.healthChecks().register("dsbZipFileProcessor", new DSBDataHealthCheck(dsbZipFileProcessor));
 
     final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService("dsbDataUpdater").build();
-    final DSBDataUpdater dsbDataUpdater = new DSBDataUpdater(dsbAssociationDAO, dsbClubDAO, dsbPlayerDAO,
+    final DSBDataUpdater dsbDataUpdater = new DSBDataUpdater(dsbOrganizationDAO, dsbPlayerDAO,
                                                              dsbZipFileProcessor);
     ses.scheduleWithFixedDelay(dsbDataUpdater, 60, configuration_.getDSBDataFactory().getRefreshInterval(),
                                TimeUnit.SECONDS);
