@@ -22,47 +22,50 @@
  *  SOFTWARE.
  */
 
+
 $(document).ready(function () {
-    buildPage("40000");
-});
-
-var buildPage = function (id) {
-
-    console.log("buildPage caled with ID " + id);
-
-    var myLabel = "";
+    var myTree = null;
+    var myNode = null;
+    var myLabel = null;
     var myChart = null;
+    var myTable = null;
 
-    $.getJSON("/app/api/dsb/organizationTree/00000", function (data) {
-        var myData = [data];
-        var tree = $('#tree').tree({
-            primaryKey: 'id',
-            dataSource: myData,
-            icons: {
-                expand: '<i>+</i>',
-                collapse: '<i>-</i>'
-            }
-        });
-        tree.expand(tree.getNodeById("00000"));
-        var myNode = tree.getNodeById(id);
-        myLabel = myNode.find('span[data-role~="display"]').html();
-        tree.select(myNode);
+    buildPage("40000");
 
-        tree.off().on('select', function (e, node, id) {
-            if (myChart != null) {
-                myChart.destroy();
-            }
-            buildPage(id);
-        });
-    });
-
-
-    if ($.fn.dataTable.isDataTable('#playerTable')) {
-        var table = $('#playerTable').DataTable();
-        table.ajax.url("/app/api/dsb/players/" + id).load();
+    function buildPage(id) {
+        buildTree(id);
+        buildTable(id);
+        buildChart(id);
     }
-    else {
-        $('#playerTable').DataTable({
+
+
+    function buildTree(id) {
+        $.getJSON("/app/api/dsb/organizationTree/00000", function (data) {
+            var myData = [data];
+            myTree = $('#tree').tree({
+                primaryKey: 'id',
+                dataSource: myData,
+                icons: {
+                    expand: '<i>+</i>',
+                    collapse: '<i>-</i>'
+                }
+            });
+            myTree.expand(myTree.getNodeById("00000"));
+            myNode = myTree.getNodeById(id);
+            myLabel = myNode.find('span[data-role~="display"]').html();
+            myTree.select(myNode);
+
+            myTree.off().on('select', function (e, node, newid) {
+                if (myChart != null) {
+                    myChart.destroy();
+                }
+                updatePage(newid);
+            });
+        });
+    }
+
+    function buildTable(id) {
+        myTable = $('#playerTable').DataTable({
             "lengthMenu": [[100, 500, 1000, -1], [100, 500, 1000, "All"]],
             "ajax": {
                 "url": "/app/api/dsb/players/" + id,
@@ -103,22 +106,39 @@ var buildPage = function (id) {
         });
     }
 
-    var ctx = document.getElementById("chessCharts");
-    $.ajax({
-        url: '/app/api/dsb/stats/' + id,
-        dataType: 'json'
-    }).done(function (results) {
-        var labels = [], dwzByAge = [], dwzDSBByAge = [], eloByAge = [], eloDSBByAge = [];
-        for (var i = 0; i < results.length; i++) {
-            var stats = results[i];
-            labels.push(stats.age);
-            dwzByAge.push(stats.dwz);
-            dwzDSBByAge.push(stats.dwzDSB);
-            eloByAge.push(stats.elo);
-            eloDSBByAge.push(stats.eloDSB);
+    function buildChart(id) {
+        document.getElementById("chessCharts");
+        $.ajax({
+            url: '/app/api/dsb/stats/' + id,
+            dataType: 'json'
+        }).done(function (results) {
+            var labels = [], dwzByAge = [], dwzDSBByAge = [], eloByAge = [], eloDSBByAge = [];
+            for (var i = 0; i < results.length; i++) {
+                labels.push(results[i].age);
+                dwzByAge.push(results[i].dwz);
+                dwzDSBByAge.push(results[i].dwzDSB);
+                eloByAge.push(results[i].elo);
+                eloDSBByAge.push(results[i].eloDSB);
+            }
+            updateChart(labels, dwzByAge, dwzDSBByAge, eloByAge, eloDSBByAge);
+        });
+    }
+
+    function updatePage(id) {
+        myNode = myTree.getNodeById(id);
+        myLabel = myNode.find('span[data-role~="display"]').html();
+        //myTree.select(myNode);
+
+        if ($.fn.dataTable.isDataTable('#playerTable')) {
+            myTable = $('#playerTable').DataTable();
+            myTable.ajax.url("/app/api/dsb/players/" + id).load();
         }
 
-        myChart = new Chart(ctx, {
+        buildChart(id);
+    }
+
+    function updateChart(labels, dwzByAge, dwzDSBByAge, eloByAge, eloDSBByAge) {
+        myChart = new Chart(document.getElementById("chessCharts"), {
             type: 'line',
             options: {
                 title: {
@@ -165,9 +185,11 @@ var buildPage = function (id) {
                     pointBackgroundColor: '#63040c'
                 }]
             }
-        })
-    });
-};
+        });
+    }
+});
+
+
 
 
 
