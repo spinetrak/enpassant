@@ -28,7 +28,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.spinetrak.enpassant.core.dsb.daos.DSBOrganizationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
-import net.spinetrak.enpassant.core.dsb.daos.Stats;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
@@ -57,7 +57,7 @@ public class DSBDataCache
   private final Cache<String, List<DSBPlayer>> _dsbPlayersCache = CacheBuilder.newBuilder()
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
-  private final Cache<String, Map<Integer, Float[]>> _dsbStatsCache = CacheBuilder.newBuilder()
+  private final Cache<String, List<DSBStats>> _dsbStatsCache = CacheBuilder.newBuilder()
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
 
@@ -158,28 +158,31 @@ public class DSBDataCache
     return new ArrayList<>();
   }
 
-  public Map<Integer, Float[]> getStats(final String organizationId_)
+  public List<DSBStats> getStats(final String organizationId_)
   {
     try
     {
       return _dsbStatsCache.get(organizationId_, () -> {
-        final List<Stats> clubDWZStats = _dsbPlayerDAO.selectDWZsFor(organizationId_);
-        final List<Stats> dsbDWZStats = _dsbPlayerDAO.selectDWZsFor("00000");
-        final List<Stats> clubELOStats = _dsbPlayerDAO.selectELOsFor(organizationId_);
-        final List<Stats> dsbELOStats = _dsbPlayerDAO.selectELOsFor("00000");
+        final List<DSBStats> clubDWZStats = _dsbPlayerDAO.selectDWZStatsFor(organizationId_);
+        final List<DSBStats> dsbDWZStats = _dsbPlayerDAO.selectDWZStatsFor("00000");
+        final List<DSBStats> clubELOStats = _dsbPlayerDAO.selectELOStatsFor(organizationId_);
+        final List<DSBStats> dsbELOStats = _dsbPlayerDAO.selectELOStatsFor("00000");
+        final List<DSBStats> clubMemberStats = _dsbPlayerDAO.selectMemberStatsFor(organizationId_);
 
-        final Map<Integer, Stats> clubDWZ = Stats.asMap(clubDWZStats);
-        final Map<Integer, Stats> dsbDWZ = Stats.asMap(dsbDWZStats);
-        final Map<Integer, Stats> clubELO = Stats.asMap(clubELOStats);
-        final Map<Integer, Stats> dsbELO = Stats.asMap(dsbELOStats);
-        return mergeStats(clubDWZ, dsbDWZ, clubELO, dsbELO);
+        final Map<Integer, List<DSBStats>> stats = new HashMap<>();
+        stats.put(DSBStats.CLUB_DWZ, clubDWZStats);
+        stats.put(DSBStats.DSB_DWZ, dsbDWZStats);
+        stats.put(DSBStats.CLUB_ELO, clubELOStats);
+        stats.put(DSBStats.DSB_ELO, dsbELOStats);
+        stats.put(DSBStats.CLUB_MEMBERS, clubMemberStats);
+        return DSBStats.asConsolidatedStats(stats);
       });
     }
     catch (final ExecutionException ex_)
     {
       //ignore
     }
-    return new HashMap<>();
+    return new ArrayList<>();
   }
 
   /**
@@ -197,27 +200,6 @@ public class DSBDataCache
     return organizations;
   }
 
-  private Map<Integer, Float[]> mergeStats(final Map<Integer, Stats> clubDWZ_, final Map<Integer, Stats> dsbDWZ_,
-                                           final Map<Integer, Stats> clubELO_,
-                                           final Map<Integer, Stats> dsbELO_)
-  {
-    final Map<Integer, Float[]> results = new HashMap<>();
-    for (int i = 0; i < 100; i++)
-    {
-      final Stats clubDWZStats = clubDWZ_.get(i);
-      final Stats dsbDWZStats = dsbDWZ_.get(i);
-      final float clubDWZ = clubDWZStats == null ? 0f : clubDWZStats.getAvg();
-      final float dsbDWZ = dsbDWZStats == null ? 0f : dsbDWZStats.getAvg();
-
-      final Stats clubELOStats = clubELO_.get(i);
-      final Stats dsbELOStats = dsbELO_.get(i);
-      final float clubELO = clubELOStats == null ? 0f : clubELOStats.getAvg();
-      final float dsbELO = dsbELOStats == null ? 0f : dsbELOStats.getAvg();
-
-      results.put(i, new Float[]{dsbDWZ, clubDWZ, dsbELO, clubELO});
-    }
-    return results;
-  }
 
   private void setDWZandELO(final DSBPlayer player_)
   {

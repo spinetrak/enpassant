@@ -22,54 +22,23 @@
  *  SOFTWARE.
  */
 
-package net.spinetrak.enpassant.core.dsb.daos;
+package net.spinetrak.enpassant.core.dsb.mappers;
 
-import org.joda.time.DateTime;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
+import org.jdbi.v3.core.mapper.RowMapper;
+import org.jdbi.v3.core.statement.StatementContext;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
-public class Stats
+public class DSBMemberStatsMapper implements RowMapper<DSBStats>
 {
-  private final static int TODAY = DateTime.now().getYear();
-  private Float _avg;
-  private Integer _yoB;
-
-  public static Map<Integer, Stats> asMap(final List<Stats> stats_)
+  @Override
+  public DSBStats map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    final Map<Integer, Stats> map = new HashMap<>();
-    if (stats_ == null)
-    {
-      return map;
-    }
-    for (final Stats stats : stats_)
-    {
-      if (stats != null && stats.getYoB() != null)
-      {
-        map.put(TODAY - stats.getYoB(), stats);
-      }
-    }
-    return map;
-  }
-
-  public Float getAvg()
-  {
-    return _avg;
-  }
-
-  public Integer getYoB()
-  {
-    return _yoB;
-  }
-
-  public void setAverage(final float avg_)
-  {
-    _avg = avg_;
-  }
-
-  public void setYoB(final int yoB_)
-  {
-    _yoB = yoB_;
+    final DSBStats stats = new DSBStats();
+    stats.setMembers(rs_.getInt("members"));
+    stats.setYoB(rs_.getInt("yob"));
+    return stats;
   }
 }

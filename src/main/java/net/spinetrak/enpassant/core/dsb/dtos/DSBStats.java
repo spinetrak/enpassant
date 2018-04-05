@@ -25,29 +25,84 @@
 package net.spinetrak.enpassant.core.dsb.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class DSBStats
 {
+  public static final int CLUB_DWZ = 3;
+  public static final int CLUB_ELO = 1;
+  public static final int CLUB_MEMBERS = 5;
+  public static final int DSB_DWZ = 4;
+  public static final int DSB_ELO = 2;
+  private final static int TODAY = DateTime.now().getYear();
   private final List<DSBStats> _data = new ArrayList<>();
   private Integer _age;
+  private Float _avg;
   private Float _dwz;
   private Float _dwzDSB;
   private Float _elo;
   private Float _eloDSB;
-  private Map<Integer, Float[]> _stats;
+  private Integer _members;
+  private Number _y;
+  private Integer _yoB;
 
   public DSBStats()
   {
-    _stats = new HashMap<>();
-    for (int i = 0; i <= 100; i++)
+
+  }
+
+  public static List<DSBStats> asConsolidatedStats(final Map<Integer, List<DSBStats>> stats_)
+  {
+    final List<DSBStats> consolidated = new ArrayList<>();
+    for (int x = 0; x < 100; x++)
     {
-      _stats.put(i, new Float[]{0f, 0f, 0f, 0f});
+      final DSBStats consolidate = new DSBStats();
+      consolidate.setAge(x);
+      for (final Map.Entry<Integer, List<DSBStats>> stats : stats_.entrySet())
+      {
+        final Integer statsType = stats.getKey();
+        final List<DSBStats> theStats = stats.getValue();
+        for (final DSBStats stat : theStats)
+        {
+          if (stat != null && stat.getYoB() != null)
+          {
+            final int age = TODAY - stat.getYoB();
+            final Float avg = stat.getAvg();
+            final Integer mem = stat.getMembers();
+            if (age == x)
+            {
+              switch (statsType)
+              {
+                case CLUB_ELO:
+                  consolidate.setElo(avg);
+                  break;
+                case DSB_ELO:
+                  consolidate.setEloDSB(avg);
+                  break;
+                case CLUB_DWZ:
+                  consolidate.setDwz(avg);
+                  break;
+                case DSB_DWZ:
+                  consolidate.setDwzDSB(avg);
+                  break;
+                case CLUB_MEMBERS:
+                  consolidate.setMembers(mem);
+                  break;
+                default:
+                  break;
+              }
+            }
+          }
+        }
+      }
+
+      consolidated.add(consolidate);
     }
+    return consolidated;
   }
 
   public Integer getAge()
@@ -81,26 +136,34 @@ public class DSBStats
     return _eloDSB;
   }
 
-  public void setStats(final Map<Integer, Float[]> stats_)
+  public Integer getMembers()
   {
-    if (null != stats_)
-    {
-      _stats.putAll(stats_);
-    }
+    return _members;
+  }
 
-    for (final Map.Entry<Integer, Float[]> entry : _stats.entrySet())
-    {
-      final Integer age = entry.getKey();
-      final Float[] stats = entry.getValue();
+  public void setAverage(final float avg_)
+  {
+    _avg = avg_;
+  }
 
-      final DSBStats DSBStats = new DSBStats();
-      DSBStats.setAge(age);
-      DSBStats.setDwzDSB(stats[0]);
-      DSBStats.setDwz(stats[1]);
-      DSBStats.setEloDSB(stats[2]);
-      DSBStats.setElo(stats[3]);
-      _data.add(DSBStats);
-    }
+  public void setMembers(final int members_)
+  {
+    _members = members_;
+  }
+
+  public void setYoB(final int yoB_)
+  {
+    _yoB = yoB_;
+  }
+
+  private Float getAvg()
+  {
+    return _avg;
+  }
+
+  private Integer getYoB()
+  {
+    return _yoB;
   }
 
   private void setAge(final Integer age_)

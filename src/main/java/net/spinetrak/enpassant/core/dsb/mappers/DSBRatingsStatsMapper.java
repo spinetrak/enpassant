@@ -24,19 +24,19 @@
 
 package net.spinetrak.enpassant.core.dsb.mappers;
 
-import net.spinetrak.enpassant.core.dsb.daos.Stats;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
 import org.jdbi.v3.core.mapper.RowMapper;
 import org.jdbi.v3.core.statement.StatementContext;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class StatsMapper implements RowMapper<Stats>
+public class DSBRatingsStatsMapper implements RowMapper<DSBStats>
 {
   @Override
-  public Stats map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  public DSBStats map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
-    final Stats stats = new Stats();
+    final DSBStats stats = new DSBStats();
     stats.setAverage(rs_.getFloat("avg"));
     stats.setYoB(rs_.getInt("yob"));
     return stats;

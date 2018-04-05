@@ -24,10 +24,8 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
-import net.spinetrak.enpassant.core.dsb.mappers.DSBPlayerMapper;
-import net.spinetrak.enpassant.core.dsb.mappers.DWZMapper;
-import net.spinetrak.enpassant.core.dsb.mappers.FIDEMapper;
-import net.spinetrak.enpassant.core.dsb.mappers.StatsMapper;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
+import net.spinetrak.enpassant.core.dsb.mappers.*;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
@@ -72,16 +70,20 @@ public interface DSBPlayerDAO
   List<DWZ> selectDWZByPlayer(@BindBean("p") final DSBPlayer player_);
 
   @SqlQuery("SELECT * from getDWZStatsByAgeForAssociationOrClub (:id)")
-  @RegisterRowMapper(StatsMapper.class)
-  List<Stats> selectDWZsFor(@Bind("id") String id_);
+  @RegisterRowMapper(DSBRatingsStatsMapper.class)
+  List<DSBStats> selectDWZStatsFor(@Bind("id") String id_);
 
   @SqlQuery("SELECT * from getELOStatsByAgeForAssociationOrClub (:id)")
-  @RegisterRowMapper(StatsMapper.class)
-  List<Stats> selectELOsFor(@Bind("id") String id_);
+  @RegisterRowMapper(DSBRatingsStatsMapper.class)
+  List<DSBStats> selectELOStatsFor(@Bind("id") String id_);
 
   @SqlQuery("SELECT * FROM fide where id = :p.fideId")
   @RegisterRowMapper(FIDEMapper.class)
   List<FIDE> selectFIDEByPlayer(@BindBean("p") final DSBPlayer player_);
+
+  @SqlQuery("SELECT * from getMemberStatsByAgeForAssociationOrClub (:id)")
+  @RegisterRowMapper(DSBMemberStatsMapper.class)
+  List<DSBStats> selectMemberStatsFor(@Bind("id") String id_);
 
   @SqlQuery("SELECT * from dsb_player where clubid in (WITH RECURSIVE rec (id) as (SELECT o.id from dsb_organization as o where id = :id UNION ALL SELECT o.id from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec order by id)")
   @RegisterRowMapper(DSBPlayerMapper.class)

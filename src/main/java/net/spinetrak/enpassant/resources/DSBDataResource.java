@@ -111,11 +111,6 @@ public class DSBDataResource
   @GET
   public List<DSBStats> getStats(@PathParam("organizationId") final String organizationId_)
   {
-    final Map<Integer, Float[]> finalResults = _dsbDataCache.getStats(organizationId_);
-
-    final DSBStats dsbStats = new DSBStats();
-    dsbStats.setStats(finalResults);
-
-    return dsbStats.getData();
+    return _dsbDataCache.getStats(organizationId_);
   }
 }

@@ -52,8 +52,8 @@ $(document).ready(function () {
             });
             myTree.expand(myTree.getNodeById("00000"));
             myNode = myTree.getNodeById(id);
-            myLabel = myNode.find('span[data-role~="display"]').html();
             myTree.select(myNode);
+            myLabel = myNode.find('span[data-role~="display"]').html();
 
             myTree.off().on('select', function (e, node, newid) {
                 if (myChart != null) {
@@ -112,22 +112,22 @@ $(document).ready(function () {
             url: '/app/api/dsb/stats/' + id,
             dataType: 'json'
         }).done(function (results) {
-            var labels = [], dwzByAge = [], dwzDSBByAge = [], eloByAge = [], eloDSBByAge = [];
+            var labels = [], dwzByAge = [], dwzDSBByAge = [], eloByAge = [], eloDSBByAge = [], members = [];
             for (var i = 0; i < results.length; i++) {
                 labels.push(results[i].age);
                 dwzByAge.push(results[i].dwz);
                 dwzDSBByAge.push(results[i].dwzDSB);
                 eloByAge.push(results[i].elo);
                 eloDSBByAge.push(results[i].eloDSB);
+                members.push(results[i].members)
             }
-            updateChart(labels, dwzByAge, dwzDSBByAge, eloByAge, eloDSBByAge);
+            updateChart(labels, dwzByAge, dwzDSBByAge, eloByAge, eloDSBByAge, members);
         });
     }
 
     function updatePage(id) {
         myNode = myTree.getNodeById(id);
         myLabel = myNode.find('span[data-role~="display"]').html();
-        //myTree.select(myNode);
 
         if ($.fn.dataTable.isDataTable('#playerTable')) {
             myTable = $('#playerTable').DataTable();
@@ -137,7 +137,7 @@ $(document).ready(function () {
         buildChart(id);
     }
 
-    function updateChart(labels, dwzByAge, dwzDSBByAge, eloByAge, eloDSBByAge) {
+    function updateChart(labels, dwzByAge, dwzDSBByAge, eloByAge, eloDSBByAge, members) {
         myChart = new Chart(document.getElementById("chessCharts"), {
             type: 'line',
             options: {
@@ -145,8 +145,32 @@ $(document).ready(function () {
                     display: true,
                     text: "Chess Statistics for " + myLabel
                 },
+                scales: {
+                    xAxes: [{
+                        display: true,
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'Age'
+                        }
+                    }],
+                    yAxes: [{
+                        id: 'ratings',
+                        position: 'left',
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'DWZ/ELO Ratings'
+                        }
+                    }, {
+                        id: 'members',
+                        position: 'right',
+                        scaleLabel: {
+                            display: true,
+                            labelString: '# of Members'
+                        }
+                    }]
+                },
                 legend: {
-                    display: false
+                    display: true
                 }
             },
             data: {
@@ -154,35 +178,54 @@ $(document).ready(function () {
                 datasets: [{
                     data: dwzByAge,
                     lineTension: 0,
-                    label: "Avg. DWZ by Age (" + myLabel + ")",
-                    backgroundColor: 'transparent',
-                    borderColor: '#637fed',
+                    label: 'Avg. DWZ by Age (' + myLabel + ")",
+                    yAxisID: 'ratings',
+                    backgroundColor: '#0000FF',
+                    borderColor: '#0000FF',
                     borderWidth: 1,
-                    pointBackgroundColor: '#637fed'
+                    pointBackgroundColor: '#0000FF',
+                    fill: false
                 }, {
                     data: dwzDSBByAge,
                     lineTension: 0,
                     label: "Avg. DWZ by Age (00000: Deutscher Schachbund)",
-                    backgroundColor: 'transparent',
-                    borderColor: '#09279b',
+                    yAxisID: "ratings",
+                    backgroundColor: '#00FFFF',
+                    borderColor: '#00FFFF',
                     borderWidth: 1,
-                    pointBackgroundColor: '#09279b'
+                    pointBackgroundColor: '#00FFFF',
+                    fill: false
                 }, {
                     data: eloByAge,
                     lineTension: 0,
-                    label: "Avg. ELO by Age (" + myLabel + ")",
-                    backgroundColor: 'transparent',
-                    borderColor: '#f44250',
+                    label: 'Avg. ELO by Age (' + myLabel + ")",
+                    yAxisID: 'ratings',
+                    backgroundColor: '#FF0000',
+                    borderColor: '#FF0000',
                     borderWidth: 1,
-                    pointBackgroundColor: '#f44250'
+                    pointBackgroundColor: '#FF0000',
+                    fill: false
                 }, {
                     data: eloDSBByAge,
                     lineTension: 0,
-                    label: "Avg. ELO by Age (00000: Deutscher Schachbund)",
-                    backgroundColor: 'transparent',
-                    borderColor: '#63040c',
+                    label: 'Avg. ELO by Age (00000: Deutscher Schachbund)',
+                    type: 'line',
+                    yAxisID: 'ratings',
+                    backgroundColor: '#FF8040',
+                    borderColor: '#FF8040',
                     borderWidth: 1,
-                    pointBackgroundColor: '#63040c'
+                    pointBackgroundColor: '#FF8040',
+                    fill: false
+                }, {
+                    data: members,
+                    lineTension: 0,
+                    label: 'Members (' + myLabel + ")",
+                    type: 'line',
+                    yAxisID: 'members',
+                    backgroundColor: '#008000',
+                    borderColor: '#008000',
+                    borderWidth: 1,
+                    pointBackgroundColor: '#008000'
                 }]
             }
         });
