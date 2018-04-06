@@ -42,6 +42,7 @@ import net.spinetrak.enpassant.db.DSBDataCache;
 import net.spinetrak.enpassant.db.DSBDataUpdater;
 import net.spinetrak.enpassant.health.DSBDataHealthCheck;
 import net.spinetrak.enpassant.resources.DSBDataResource;
+import net.spinetrak.enpassant.resources.GitDataResource;
 import org.flywaydb.core.Flyway;
 import org.jdbi.v3.core.Jdbi;
 import org.slf4j.Logger;
@@ -93,9 +94,11 @@ public class EnPassantApp extends Application<EnPassantConfig>
   public void run(final EnPassantConfig configuration_,
                   final Environment environment_)
   {
+    final GitDataResource gitDataResource = new GitDataResource();
+    environment_.jersey().register(gitDataResource);
+
     final JdbiFactory factory = new JdbiFactory();
     final Jdbi jdbi = factory.build(environment_, configuration_.getDataSourceFactory(), "postgresql");
-
 
     final Flyway flyway = configuration_.getFlywayFactory().build(
       configuration_.getDataSourceFactory().build(environment_.metrics(), "flyway"));
@@ -103,14 +106,15 @@ public class EnPassantApp extends Application<EnPassantConfig>
     flyway.migrate();
     flyway.validate();
 
+    final DSBZipFileProcessor dsbZipFileProcessor = configuration_.getDSBDataFactory().build(environment_);
+    environment_.healthChecks().register("dsbZipFileProcessor", new DSBDataHealthCheck(dsbZipFileProcessor));
+
     final DSBOrganizationDAO dsbOrganizationDAO = jdbi.onDemand(DSBOrganizationDAO.class);
     final DSBPlayerDAO dsbPlayerDAO = jdbi.onDemand(DSBPlayerDAO.class);
 
-    final DSBZipFileProcessor dsbZipFileProcessor = configuration_.getDSBDataFactory().build(environment_);
     final DSBDataCache dsbDataCache = new DSBDataCache(dsbOrganizationDAO, dsbPlayerDAO);
     final DSBDataResource dsbDataResource = new DSBDataResource(dsbDataCache);
     environment_.jersey().register(dsbDataResource);
-    environment_.healthChecks().register("dsbZipFileProcessor", new DSBDataHealthCheck(dsbZipFileProcessor));
 
     final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService("dsbDataUpdater").build();
     final DSBDataUpdater dsbDataUpdater = new DSBDataUpdater(dsbOrganizationDAO, dsbPlayerDAO,

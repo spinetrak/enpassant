@@ -33,11 +33,25 @@ $(document).ready(function () {
     buildPage("40000");
 
     function buildPage(id) {
+        buildFooter();
         buildTree(id);
         buildTable(id);
         buildChart(id);
     }
 
+<<<<<<< HEAD
+=======
+    function buildFooter() {
+        var e = document.getElementById("buildInfo");
+        $.ajax({
+            url: '/app/api/git/buildInfo',
+            dataType: 'text'
+        }).done(function (results) {
+            e.innerHTML = results;
+        });
+    }
+    
+>>>>>>> e6f8998... - add build/version number
     function buildTree(id) {
         $.getJSON("/api/dsb/organizationTree/00000", function (data) {
             var myData = [data];
