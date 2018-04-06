@@ -33,12 +33,22 @@ $(document).ready(function () {
     buildPage("40000");
 
     function buildPage(id) {
+        buildFooter();
         buildTree(id);
         buildTable(id);
         buildChart(id);
     }
 
-
+    function buildFooter() {
+        var e = document.getElementById("buildInfo");
+        $.ajax({
+            url: '/app/api/git/buildInfo',
+            dataType: 'text'
+        }).done(function (results) {
+            e.innerHTML = results;
+        });
+    }
+    
     function buildTree(id) {
         $.getJSON("/app/api/dsb/organizationTree/00000", function (data) {
             var myData = [data];
