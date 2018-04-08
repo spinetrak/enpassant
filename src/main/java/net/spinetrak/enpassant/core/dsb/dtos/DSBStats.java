@@ -38,22 +38,20 @@ public class DSBStats
   public static final int CLUB_MEMBERS = 5;
   public static final int DSB_DWZ = 4;
   public static final int DSB_ELO = 2;
+  public static final int NO_DWZ_MEMBERS = 6;
+  public static final int NO_ELO_MEMBERS = 7;
   private final static int TODAY = DateTime.now().getYear();
   private final List<DSBStats> _data = new ArrayList<>();
-  private Integer _age;
-  private Float _avg;
-  private Float _dwz;
-  private Float _dwzDSB;
-  private Float _elo;
-  private Float _eloDSB;
-  private Integer _members;
-  private Number _y;
+  private Integer _age = 0;
+  private Float _avg = 0f;
+  private Float _dwz = 0f;
+  private Float _dwzDSB = 0f;
+  private Float _elo = 0f;
+  private Float _eloDSB = 0f;
+  private Integer _members = 0;
+  private Integer _membersWithoutDWZ = 0;
+  private Integer _membersWithoutELO = 0;
   private Integer _yoB;
-
-  public DSBStats()
-  {
-
-  }
 
   public static List<DSBStats> asConsolidatedStats(final Map<Integer, List<DSBStats>> stats_)
   {
@@ -91,6 +89,12 @@ public class DSBStats
                   break;
                 case CLUB_MEMBERS:
                   consolidate.setMembers(mem);
+                  break;
+                case NO_DWZ_MEMBERS:
+                  consolidate.setMembersWithoutDWZ(mem);
+                  break;
+                case NO_ELO_MEMBERS:
+                  consolidate.setMembersWithoutELO(mem);
                   break;
                 default:
                   break;
@@ -136,9 +140,14 @@ public class DSBStats
     return _eloDSB;
   }
 
-  public Integer getMembers()
+  public Integer getMembersWithDWZ()
   {
-    return _members;
+    return _members - _membersWithoutDWZ;
+  }
+
+  public Integer getMembersWithELO()
+  {
+    return _members - _membersWithoutELO;
   }
 
   public void setAverage(final float avg_)
@@ -159,6 +168,11 @@ public class DSBStats
   private Float getAvg()
   {
     return _avg;
+  }
+
+  private Integer getMembers()
+  {
+    return _members;
   }
 
   private Integer getYoB()
@@ -189,5 +203,15 @@ public class DSBStats
   private void setEloDSB(final Float eloDSB_)
   {
     _eloDSB = eloDSB_;
+  }
+
+  private void setMembersWithoutDWZ(final int membersWithoutDWZ_)
+  {
+    _membersWithoutDWZ = membersWithoutDWZ_;
+  }
+
+  private void setMembersWithoutELO(final int membersWithoutELO_)
+  {
+    _membersWithoutELO = membersWithoutELO_;
   }
 }

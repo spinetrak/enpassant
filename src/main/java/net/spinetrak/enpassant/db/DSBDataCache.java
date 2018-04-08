@@ -168,6 +168,8 @@ public class DSBDataCache
         final List<DSBStats> clubELOStats = _dsbPlayerDAO.selectELOStatsFor(organizationId_);
         final List<DSBStats> dsbELOStats = _dsbPlayerDAO.selectELOStatsFor("00000");
         final List<DSBStats> clubMemberStats = _dsbPlayerDAO.selectMemberStatsFor(organizationId_);
+        final List<DSBStats> membersWithoutDWZStats = _dsbPlayerDAO.selectMembersWithoutDWZByAge(organizationId_);
+        final List<DSBStats> membersWithoutELOStats = _dsbPlayerDAO.selectMembersWithoutELOByAge(organizationId_);
 
         final Map<Integer, List<DSBStats>> stats = new HashMap<>();
         stats.put(DSBStats.CLUB_DWZ, clubDWZStats);
@@ -175,6 +177,8 @@ public class DSBDataCache
         stats.put(DSBStats.CLUB_ELO, clubELOStats);
         stats.put(DSBStats.DSB_ELO, dsbELOStats);
         stats.put(DSBStats.CLUB_MEMBERS, clubMemberStats);
+        stats.put(DSBStats.NO_DWZ_MEMBERS, membersWithoutDWZStats);
+        stats.put(DSBStats.NO_ELO_MEMBERS, membersWithoutELOStats);
         return DSBStats.asConsolidatedStats(stats);
       });
     }

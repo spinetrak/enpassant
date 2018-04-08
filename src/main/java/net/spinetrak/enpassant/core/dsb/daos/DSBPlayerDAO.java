@@ -85,6 +85,14 @@ public interface DSBPlayerDAO
   @RegisterRowMapper(DSBMemberStatsMapper.class)
   List<DSBStats> selectMemberStatsFor(@Bind("id") String id_);
 
+  @SqlQuery("SELECT * from getMembersWithoutDWZByAge (:id)")
+  @RegisterRowMapper(DSBMemberStatsMapper.class)
+  List<DSBStats> selectMembersWithoutDWZByAge(@Bind("id") String id_);
+
+  @SqlQuery("SELECT * from getMembersWithoutELOByAge (:id)")
+  @RegisterRowMapper(DSBMemberStatsMapper.class)
+  List<DSBStats> selectMembersWithoutELOByAge(@Bind("id") String id_);
+
   @SqlQuery("SELECT * from dsb_player where clubid in (WITH RECURSIVE rec (id) as (SELECT o.id from dsb_organization as o where id = :id UNION ALL SELECT o.id from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec order by id)")
   @RegisterRowMapper(DSBPlayerMapper.class)
   List<DSBPlayer> selectPlayersFor(@Bind("id") String id_);

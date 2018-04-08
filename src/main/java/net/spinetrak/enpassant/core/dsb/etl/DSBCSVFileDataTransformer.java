@@ -60,7 +60,7 @@ public class DSBCSVFileDataTransformer
     }
     catch (final DSBCSVFileParseException ex_)
     {
-      LOGGER.error("Error parsing CSV file for club " + club_);
+      LOGGER.error("Error parsing CSV file for club " + club_ + " due to " + ex_.getMessage());
     }
     return mapping;
   }
@@ -76,11 +76,19 @@ public class DSBCSVFileDataTransformer
       }
       try
       {
-        mapping.put(record.get(4) + "-" + Converters.leftPad(record.get(5)), Integer.parseInt(record.get(0)));
+        if (record.size() >= 6)
+        {
+          mapping.put(record.get(4) + "-" + Converters.leftPad(record.get(5)), Integer.parseInt(record.get(0)));
+        }
+        else
+        {
+          throw new IllegalStateException("Invalid record: " + record.get(0));
+        }
       }
       catch (final Exception ex_)
       {
-        throw new DSBCSVFileParseException("Error reading record " + record.toString());
+        throw new DSBCSVFileParseException(
+          "Error reading record " + record.toString() + " due to " + ex_.getCause().getMessage());
       }
     }
     return mapping;
