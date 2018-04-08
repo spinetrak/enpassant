@@ -88,7 +88,7 @@ public class DSBCSVFileDataTransformer
       catch (final Exception ex_)
       {
         throw new DSBCSVFileParseException(
-          "Error reading record " + record.toString() + " due to " + ex_.getCause().getMessage());
+          "Error reading record " + record.toString() + " due to " + ex_.getMessage());
       }
     }
     return mapping;
