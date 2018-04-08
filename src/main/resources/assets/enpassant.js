@@ -59,6 +59,9 @@ $(document).ready(function () {
                 if (myChart != null) {
                     myChart.destroy();
                 }
+                if (myTable != null) {
+                    myTable.clear().draw();
+                }
                 updatePage(newid);
             });
         });
