@@ -26,7 +26,7 @@
 $(document).ready(function () {
     var myTree = null;
     var myNode = null;
-    var myLabel = null;
+    var myLabel = "40000: Hamburger Schachverband";
     var myChart = null;
     var myTable = null;
 
