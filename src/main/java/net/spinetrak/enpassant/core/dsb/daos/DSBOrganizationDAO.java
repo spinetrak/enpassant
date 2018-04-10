@@ -24,7 +24,10 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
+import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
+import net.spinetrak.enpassant.core.dsb.mappers.DSBMemberStatsMapper;
 import net.spinetrak.enpassant.core.dsb.mappers.DSBOrganizationMapper;
+import net.spinetrak.enpassant.core.dsb.mappers.DSBRatingsStatsMapper;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import org.jdbi.v3.sqlobject.config.RegisterRowMapper;
 import org.jdbi.v3.sqlobject.customizer.Bind;
@@ -55,4 +58,24 @@ public interface DSBOrganizationDAO
   @SqlQuery("WITH RECURSIVE rec (id) as (SELECT o.id, o.name, o.isclub from dsb_organization as o where id = :id UNION ALL SELECT o.id, o.name, o.isclub from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec where isclub=true order by id")
   @RegisterRowMapper(DSBOrganizationMapper.class)
   List<DSBOrganization> selectClubsFor(@Bind("id") String id_);
+
+  @SqlQuery("SELECT * from getDWZStatsByAgeForAssociationOrClub (:id)")
+  @RegisterRowMapper(DSBRatingsStatsMapper.class)
+  List<DSBStats> selectDWZStatsFor(@Bind("id") String orgId_);
+
+  @SqlQuery("SELECT * from getELOStatsByAgeForAssociationOrClub (:id)")
+  @RegisterRowMapper(DSBRatingsStatsMapper.class)
+  List<DSBStats> selectELOStatsFor(@Bind("id") String orgId_);
+
+  @SqlQuery("SELECT * from getMemberStatsByAgeForAssociationOrClub (:id)")
+  @RegisterRowMapper(DSBMemberStatsMapper.class)
+  List<DSBStats> selectMemberStatsFor(@Bind("id") String orgId_);
+
+  @SqlQuery("SELECT * from getMembersWithoutDWZByAge (:id)")
+  @RegisterRowMapper(DSBMemberStatsMapper.class)
+  List<DSBStats> selectMembersWithoutDWZByAge(@Bind("id") String orgId_);
+
+  @SqlQuery("SELECT * from getMembersWithoutELOByAge (:id)")
+  @RegisterRowMapper(DSBMemberStatsMapper.class)
+  List<DSBStats> selectMembersWithoutELOByAge(@Bind("id") String orgId_);
 }

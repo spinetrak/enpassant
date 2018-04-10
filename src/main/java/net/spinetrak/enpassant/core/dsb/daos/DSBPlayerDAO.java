@@ -24,8 +24,11 @@
 
 package net.spinetrak.enpassant.core.dsb.daos;
 
-import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
-import net.spinetrak.enpassant.core.dsb.mappers.*;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBPlayerStats;
+import net.spinetrak.enpassant.core.dsb.mappers.DSBPlayerMapper;
+import net.spinetrak.enpassant.core.dsb.mappers.DSBPlayerStatsMapper;
+import net.spinetrak.enpassant.core.dsb.mappers.DWZMapper;
+import net.spinetrak.enpassant.core.dsb.mappers.FIDEMapper;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
 import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
 import net.spinetrak.enpassant.core.fide.FIDE;
@@ -69,31 +72,16 @@ public interface DSBPlayerDAO
   @RegisterRowMapper(DWZMapper.class)
   List<DWZ> selectDWZByPlayer(@BindBean("p") final DSBPlayer player_);
 
-  @SqlQuery("SELECT * from getDWZStatsByAgeForAssociationOrClub (:id)")
-  @RegisterRowMapper(DSBRatingsStatsMapper.class)
-  List<DSBStats> selectDWZStatsFor(@Bind("id") String id_);
-
-  @SqlQuery("SELECT * from getELOStatsByAgeForAssociationOrClub (:id)")
-  @RegisterRowMapper(DSBRatingsStatsMapper.class)
-  List<DSBStats> selectELOStatsFor(@Bind("id") String id_);
-
   @SqlQuery("SELECT * FROM fide where id = :p.fideId")
   @RegisterRowMapper(FIDEMapper.class)
   List<FIDE> selectFIDEByPlayer(@BindBean("p") final DSBPlayer player_);
 
-  @SqlQuery("SELECT * from getMemberStatsByAgeForAssociationOrClub (:id)")
-  @RegisterRowMapper(DSBMemberStatsMapper.class)
-  List<DSBStats> selectMemberStatsFor(@Bind("id") String id_);
+  @SqlQuery("SELECT d.dwz, d.lasteval AS dwzLastEval, f.elo, f.lasteval AS eloLastEval FROM dsb_player p LEFT OUTER JOIN dwz d ON p.clubid=d.clubid AND p.memberid=d.memberid LEFT OUTER JOIN fide f ON p.fideid = f.id WHERE p.clubId = :clubId AND p.memberId = :memberId")
+  @RegisterRowMapper(DSBPlayerStatsMapper.class)
+  List<DSBPlayerStats> selectPlayerStatsFor(@Bind("clubId") final String clubId_,
+                                            @Bind("memberId") final String memberId_);
 
-  @SqlQuery("SELECT * from getMembersWithoutDWZByAge (:id)")
-  @RegisterRowMapper(DSBMemberStatsMapper.class)
-  List<DSBStats> selectMembersWithoutDWZByAge(@Bind("id") String id_);
-
-  @SqlQuery("SELECT * from getMembersWithoutELOByAge (:id)")
-  @RegisterRowMapper(DSBMemberStatsMapper.class)
-  List<DSBStats> selectMembersWithoutELOByAge(@Bind("id") String id_);
-
-  @SqlQuery("SELECT * from dsb_player where clubid in (WITH RECURSIVE rec (id) as (SELECT o.id from dsb_organization as o where id = :id UNION ALL SELECT o.id from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec order by id)")
+  @SqlQuery("SELECT * FROM dsb_player WHERE clubid IN (WITH RECURSIVE rec (id) AS (SELECT o.id FROM dsb_organization AS o WHERE id = :id UNION ALL SELECT o.id FROM rec, dsb_organization AS o WHERE o.parentid = rec.id) SELECT * FROM rec ORDER BY id)")
   @RegisterRowMapper(DSBPlayerMapper.class)
   List<DSBPlayer> selectPlayersFor(@Bind("id") String id_);
 }

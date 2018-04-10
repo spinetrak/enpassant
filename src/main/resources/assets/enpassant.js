@@ -38,7 +38,6 @@ $(document).ready(function () {
         buildChart(id);
     }
 
-
     function buildTree(id) {
         $.getJSON("/app/api/dsb/organizationTree/00000", function (data) {
             var myData = [data];
@@ -82,20 +81,20 @@ $(document).ready(function () {
                 },
                 {
                     data: "dsbId", "render": function (data, type, row) {
-                    return data === 0 ? '' : data;
+                    return data === 0 ? '' : "<a target='_blank' href='https://www.schachbund.de/spieler/" + data + ".html'>" + data + "</a>";
                 }
                 },
                 {
                     "data": "fideId", "render": function (data, type, row) {
-                    return data === 0 ? '' : data;
+                    return data === 0 ? '' : "<a target='_blank' href='https://ratings.fide.com/card.phtml?event=" + data + "'>" + data + "</a>";
                 }
                 },
                 {"data": "name"},
                 {"data": "gender"},
                 {"data": "yoB"},
                 {
-                    "data": "currentDWZ", "render": function (data, type, row) {
-                    return data === 0 ? '' : data;
+                    data: null, render: function (data, type, row) {
+                    return data.currentDWZ === 0 ? '' : data.currentDWZ;
                 }
                 },
                 {
@@ -106,6 +105,17 @@ $(document).ready(function () {
                 {"data": "status"},
                 {"data": "eligibility"}
             ]
+        });
+        myTable.off('click').on('click', 'tr', function () {
+            if (myChart != null) {
+                myChart.destroy();
+            }
+            var arr = $('#playerTable').DataTable().row(this).data();
+            var clubId = arr.clubId;
+            var memberId = arr.memberId;
+            var player = clubId + '-' + memberId;
+            myLabel = arr.name;
+            showRatingsHistory(player);
         });
     }
 
@@ -135,8 +145,7 @@ $(document).ready(function () {
         myLabel = myNode.find('span[data-role~="display"]').html();
 
         if ($.fn.dataTable.isDataTable('#playerTable')) {
-            myTable = $('#playerTable').DataTable();
-            myTable.ajax.url("/app/api/dsb/players/" + id).load();
+            $('#playerTable').DataTable().ajax.url("/app/api/dsb/players/" + id).load();
         }
 
         buildChart(id);
@@ -184,7 +193,7 @@ $(document).ready(function () {
                 datasets: [{
                     data: dwzByAge,
                     lineTension: 0,
-                    label: 'Avg. DWZ by Age (' + myLabel + ")",
+                    label: 'Avg. DWZ by Age (' + myLabel + ')',
                     yAxisID: 'ratings',
                     backgroundColor: '#0FA211',
                     borderColor: '#0FA211',
@@ -205,7 +214,7 @@ $(document).ready(function () {
                 }, {
                     data: eloByAge,
                     lineTension: 0,
-                    label: 'Avg. ELO by Age (' + myLabel + ")",
+                    label: 'Avg. ELO by Age (' + myLabel + ')',
                     yAxisID: 'ratings',
                     backgroundColor: '#110FA2',
                     borderColor: '#110FA2',
@@ -226,7 +235,7 @@ $(document).ready(function () {
                 }, {
                     data: membersWithELO,
                     lineTension: 0,
-                    label: 'Members with ELO (' + myLabel + ")",
+                    label: 'Members with ELO (' + myLabel + ')',
                     type: 'line',
                     yAxisID: 'members',
                     backgroundColor: '#A0A20F',
@@ -246,7 +255,7 @@ $(document).ready(function () {
                 }, {
                     data: members,
                     lineTension: 0,
-                    label: 'Members (' + myLabel + ")",
+                    label: 'Members (' + myLabel + ')',
                     type: 'line',
                     yAxisID: 'members',
                     backgroundColor: '#A2110F',
@@ -256,6 +265,86 @@ $(document).ready(function () {
                 }]
             }
         });
+    }
+
+    function showRatingsHistory(id) {
+        document.getElementById("chessCharts");
+        $.ajax({
+            url: '/app/api/dsb/playerStats/' + id,
+            dataType: 'json'
+        }).done(function (results) {
+            var labels = [], eloHistory = [], dwzHistory = [];
+            for (var i = 0; i < results.length; i++) {
+                labels.push(results[i].lastEval);
+                dwzHistory.push(results[i].dwz);
+                eloHistory.push(results[i].elo);
+            }
+            updateRatingsChart(labels, dwzHistory, eloHistory);
+        });
+
+
+        function updateRatingsChart(labels, dwzHistory, eloHistory) {
+            myChart = new Chart(document.getElementById("chessCharts"), {
+                type: 'line',
+                options: {
+                    title: {
+                        display: true,
+                        text: "Chess Ratings for " + myLabel
+                    },
+                    scales: {
+                        xAxes: [{
+                            type: 'time',
+                            display: true,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Time'
+                            },
+                            time: {
+                                unit: 'month'
+                            }
+                        }],
+                        yAxes: [{
+                            id: 'ratings',
+                            position: 'left',
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'DWZ/ELO Ratings'
+                            }
+                        }]
+                    },
+                    legend: {
+                        display: true,
+                        position: 'left'
+                    }
+                },
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dwzHistory,
+                        lineTension: 0,
+                        label: 'DWZ History (' + myLabel + ')',
+                        yAxisID: 'ratings',
+                        backgroundColor: '#0FA211',
+                        borderColor: '#0FA211',
+                        borderWidth: 2,
+                        pointRadius: 1,
+                        fill: false
+                    }, {
+                        data: eloHistory,
+                        lineTension: 0,
+                        label: 'ELO History (' + myLabel + ')',
+                        yAxisID: "ratings",
+                        backgroundColor: '#0FA0A2',
+                        borderColor: '#0FA0A2',
+                        borderWidth: 2,
+                        pointRadius: 1,
+                        borderDashOffset: 3,
+                        fill: false
+                    }]
+                }
+            });
+        }
+
     }
 });
 

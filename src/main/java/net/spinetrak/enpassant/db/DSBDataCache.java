@@ -28,6 +28,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.spinetrak.enpassant.core.dsb.daos.DSBOrganizationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBPlayerStats;
 import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
@@ -54,6 +55,9 @@ public class DSBDataCache
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
   private final DSBPlayerDAO _dsbPlayerDAO;
+  private final Cache<String, List<DSBPlayerStats>> _dsbPlayerStatsCache = CacheBuilder.newBuilder()
+    .expireAfterWrite(12, TimeUnit.HOURS)
+    .build();
   private final Cache<String, List<DSBPlayer>> _dsbPlayersCache = CacheBuilder.newBuilder()
     .expireAfterWrite(12, TimeUnit.HOURS)
     .build();
@@ -138,6 +142,26 @@ public class DSBDataCache
     return null;
   }
 
+  public List<DSBPlayerStats> getDSBPlayerStats(final String playerId_)
+  {
+    try
+    {
+      if (playerId_.contains("-"))
+      {
+        final String[] ids = playerId_.split("-");
+        return _dsbPlayerStatsCache.get(playerId_, () -> {
+          final List<DSBPlayerStats> stats = _dsbPlayerDAO.selectPlayerStatsFor(ids[0], ids[1]);
+          return DSBPlayerStats.consolidate(stats);
+        });
+      }
+    }
+    catch (final ExecutionException ex_)
+    {
+      //ignore
+    }
+    return new ArrayList<>();
+  }
+
   public List<DSBPlayer> getDSBPlayers(final String organizationId_)
   {
     try
@@ -163,13 +187,13 @@ public class DSBDataCache
     try
     {
       return _dsbStatsCache.get(organizationId_, () -> {
-        final List<DSBStats> clubDWZStats = _dsbPlayerDAO.selectDWZStatsFor(organizationId_);
-        final List<DSBStats> dsbDWZStats = _dsbPlayerDAO.selectDWZStatsFor("00000");
-        final List<DSBStats> clubELOStats = _dsbPlayerDAO.selectELOStatsFor(organizationId_);
-        final List<DSBStats> dsbELOStats = _dsbPlayerDAO.selectELOStatsFor("00000");
-        final List<DSBStats> clubMemberStats = _dsbPlayerDAO.selectMemberStatsFor(organizationId_);
-        final List<DSBStats> membersWithoutDWZStats = _dsbPlayerDAO.selectMembersWithoutDWZByAge(organizationId_);
-        final List<DSBStats> membersWithoutELOStats = _dsbPlayerDAO.selectMembersWithoutELOByAge(organizationId_);
+        final List<DSBStats> clubDWZStats = _dsbOrganizationDAO.selectDWZStatsFor(organizationId_);
+        final List<DSBStats> dsbDWZStats = _dsbOrganizationDAO.selectDWZStatsFor("00000");
+        final List<DSBStats> clubELOStats = _dsbOrganizationDAO.selectELOStatsFor(organizationId_);
+        final List<DSBStats> dsbELOStats = _dsbOrganizationDAO.selectELOStatsFor("00000");
+        final List<DSBStats> clubMemberStats = _dsbOrganizationDAO.selectMemberStatsFor(organizationId_);
+        final List<DSBStats> membersWithoutDWZStats = _dsbOrganizationDAO.selectMembersWithoutDWZByAge(organizationId_);
+        final List<DSBStats> membersWithoutELOStats = _dsbOrganizationDAO.selectMembersWithoutELOByAge(organizationId_);
 
         final Map<Integer, List<DSBStats>> stats = new HashMap<>();
         stats.put(DSBStats.CLUB_DWZ, clubDWZStats);

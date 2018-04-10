@@ -25,6 +25,7 @@
 package net.spinetrak.enpassant.resources;
 
 import net.spinetrak.enpassant.core.dsb.dtos.DSBOrganizationTree;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBPlayerStats;
 import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
@@ -88,6 +89,20 @@ public class DSBDataResource
       return player;
     }
 
+    throw new WebApplicationException(Response.Status.NOT_FOUND);
+  }
+
+  @Path("/playerStats/{playerId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @GET
+  public List<DSBPlayerStats> getPlayerStats(@PathParam("playerId") final String playerId_)
+  {
+    final List<DSBPlayerStats> stats = _dsbDataCache.getDSBPlayerStats(playerId_);
+
+    if (stats != null && !stats.isEmpty())
+    {
+      return stats;
+    }
     throw new WebApplicationException(Response.Status.NOT_FOUND);
   }
 
