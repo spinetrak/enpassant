@@ -111,6 +111,10 @@ public class DSBDataResource
   @GET
   public Map<String, List<DSBPlayer>> getPlayers(@PathParam("organizationId_") final String organizationId_)
   {
+    if (organizationId_ != null && "00000".equals(organizationId_))
+    {
+      return new HashMap<>();
+    }
     final List<DSBPlayer> players = _dsbDataCache.getDSBPlayers(organizationId_);
     if (players.isEmpty())
     {
