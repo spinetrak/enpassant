@@ -78,7 +78,7 @@ $(document).ready(function () {
             "columns": [
                 {
                     data: null, render: function (data, type, row) {
-                    return data.clubId + '-' + data.memberId;
+                    return "<a href='#'>" + data.clubId + '-' + data.memberId + "</a>";
                 }
                 },
                 {
@@ -87,11 +87,15 @@ $(document).ready(function () {
                 }
                 },
                 {
-                    "data": "fideId", "render": function (data, type, row) {
+                    data: "fideId", render: function (data, type, row) {
                     return data === 0 ? '' : "<a target='_blank' href='https://ratings.fide.com/card.phtml?event=" + data + "'>" + data + "</a>";
                 }
                 },
-                {"data": "name"},
+                {
+                    data: "name", render: function (data, type, row) {
+                    return data == 0 ? '' : "<a href='#'>" + data + "</a>";
+                }
+                },
                 {"data": "gender"},
                 {"data": "yoB"},
                 {
