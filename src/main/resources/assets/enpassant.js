@@ -55,13 +55,15 @@ $(document).ready(function () {
             myLabel = myNode.find('span[data-role~="display"]').html();
 
             myTree.off().on('select', function (e, node, newid) {
-                if (myChart != null) {
-                    myChart.destroy();
+                if (newid != "00000") {
+                    if (myChart != null) {
+                        myChart.destroy();
+                    }
+                    if (myTable != null) {
+                        myTable.clear().draw();
+                    }
+                    updatePage(newid);
                 }
-                if (myTable != null) {
-                    myTable.clear().draw();
-                }
-                updatePage(newid);
             });
         });
     }
