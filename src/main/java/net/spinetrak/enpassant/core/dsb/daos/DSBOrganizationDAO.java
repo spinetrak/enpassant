@@ -37,27 +37,19 @@ import org.jdbi.v3.sqlobject.statement.SqlUpdate;
 
 import java.util.List;
 
+
 public interface DSBOrganizationDAO
 {
-
-  @SqlUpdate("INSERT INTO dsb_organization (id, name, level, isclub, parentId) VALUES (:o.organizationId, :o.name, :o.level, :o.isClub, :o.parentId) ON CONFLICT (id) DO UPDATE SET name = :o.name, level = :o.level, isClub = :o.isClub, parentId = :o.parentId")
+  @SqlUpdate("INSERT INTO dsb_organization (o_id, o_name, o_level, o_isclub, o_parentid) VALUES (:o.organizationId, :o.name, :o.level, :o.isClub, :o.parentId) ON CONFLICT (o_id) DO UPDATE SET o_name = :o.name, o_level = :o.level, o_isclub = :o.isClub, o_parentid = :o.parentId")
   void insertOrUpdate(@BindBean("o") final DSBOrganization organization_);
 
-  @SqlQuery("SELECT * from dsb_organization")
-  @RegisterRowMapper(DSBOrganizationMapper.class)
-  List<DSBOrganization> selectAll();
-
-  @SqlQuery("SELECT * from dsb_organization where id = :id")
+  @SqlQuery("SELECT o_id,o_name,o_level,o_isclub,o_parentid from dsb_organization where o_id = :id")
   @RegisterRowMapper(DSBOrganizationMapper.class)
   List<DSBOrganization> selectById(@Bind("id") String id_);
 
-  @SqlQuery("SELECT * from dsb_organization where parentId = :id")
+  @SqlQuery("SELECT o_id,o_name,o_level,o_isclub,o_parentid from dsb_organization where o_parentid = :id")
   @RegisterRowMapper(DSBOrganizationMapper.class)
   List<DSBOrganization> selectChildrenOf(@Bind("id") String id_);
-
-  @SqlQuery("WITH RECURSIVE rec (id) as (SELECT o.id, o.name, o.isclub from dsb_organization as o where id = :id UNION ALL SELECT o.id, o.name, o.isclub from rec, dsb_organization as o where o.parentid = rec.id) SELECT * FROM rec where isclub=true order by id")
-  @RegisterRowMapper(DSBOrganizationMapper.class)
-  List<DSBOrganization> selectClubsFor(@Bind("id") String id_);
 
   @SqlQuery("SELECT * from getDWZStatsByAgeForAssociationOrClub (:id)")
   @RegisterRowMapper(DSBRatingsStatsMapper.class)

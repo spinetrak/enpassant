@@ -37,10 +37,10 @@ public class DSBPlayerStatsMapper implements RowMapper<DSBPlayerStats>
   public DSBPlayerStats map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
     final DSBPlayerStats stats = new DSBPlayerStats();
-    stats.setDWZ(rs_.getInt("dwz"));
-    stats.setDWZLastEval(rs_.getDate("dwzLastEval"));
-    stats.setELO(rs_.getInt("elo"));
-    stats.setELOLastEval(rs_.getDate("eloLastEval"));
+    stats.setDWZ(rs_.getInt("d_dwz"));
+    stats.setDWZLastEval(rs_.getDate("d_lasteval"));
+    stats.setELO(rs_.getInt("f_elo"));
+    stats.setELOLastEval(rs_.getDate("f_lasteval"));
     return stats;
   }
 }

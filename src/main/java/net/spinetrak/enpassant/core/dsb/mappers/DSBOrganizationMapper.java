@@ -37,11 +37,11 @@ public class DSBOrganizationMapper implements RowMapper<DSBOrganization>
   public DSBOrganization map(final ResultSet rs_, final StatementContext sc_) throws SQLException
   {
     final DSBOrganization dsbOrganization = new DSBOrganization();
-    dsbOrganization.setOrganizationId(rs_.getString("id"));
-    dsbOrganization.setParentId(rs_.getString("parentId"));
-    dsbOrganization.setLevel(rs_.getInt("level"));
-    dsbOrganization.setName(rs_.getString("name"));
-    dsbOrganization.setIsClub(rs_.getBoolean("isclub"));
+    dsbOrganization.setOrganizationId(rs_.getString("o_id"));
+    dsbOrganization.setParentId(rs_.getString("o_parentid"));
+    dsbOrganization.setLevel(rs_.getInt("o_level"));
+    dsbOrganization.setName(rs_.getString("o_name"));
+    dsbOrganization.setIsClub(rs_.getBoolean("o_isclub"));
     return dsbOrganization;
   }
 }

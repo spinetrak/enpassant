@@ -25,27 +25,29 @@
 package net.spinetrak.enpassant.core.dsb.mappers;
 
 import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
-import org.jdbi.v3.core.mapper.RowMapper;
-import org.jdbi.v3.core.statement.StatementContext;
+import net.spinetrak.enpassant.core.dsb.pojos.DWZ;
+import net.spinetrak.enpassant.core.fide.FIDE;
+import org.jdbi.v3.core.result.LinkedHashMapRowReducer;
+import org.jdbi.v3.core.result.RowView;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.util.Map;
 
-public class DSBPlayerMapper implements RowMapper<DSBPlayer>
+public class DSBPlayerMapper implements LinkedHashMapRowReducer<String, DSBPlayer>
 {
   @Override
-  public DSBPlayer map(final ResultSet rs_, final StatementContext sc_) throws SQLException
+  public void accumulate(final Map<String, DSBPlayer> map_, final RowView rowView_)
   {
-    final DSBPlayer dsbPlayer = new DSBPlayer();
-    dsbPlayer.setClubId(rs_.getString("clubId"));
-    dsbPlayer.setMemberId(rs_.getString("memberId"));
-    dsbPlayer.setDsbId(rs_.getInt("dsbId"));
-    dsbPlayer.setName(rs_.getString("name"));
-    dsbPlayer.setStatus(rs_.getString("status"));
-    dsbPlayer.setGender(rs_.getString("gender"));
-    dsbPlayer.setEligibility(rs_.getString("eligibility"));
-    dsbPlayer.setYoB(rs_.getInt("yob"));
-    dsbPlayer.setFideId(rs_.getInt("fideId"));
-    return dsbPlayer;
+    final DSBPlayer dsbPlayer = map_.computeIfAbsent(
+      rowView_.getColumn("p_clubid", String.class) + "-" + rowView_.getColumn("p_memberid", String.class),
+      id -> rowView_.getRow(DSBPlayer.class));
+
+    if (rowView_.getColumn("d_index", Integer.class) != null)
+    {
+      dsbPlayer.getDWZ().add(rowView_.getRow(DWZ.class));
+    }
+    if (rowView_.getColumn("f_id", Integer.class) != null)
+    {
+      dsbPlayer.getFIDE().add(rowView_.getRow(FIDE.class));
+    }
   }
 }

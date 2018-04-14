@@ -24,6 +24,8 @@
 
 package net.spinetrak.enpassant.core.dsb.pojos;
 
+import org.jdbi.v3.core.mapper.reflect.ColumnName;
+
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +46,6 @@ public class DSBOrganization
   private String _name;
   private String _organizationId;
   private String _parentId;
-
 
   public void add(@NotNull final DSBOrganization dsbOrganization_)
   {
@@ -114,26 +115,31 @@ public class DSBOrganization
     return _players;
   }
 
+  @ColumnName("o_isclub")
   public void setIsClub(final boolean isClub_)
   {
     _isClub = isClub_;
   }
 
+  @ColumnName("o_level")
   public void setLevel(final int level_)
   {
     _level = level_;
   }
 
+  @ColumnName("o_name")
   public void setName(final String name_)
   {
     _name = name_;
   }
 
+  @ColumnName("o_id")
   public void setOrganizationId(final String organizationId_)
   {
     _organizationId = organizationId_;
   }
 
+  @ColumnName("o_parentid")
   public void setParentId(final String parentId_)
   {
     _parentId = parentId_;

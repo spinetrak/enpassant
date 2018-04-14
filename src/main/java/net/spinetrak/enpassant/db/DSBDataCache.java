@@ -166,14 +166,7 @@ public class DSBDataCache
   {
     try
     {
-      return _dsbPlayersCache.get(organizationId_, () -> {
-        final List<DSBPlayer> players = _dsbPlayerDAO.selectPlayersFor(organizationId_);
-        for (final DSBPlayer dsbPlayer : players)
-        {
-          setDWZandELO(dsbPlayer);
-        }
-        return players;
-      });
+      return _dsbPlayersCache.get(organizationId_, () -> _dsbPlayerDAO.selectPlayersFor(organizationId_));
     }
     catch (final ExecutionException ex_)
     {
