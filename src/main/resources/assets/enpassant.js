@@ -55,7 +55,6 @@ $(document).ready(function () {
             myLabel = myNode.find('span[data-role~="display"]').html();
 
             myTree.off().on('select', function (e, node, newid) {
-                if (newid != "00000") {
                     if (myChart != null) {
                         myChart.destroy();
                     }
@@ -63,7 +62,6 @@ $(document).ready(function () {
                         myTable.clear().draw();
                     }
                     updatePage(newid);
-                }
             });
         });
     }
