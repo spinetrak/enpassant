@@ -140,6 +140,11 @@ public class DSBStats
     return _eloDSB;
   }
 
+  public Integer getMembers()
+  {
+    return _members;
+  }
+
   public Integer getMembersWithDWZ()
   {
     return _members - _membersWithoutDWZ;
@@ -168,11 +173,6 @@ public class DSBStats
   private Float getAvg()
   {
     return _avg;
-  }
-
-  private Integer getMembers()
-  {
-    return _members;
   }
 
   private Integer getYoB()
