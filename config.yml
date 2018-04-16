@@ -10,7 +10,7 @@ dsbData:
 server:
   rootPath: /api/
   type: simple
-  applicationContextPath: /app
+  applicationContextPath: /
   adminContextPath: /admin
   connector:
     type: http

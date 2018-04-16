@@ -39,7 +39,7 @@ $(document).ready(function () {
     }
 
     function buildTree(id) {
-        $.getJSON("/app/api/dsb/organizationTree/00000", function (data) {
+        $.getJSON("/api/dsb/organizationTree/00000", function (data) {
             var myData = [data];
             myTree = $('#tree').tree({
                 primaryKey: 'id',
@@ -70,7 +70,7 @@ $(document).ready(function () {
         myTable = $('#playerTable').DataTable({
             "lengthMenu": [[100, 500, 1000, -1], [100, 500, 1000, "All"]],
             "ajax": {
-                "url": "/app/api/dsb/players/" + id,
+                "url": "/api/dsb/players/" + id,
                 "dataSrc": "players"
             },
             "columns": [
@@ -126,7 +126,7 @@ $(document).ready(function () {
     function buildChart(id) {
         document.getElementById("chessCharts");
         $.ajax({
-            url: '/app/api/dsb/stats/' + id,
+            url: '/api/dsb/stats/' + id,
             dataType: 'json'
         }).done(function (results) {
             var labels = [], dwzByAge = [], dwzDSBByAge = [], eloByAge = [], eloDSBByAge = [], members = [], membersWithDWZ = [], membersWithELO = [];
@@ -149,7 +149,7 @@ $(document).ready(function () {
         myLabel = myNode.find('span[data-role~="display"]').html();
 
         if ($.fn.dataTable.isDataTable('#playerTable')) {
-            $('#playerTable').DataTable().ajax.url("/app/api/dsb/players/" + id).load();
+            $('#playerTable').DataTable().ajax.url("/api/dsb/players/" + id).load();
         }
 
         buildChart(id);
@@ -274,7 +274,7 @@ $(document).ready(function () {
     function showRatingsHistory(id) {
         document.getElementById("chessCharts");
         $.ajax({
-            url: '/app/api/dsb/playerStats/' + id,
+            url: '/api/dsb/playerStats/' + id,
             dataType: 'json'
         }).done(function (results) {
             var labels = [], eloHistory = [], dwzHistory = [];
