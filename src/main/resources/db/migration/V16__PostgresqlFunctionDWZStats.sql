@@ -1,4 +1,4 @@
-DROP FUNCTION getDWZStatsByAgeForAssociationOrClub;
+DROP FUNCTION getDWZStatsByAgeForAssociationOrClub( CHAR(5) );
 
 CREATE FUNCTION getDWZStatsByAgeForAssociationOrClub(IN CHAR(5))
   RETURNS TABLE(avg NUMERIC, yob SMALLINT) AS $$

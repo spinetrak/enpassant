@@ -1,4 +1,4 @@
-DROP FUNCTION getMemberStatsByAgeForAssociationOrClub;
+DROP FUNCTION getMemberStatsByAgeForAssociationOrClub( CHAR(5) );
 
 CREATE FUNCTION getMemberStatsByAgeForAssociationOrClub(IN CHAR(5))
   RETURNS TABLE(avg BIGINT, yob SMALLINT) AS
@@ -31,7 +31,7 @@ $$
 LANGUAGE SQL;
 
 
-DROP FUNCTION getELOStatsByAgeForAssociationOrClub;
+DROP FUNCTION getELOStatsByAgeForAssociationOrClub( CHAR(5) );
 
 CREATE FUNCTION getELOStatsByAgeForAssociationOrClub(IN CHAR(5))
   RETURNS TABLE(avg NUMERIC, yob SMALLINT) AS
@@ -68,7 +68,7 @@ $$
 LANGUAGE SQL;
 
 
-DROP FUNCTION getDWZStatsByAgeForAssociationOrClub;
+DROP FUNCTION getDWZStatsByAgeForAssociationOrClub( CHAR(5) );
 
 CREATE FUNCTION getDWZStatsByAgeForAssociationOrClub(IN CHAR(5))
   RETURNS TABLE(avg NUMERIC, yob SMALLINT) AS $$
@@ -105,7 +105,7 @@ $$
 LANGUAGE SQL;
 
 
-DROP FUNCTION getMembersWithoutDWZByAge;
+DROP FUNCTION getMembersWithoutDWZByAge( CHAR(5) );
 CREATE FUNCTION getMembersWithoutDWZByAge(IN CHAR(5))
   RETURNS TABLE(members BIGINT, yob SMALLINT) AS
 $$
@@ -140,7 +140,7 @@ ORDER BY p.p_yob DESC;
 $$
 LANGUAGE SQL;
 
-DROP FUNCTION getMembersWithoutELOByAge;
+DROP FUNCTION getMembersWithoutELOByAge( CHAR(5) );
 CREATE FUNCTION getMembersWithoutELOByAge(IN CHAR(5))
   RETURNS TABLE(members BIGINT, yob SMALLINT) AS
 $$

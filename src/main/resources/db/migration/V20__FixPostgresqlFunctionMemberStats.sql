@@ -1,4 +1,4 @@
-DROP FUNCTION getMemberStatsByAgeForAssociationOrClub;
+DROP FUNCTION getMemberStatsByAgeForAssociationOrClub( CHAR(5) );
 
 CREATE FUNCTION getMemberStatsByAgeForAssociationOrClub(IN CHAR(5))
   RETURNS TABLE(members BIGINT, yob SMALLINT) AS
