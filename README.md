@@ -15,3 +15,4 @@ To see your applications health enter url `http://localhost:8081/healthcheck`
 Status
 ---
 [![Build Status](https://travis-ci.org/spinetrak/enpassant.svg?branch=master)](https://travis-ci.org/spinetrak/enpassant)
+
