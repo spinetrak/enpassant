@@ -1,7 +1,6 @@
 [Unit]
 Description=EnPassant App
 [Service]
-Environment="PORT=80"
 User=spinetrak
 WorkingDirectory=/home/spinetrak/prod/enpassant
 ExecStart=/home/spinetrak/prod/enpassant/run.sh
