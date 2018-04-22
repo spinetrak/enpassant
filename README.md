@@ -39,5 +39,5 @@ sudo PORT=$PORT java -jar target/enpassant-1.0-SNAPSHOT.jar server config.yml
 Run as Service
 ---
 ```
-copy $HOME/prod/enpassant/enpassant.service /etc/systemd/system/
+sudo cp $HOME/prod/enpassant/enpassant.service /etc/systemd/system/
 ```
