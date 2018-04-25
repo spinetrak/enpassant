@@ -1,9 +1,9 @@
 language: java
 jdk:
-  - oraclejdk8
-
+- oraclejdk8
 script: mvn test
-
+before_install:
+- openssl aes-256-cbc -K $encrypted_37a0ca319063_key -iv $encrypted_37a0ca319063_iv -in $CLOUD.enc -out ~\/.ssh/$CLOUD -d
 deploy:
   provider: script
   script: bash ./deploy.sh
