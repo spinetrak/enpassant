@@ -21,15 +21,16 @@ cd $HOME/prod/
 git clone https://github.com/spinetrak/enpassant.git
 ```
 
-Build / Install
+Build / Install / Restart
 ---
 ```
 cd $HOME/prod/enpassant/
 git pull https://github.com/spinetrak/enpassant.git
 mvn install
+sudo systemctl restart enpassant
 ```
 
-Start
+Start Manually
 ---
 ```
 export PORT=80

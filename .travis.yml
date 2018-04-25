@@ -4,3 +4,8 @@ jdk:
 
 script: mvn test
 
+deploy:
+  provider: script
+  script: bash ./deploy.sh
+  on:
+    branch: develop
