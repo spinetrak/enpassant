@@ -2,8 +2,13 @@ language: java
 jdk:
 - oraclejdk8
 script: mvn test
-before_install:
-- openssl aes-256-cbc -K $encrypted_37a0ca319063_key -iv $encrypted_37a0ca319063_iv -in travis.enc -out travis -d
+addons:
+  ssh_known_hosts: $IP
+before_deploy:
+- openssl aes-256-cbc -K $encrypted_37a0ca319063_key -iv $encrypted_37a0ca319063_iv -in travis.enc -out /tmp/travis -d
+- eval "$(ssh-agent -s)"
+- chmod 600 /tmp/travis
+- ssh-add /tmp/travis
 deploy:
   provider: script
   script: bash ./deploy.sh
