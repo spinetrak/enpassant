@@ -39,19 +39,16 @@ $(document).ready(function () {
         buildChart(id);
     }
 
-<<<<<<< HEAD
-=======
     function buildFooter() {
         var e = document.getElementById("buildInfo");
         $.ajax({
-            url: '/app/api/git/buildInfo',
+            url: '/api/git/buildInfo',
             dataType: 'text'
         }).done(function (results) {
             e.innerHTML = results;
         });
     }
-    
->>>>>>> e6f8998... - add build/version number
+
     function buildTree(id) {
         $.getJSON("/api/dsb/organizationTree/00000", function (data) {
             var myData = [data];
