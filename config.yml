@@ -26,3 +26,5 @@ database:
   maxWaitForConnection: 1s
   validationQuery: "/* MyService Health Check */ SELECT 1"
   validationQueryTimeout: 3s
+
+
