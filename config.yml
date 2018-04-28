@@ -7,7 +7,7 @@ dsbData:
   url: https://dwz.svw.info/services/files/export/csv/LV-0-csv.zip
   refreshInterval: 86400
 
-initialStateAPIKey: ${INITIAL_STATE_API_KEY:-"foo"}
+initialStateAPIKey: ${INITIAL_STATE_API_KEY:-"whateveryourkeyis"}
 
 server:
   rootPath: /api/

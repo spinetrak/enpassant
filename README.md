@@ -21,24 +21,26 @@ cd $HOME/prod/
 git clone https://github.com/spinetrak/enpassant.git
 ```
 
-Build / Install / Restart
+Build / Install
 ---
 ```
 cd $HOME/prod/enpassant/
 git pull https://github.com/spinetrak/enpassant.git
 mvn install
-sudo systemctl restart enpassant
 ```
 
 Start Manually
 ---
 ```
 export PORT=80
-sudo PORT=$PORT java -jar target/enpassant-1.0-SNAPSHOT.jar server config.yml
+export INITIAL_STATE_API_KEY=whateveryourkeyis
+sudo PORT=$PORT INITIAL_STATE_API_KEY=$INITIAL_STATE_API_KEY java -jar target/enpassant-1.0-SNAPSHOT.jar server config.yml
 ```
 
 Run as Service
 ---
 ```
-sudo cp $HOME/prod/enpassant/enpassant.service /etc/systemd/system/
+cd /etc/systemd/system/
+sudo ln -s $HOME/prod/enpassant/enpassant.service
+sudo systemctl start enpassant
 ```
