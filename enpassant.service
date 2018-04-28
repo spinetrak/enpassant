@@ -3,6 +3,7 @@ Description=EnPassant App
 [Service]
 User=spinetrak
 WorkingDirectory=/home/spinetrak/prod/enpassant
+EnvironmentFile=/home/spinetrak/prod/env/enpassant.conf
 ExecStart=/home/spinetrak/prod/enpassant/run.sh
 SuccessExitStatus=143
 TimeoutStopSec=10

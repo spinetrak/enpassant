@@ -24,6 +24,7 @@
 
 package net.spinetrak.enpassant;
 
+import com.alonkadury.initialState.InitialStateReporter;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.configuration.EnvironmentVariableSubstitutor;
@@ -116,11 +117,19 @@ public class EnPassantApp extends Application<EnPassantConfig>
     final DSBDataResource dsbDataResource = new DSBDataResource(dsbDataCache);
     environment_.jersey().register(dsbDataResource);
 
-    final ScheduledExecutorService ses = environment_.lifecycle().scheduledExecutorService("dsbDataUpdater").build();
+    final ScheduledExecutorService dataUpdater = environment_.lifecycle().scheduledExecutorService(
+      "dsbDataUpdater").build();
     final DSBDataUpdater dsbDataUpdater = new DSBDataUpdater(dsbOrganizationDAO, dsbPlayerDAO,
                                                              dsbZipFileProcessor);
-    ses.scheduleWithFixedDelay(dsbDataUpdater, 60, configuration_.getDSBDataFactory().getRefreshInterval(),
-                               TimeUnit.SECONDS);
+    dataUpdater.scheduleWithFixedDelay(dsbDataUpdater, 60, configuration_.getDSBDataFactory().getRefreshInterval(),
+                                       TimeUnit.SECONDS);
+
+    final ScheduledExecutorService monitorUpdater = environment_.lifecycle().scheduledExecutorService(
+      "monitorUpdater").build();
+    final InitialStateReporter isr = new InitialStateReporter(configuration_.getInitialStateAPIKey(),
+                                                              environment_.metrics());
+    monitorUpdater.scheduleWithFixedDelay(isr, 5, 5, TimeUnit.SECONDS);
+
     environment_.jersey().register(new JsonProcessingExceptionMapper(true));
   }
 }

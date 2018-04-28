@@ -41,16 +41,24 @@ import javax.validation.constraints.NotNull;
 class EnPassantConfig extends Configuration
 {
   private final static Logger LOGGER = LoggerFactory.getLogger(EnPassantConfig.class);
+
   @Valid
   @NotNull
   private DataSourceFactory database = new DataSourceFactory();
+
   @Valid
   @NotNull
   @JsonProperty("dsbData")
   private DSBDataFactory dsbData;
+
   @Valid
   @NotNull
   private FlywayFactory flyway = new FlywayFactory();
+
+  @Valid
+  @NotNull
+  @JsonProperty("initialStateAPIKey")
+  private String initialStateAPIKey;
 
   @JsonProperty("dsbData")
   DSBDataFactory getDSBDataFactory()
@@ -76,6 +84,12 @@ class EnPassantConfig extends Configuration
     return flyway;
   }
 
+  @JsonProperty("initialStateAPIKey")
+  String getInitialStateAPIKey()
+  {
+    return initialStateAPIKey;
+  }
+
   @JsonProperty("dsbData")
   public void setDSBDataFactory(final DSBDataFactory factory_)
   {
@@ -86,5 +100,11 @@ class EnPassantConfig extends Configuration
   public void setDataSourceFactory(final DataSourceFactory factory_)
   {
     database = factory_;
+  }
+
+  @JsonProperty("initialStateAPIKey")
+  public void setInitialStateAPIKey(final String initialStateAPIKey_)
+  {
+    initialStateAPIKey = initialStateAPIKey_;
   }
 }
