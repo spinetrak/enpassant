@@ -26,15 +26,34 @@ package net.spinetrak.enpassant.core.dsb.pojos;
 
 import net.spinetrak.enpassant.core.fide.FIDE;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 public class DSBPlayer
 {
-  private final List<DWZ> _dwz = new ArrayList<>();
-  private final List<FIDE> _fide = new ArrayList<>();
+  private final TreeSet<DWZ> _dwz = new TreeSet<>(new Comparator<DWZ>()
+  {
+    @Override
+    public int compare(final DWZ dwz1_, final DWZ dwz2_)
+    {
+      if(dwz1_.toString().equals(dwz2_.toString()))
+      {
+        return 0;
+      }
+      return dwz1_.getIndex().compareTo(dwz2_.getIndex());
+    }
+  });
+  private final TreeSet<FIDE> _fide = new TreeSet<>(new Comparator<FIDE>()
+  {
+    @Override
+    public int compare(final FIDE fide1_, final FIDE fide2_)
+    {
+      if(fide1_.toString().equals(fide2_.toString()))
+      {
+        return 0;
+      }
+      return fide1_.getLastEvaluation().compareTo(fide2_.getLastEvaluation());
+    }
+  });
   private String _clubId;
   private Integer _dsbId = 0;
   private String _eligibility;
@@ -76,12 +95,7 @@ public class DSBPlayer
     {
       return 0;
     }
-    Collections.sort(_dwz, (dwz1_, dwz2_) -> {
-      final Integer idx1 = dwz1_.getIndex();
-      final Integer idx2 = dwz2_.getIndex();
-      return idx1.compareTo(idx2);
-    });
-    return _dwz.get(0).getDwz();
+    return _dwz.last().getDwz();
   }
 
   public Integer getCurrentELO()
@@ -90,15 +104,10 @@ public class DSBPlayer
     {
       return 0;
     }
-    Collections.sort(_fide, (fide1_, fide2_) -> {
-      final Date date1 = fide1_.getLastEvaluation();
-      final Date date2 = fide2_.getLastEvaluation();
-      return date1.compareTo(date2);
-    });
-    return _fide.get(0).getElo();
+    return _fide.last().getElo();
   }
 
-  public List<DWZ> getDWZ()
+  public Set<DWZ> getDWZ()
   {
     return _dwz;
   }
@@ -113,7 +122,7 @@ public class DSBPlayer
     return _eligibility;
   }
 
-  public List<FIDE> getFIDE()
+  public Set<FIDE> getFIDE()
   {
     return _fide;
   }
