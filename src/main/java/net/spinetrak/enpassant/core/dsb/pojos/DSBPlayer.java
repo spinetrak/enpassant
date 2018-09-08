@@ -79,7 +79,7 @@ public class DSBPlayer
     Collections.sort(_dwz, (dwz1_, dwz2_) -> {
       final Date date1 = dwz1_.getLastEvaluation();
       final Date date2 = dwz2_.getLastEvaluation();
-      return date2.compareTo(date1);
+      return date1.compareTo(date2);
     });
     return _dwz.get(0).getDwz();
   }
@@ -93,7 +93,7 @@ public class DSBPlayer
     Collections.sort(_fide, (fide1_, fide2_) -> {
       final Date date1 = fide1_.getLastEvaluation();
       final Date date2 = fide2_.getLastEvaluation();
-      return date2.compareTo(date1);
+      return date1.compareTo(date2);
     });
     return _fide.get(0).getElo();
   }
