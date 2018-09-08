@@ -24,8 +24,10 @@
 
 package net.spinetrak.enpassant.core.fide;
 
-import org.joda.time.DateTime;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalAdjusters;
 import java.util.Date;
 
 public class FIDE
@@ -33,7 +35,8 @@ public class FIDE
   private String _country;
   private Integer _elo = 0;
   private Integer _id = 0;
-  private Date _lastEvaluation = DateTime.now().dayOfMonth().withMaximumValue().toDate();
+  private Date _lastEvaluation = Date.from(LocalDate.now().with(TemporalAdjusters.firstDayOfNextMonth()).atStartOfDay().toInstant(
+    ZoneOffset.UTC));
   private String _title;
 
   public String getCountry()
