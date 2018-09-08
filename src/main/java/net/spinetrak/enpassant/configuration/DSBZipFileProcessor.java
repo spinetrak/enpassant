@@ -26,8 +26,6 @@ package net.spinetrak.enpassant.configuration;
 
 import net.spinetrak.enpassant.core.dsb.etl.DSBZIPFileDataTransformer;
 import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
-import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +36,8 @@ import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Date;
 
 public class DSBZipFileProcessor implements Runnable
@@ -116,10 +116,10 @@ public class DSBZipFileProcessor implements Runnable
   private boolean zipFileIsCurrent()
   {
     final File zipFile = new File(DSB_DATA_FILE);
-    final DateTime now = new DateTime();
-    final DateTime file = new DateTime(zipFile.lastModified());
-    final Duration duration = new Duration(file, now);
-    final long ageInHours = duration.getStandardHours();
+    final Instant now = Instant.now();
+    final Instant file = new Date(zipFile.lastModified()).toInstant();
+    final Duration duration = Duration.between(file, now);
+    final long ageInHours = duration.toHours();
     return zipFile.exists() && zipFile.canRead() && (ageInHours < 24);
   }
 

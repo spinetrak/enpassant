@@ -25,8 +25,8 @@
 package net.spinetrak.enpassant.core.dsb.dtos;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.joda.time.DateTime;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class DSBStats
   public static final int DSB_ELO = 2;
   public static final int NO_DWZ_MEMBERS = 6;
   public static final int NO_ELO_MEMBERS = 7;
-  private final static int TODAY = DateTime.now().getYear();
+  private final static int TODAY = LocalDate.now().getYear();
   private final List<DSBStats> _data = new ArrayList<>();
   private Integer _age = 0;
   private Float _avg = 0f;
