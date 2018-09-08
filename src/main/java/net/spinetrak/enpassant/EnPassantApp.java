@@ -127,8 +127,8 @@ public class EnPassantApp extends Application<EnPassantConfig>
     final ScheduledExecutorService monitorUpdater = environment_.lifecycle().scheduledExecutorService(
       "monitorUpdater").build();
     final InitialStateReporter isr = new InitialStateReporter(configuration_.getInitialStateAPIKey(),
-                                                              environment_.metrics());
-    monitorUpdater.scheduleWithFixedDelay(isr, 5, 5, TimeUnit.SECONDS);
+                                                              environment_.metrics(), dsbDataCache);
+    monitorUpdater.scheduleWithFixedDelay(isr, 5, 15, TimeUnit.SECONDS);
 
     environment_.jersey().register(new JsonProcessingExceptionMapper(true));
   }

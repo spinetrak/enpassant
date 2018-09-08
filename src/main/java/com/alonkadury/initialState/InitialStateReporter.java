@@ -25,13 +25,15 @@
 package com.alonkadury.initialState;
 
 import com.codahale.metrics.*;
+import com.codahale.metrics.Timer;
+import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBOrganization;
+import net.spinetrak.enpassant.core.dsb.pojos.DSBPlayer;
+import net.spinetrak.enpassant.db.DSBDataCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedMap;
+import java.util.*;
 
 
 public class InitialStateReporter implements Runnable
@@ -39,14 +41,17 @@ public class InitialStateReporter implements Runnable
   private final static Logger LOGGER = LoggerFactory.getLogger(InitialStateReporter.class);
   private final API _account;
   private final Bucket _bucket;
+  private final DSBDataCache _dsbDataCache;
   private final MetricRegistry _metrics;
 
-  public InitialStateReporter(final String initialStateAPIKey_, final MetricRegistry metrics_)
+  public InitialStateReporter(final String initialStateAPIKey_, final MetricRegistry metrics_,
+                              final DSBDataCache dsbDataCache_)
   {
     _account = new API(initialStateAPIKey_);
     _bucket = new Bucket("enpassant", "enpassant");
     _account.createBucket(_bucket);
     _metrics = metrics_;
+    _dsbDataCache = dsbDataCache_;
   }
 
   @Override
@@ -95,6 +100,18 @@ public class InitialStateReporter implements Runnable
     return data.toArray(new Data[data.size()]);
   }
 
+  private Data[] collectStats()
+  {
+    final List<Data> data = new ArrayList<>();
+    final List<DSBPlayer> players = _dsbDataCache.getDSBPlayers("00000");
+    data.add(new Data<>("player_count", players.size()));
+    final Map<String, DSBOrganization> orgs = _dsbDataCache.getDSBOrganization("00000").getOrganizations();
+    data.add(new Data<>("org_count", orgs.size()));
+    final List<DSBStats> stats = _dsbDataCache.getStats("00000");
+    data.addAll(reportStats(stats));
+    return data.toArray(new Data[data.size()]);
+  }
+
   private Data[] collectTimers()
   {
     final List<Data> data = new ArrayList<>();
@@ -118,6 +135,19 @@ public class InitialStateReporter implements Runnable
     return data.toArray(new Data[data.size()]);
   }
 
+  private Collection<? extends Data> reportStats(final List<DSBStats> stats_)
+  {
+    final List<Data> data = new ArrayList<>();
+
+    for (final DSBStats stats : stats_)
+    {
+      int age = stats.getAge();
+      int dwz = stats.getMembersWithDWZ();
+      int elo = stats.getMembersWithELO();
+    }
+    return data;
+  }
+
   private void update()
   {
     try
@@ -133,6 +163,11 @@ public class InitialStateReporter implements Runnable
         _account.wait(500);
       }
       _account.createBulkData(_bucket, collectTimers());
+      synchronized (_account)
+      {
+        _account.wait(500);
+      }
+      _account.createBulkData(_bucket, collectStats());
     }
     catch (final Exception ex_)
     {
