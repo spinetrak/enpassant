@@ -43,11 +43,11 @@ public class DSBPlayerMapper implements LinkedHashMapRowReducer<String, DSBPlaye
 
     if (rowView_.getColumn("d_index", Integer.class) != null)
     {
-      dsbPlayer.getDWZ().add(rowView_.getRow(DWZ.class));
+      dsbPlayer.addDWZ(rowView_.getRow(DWZ.class));
     }
     if (rowView_.getColumn("f_id", Integer.class) != null)
     {
-      dsbPlayer.getFIDE().add(rowView_.getRow(FIDE.class));
+      dsbPlayer.addFIDE(rowView_.getRow(FIDE.class));
     }
   }
 }

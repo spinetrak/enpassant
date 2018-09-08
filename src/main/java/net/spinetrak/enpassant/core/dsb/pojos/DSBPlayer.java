@@ -77,9 +77,9 @@ public class DSBPlayer
       return 0;
     }
     Collections.sort(_dwz, (dwz1_, dwz2_) -> {
-      final Date date1 = dwz1_.getLastEvaluation();
-      final Date date2 = dwz2_.getLastEvaluation();
-      return date1.compareTo(date2);
+      final Integer idx1 = dwz1_.getIndex();
+      final Integer idx2 = dwz2_.getIndex();
+      return idx1.compareTo(idx2);
     });
     return _dwz.get(0).getDwz();
   }
