@@ -170,10 +170,6 @@ public class DSBDataCache
     {
       return _dsbPlayersCache.get(organizationId_, () -> {
         final List<DSBPlayer> players = _dsbPlayerDAO.selectPlayersFor(organizationId_);
-        for (final DSBPlayer player : players)
-        {
-          setDWZandELO(player);
-        }
         return players;
       });
     }
