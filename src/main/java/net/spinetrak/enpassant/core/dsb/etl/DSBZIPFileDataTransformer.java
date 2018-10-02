@@ -207,7 +207,7 @@ public class DSBZIPFileDataTransformer
       dwz.setClubId(dsbPlayer.getClubId());
       dwz.setMemberId(dsbPlayer.getMemberId());
       dwz.setDwz(Converters.integerFromString(record.get(8)));
-      dwz.setLastEvaluation(Converters.dateFromString(record.get(7), "YYYYww"));
+      dwz.setLastEval(Converters.dateFromString(record.get(7), "YYYYww"));
       dwz.setIndex(Converters.integerFromString(record.get(9)));
       if (dwz.getDwz() != 0)
       {

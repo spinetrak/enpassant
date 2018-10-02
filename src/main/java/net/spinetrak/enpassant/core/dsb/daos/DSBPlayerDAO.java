@@ -45,10 +45,10 @@ import java.util.List;
 @RegisterBeanMapper(value = FIDE.class, prefix = "f")
 public interface DSBPlayerDAO
 {
-  @SqlUpdate("INSERT INTO dwz (d_clubid, d_memberid, d_lasteval, d_dwz, d_index) VALUES (:d.clubId, :d.memberId, :d.lastEvaluation, :d.dwz, :d.index) ON CONFLICT (d_clubid, d_memberid, d_lasteval) DO NOTHING")
+  @SqlUpdate("INSERT INTO dwz (d_clubid, d_memberid, d_lasteval, d_dwz, d_index) VALUES (:d.clubId, :d.memberId, :d.lastEval, :d.dwz, :d.index) ON CONFLICT (d_clubid, d_memberid, d_lasteval) DO NOTHING")
   void insertOrUpdateDWZ(@BindBean("d") final DWZ dwz_);
 
-  @SqlUpdate("INSERT INTO fide (f_id, f_elo, f_title, f_country, f_lasteval) VALUES (:f.id, :f.elo, :f.title, :f.country, :f.lastEvaluation) ON CONFLICT (f_id, f_lasteval) DO NOTHING")
+  @SqlUpdate("INSERT INTO fide (f_id, f_elo, f_title, f_country, f_lasteval) VALUES (:f.id, :f.elo, :f.title, :f.country, :f.lastEval) ON CONFLICT (f_id, f_lasteval) DO NOTHING")
   void insertOrUpdateFIDE(@BindBean("f") final FIDE fide_);
 
   @SqlUpdate("INSERT INTO dsb_player (p_clubid, p_memberid, p_dsbid, p_fideid, p_name, p_status, p_gender, p_yob, p_eligibility) VALUES (:p.clubId, :p.memberId, :p.dsbId, :p.fideId, :p.name, :p.status, :p.gender, :p.yoB, :p.eligibility) ON CONFLICT (p_clubid, p_memberid) DO UPDATE SET p_dsbid = :p.dsbId, p_fideid = :p.fideId, p_name = :p.name, p_status = :p.status, p_gender = :p.gender, p_yob = :p.yoB")

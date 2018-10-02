@@ -51,7 +51,7 @@ public class DSBPlayer
       {
         return 0;
       }
-      return fide1_.getLastEvaluation().compareTo(fide2_.getLastEvaluation());
+      return fide1_.getLastEval().compareTo(fide2_.getLastEval());
     }
   });
   private String _clubId;

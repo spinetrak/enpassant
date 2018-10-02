@@ -32,7 +32,7 @@ public class DWZ
   private String _clubId;
   private Integer _dwz = 0;
   private Integer _index = 0;
-  private Date _lastEvaluation = new Date(0);
+  private Date _lastEval = new Date(0);
   private String _memberId;
 
   public String getClubId()
@@ -50,9 +50,9 @@ public class DWZ
     return _index;
   }
 
-  public Date getLastEvaluation()
+  public Date getLastEval()
   {
-    return new Date(_lastEvaluation.getTime());
+    return new Date(_lastEval.getTime());
   }
 
   public String getMemberId()
@@ -81,9 +81,9 @@ public class DWZ
     }
   }
 
-  public void setLastEvaluation(final Date lastEvaluation_)
+  public void setLastEval(final Date lastEval_)
   {
-    _lastEvaluation = (lastEvaluation_ != null) ? new Date(lastEvaluation_.getTime()) : new Date(0);
+    _lastEval = (lastEval_ != null) ? new Date(lastEval_.getTime()) : new Date(0);
   }
 
   public void setMemberId(final String memberId_)
@@ -98,7 +98,7 @@ public class DWZ
       "dwz=" + _dwz +
       ", memberId='" + _memberId + '\'' +
       ", index=" + _index +
-      ", lastEvaluation=" + _lastEvaluation +
+      ", lastEval=" + _lastEval +
       ", clubId='" + _clubId + '\'' +
       '}';
   }

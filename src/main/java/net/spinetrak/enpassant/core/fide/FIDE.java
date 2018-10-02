@@ -35,7 +35,7 @@ public class FIDE
   private String _country;
   private Integer _elo = 0;
   private Integer _id = 0;
-  private Date _lastEvaluation = Date.from(LocalDate.now().with(TemporalAdjusters.firstDayOfNextMonth()).atStartOfDay().toInstant(
+  private Date _lastEval = Date.from(LocalDate.now().with(TemporalAdjusters.firstDayOfNextMonth()).atStartOfDay().toInstant(
     ZoneOffset.UTC));
   private String _title;
 
@@ -54,9 +54,9 @@ public class FIDE
     return _id;
   }
 
-  public Date getLastEvaluation()
+  public Date getLastEval()
   {
-    return new Date(_lastEvaluation.getTime());
+    return new Date(_lastEval.getTime());
   }
 
   public String getTitle()
@@ -85,11 +85,11 @@ public class FIDE
     }
   }
 
-  public void setLastEvaluation(final Date lastEvaluation_)
+  public void setLastEval(final Date lastEval_)
   {
-    if (lastEvaluation_ != null)
+    if (lastEval_ != null)
     {
-      _lastEvaluation = new Date(lastEvaluation_.getTime());
+      _lastEval = new Date(lastEval_.getTime());
     }
   }
 
@@ -106,7 +106,7 @@ public class FIDE
       ", elo=" + _elo +
       ", id=" + _id +
       ", title='" + _title + '\'' +
-      ", lastEvaluation=" + _lastEvaluation +
+      ", lastEval=" + _lastEval +
       '}';
   }
 }

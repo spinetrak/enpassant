@@ -83,14 +83,15 @@ public class DSBDataCache
           final DSBOrganization dsbOrganization = organizations.get(0);
           for (final DSBOrganization child : getChildrenForOrganization(dsbOrganization))
           {
-            child.add(_dsbPlayerDAO.selectByClubId(child.getOrganizationId()));
+            final List<DSBPlayer> players = getDSBPlayers(child.getOrganizationId());
 
-            for (final DSBPlayer player : child.getPlayers())
-            {
-              player.setDWZ(_dsbPlayerDAO.selectDWZByPlayer(player));
-              player.setFIDE(_dsbPlayerDAO.selectFIDEByPlayer(player));
-            }
+            child.add(players);
             dsbOrganization.add(child);
+          }
+          if(dsbOrganization.getIsClub())
+          {
+            final List<DSBPlayer> players = getDSBPlayers(dsbOrganization.getOrganizationId());
+            dsbOrganization.add(players);
           }
           return dsbOrganization;
         }
@@ -103,6 +104,7 @@ public class DSBDataCache
     }
     return null;
   }
+
 
   public DSBPlayer getDSBPlayer(final String playerId_)
   {
@@ -166,7 +168,14 @@ public class DSBDataCache
   {
     try
     {
-      return _dsbPlayersCache.get(organizationId_, () -> _dsbPlayerDAO.selectPlayersFor(organizationId_));
+      return _dsbPlayersCache.get(organizationId_, () -> {
+        final List<DSBPlayer> players = _dsbPlayerDAO.selectPlayersFor(organizationId_);
+        for (final DSBPlayer player : players)
+        {
+          setDWZandELO(player);
+        }
+        return players;
+      });
     }
     catch (final ExecutionException ex_)
     {
