@@ -78,6 +78,22 @@ $(document).ready(function () {
     }
 
     function buildTable(id) {
+
+        $('#playerTable thead tr').clone(true).appendTo( '#playerTable thead' );
+        $('#playerTable thead tr:eq(1) th').each( function (i) {
+            var title = $(this).text();
+            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+
+            $( 'input', this ).on( 'keyup change', function () {
+                if ( myTable.column(i).search() !== this.value ) {
+                    myTable
+                        .column(i)
+                        .search( this.value )
+                        .draw();
+                }
+            } );
+        } );
+
         myTable = $('#playerTable').DataTable({
             "lengthMenu": [[100, 500, 1000, -1], [100, 500, 1000, "All"]],
             "ajax": {
@@ -126,11 +142,13 @@ $(document).ready(function () {
                 myChart.destroy();
             }
             var arr = $('#playerTable').DataTable().row(this).data();
-            var clubId = arr.clubId;
-            var memberId = arr.memberId;
-            var player = clubId + '-' + memberId;
-            myLabel = arr.name;
-            showRatingsHistory(player);
+            if(typeof arr != 'undefined') {
+                var clubId = arr.clubId;
+                var memberId = arr.memberId;
+                var player = clubId + '-' + memberId;
+                myLabel = arr.name;
+                showRatingsHistory(player);
+            }
         });
     }
 
