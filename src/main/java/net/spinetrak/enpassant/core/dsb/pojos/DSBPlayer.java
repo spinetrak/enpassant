@@ -24,9 +24,14 @@
 
 package net.spinetrak.enpassant.core.dsb.pojos;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import net.spinetrak.enpassant.core.fide.FIDE;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
 
 public class DSBPlayer
 {
@@ -127,6 +132,7 @@ public class DSBPlayer
      return _currentELO;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   public Set<DWZ> getDWZ()
   {
     return _dwz;
@@ -142,6 +148,7 @@ public class DSBPlayer
     return _eligibility;
   }
 
+  @JsonInclude(JsonInclude.Include.NON_EMPTY)
   public Set<FIDE> getFIDE()
   {
     return _fide;
