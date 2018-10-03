@@ -126,8 +126,8 @@ $(document).ready(function () {
                 {"data": "gender"},
                 {"data": "yoB"},
                 {
-                    data: null, render: function (data, type, row) {
-                    return data.currentDWZ === 0 ? '' : data.currentDWZ;
+                    "data": "currentDWZ", "render": function (data, type, row) {
+                    return data === 0 ? '' : data;
                     }
                 },
                 {
