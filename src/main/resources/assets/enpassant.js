@@ -196,6 +196,7 @@ $(document).ready(function () {
     }
 
     function updateChart(labels, dwzByAge, dwzDSBByAge, eloByAge, eloDSBByAge, members, membersWithDWZ, membersWithELO) {
+        Chart.defaults.global.defaultFontSize = 10;
         myChart = new Chart(document.getElementById("chessCharts"), {
             type: 'line',
             options: {
@@ -241,8 +242,8 @@ $(document).ready(function () {
                     yAxisID: 'ratings',
                     backgroundColor: '#0FA211',
                     borderColor: '#0FA211',
-                    borderWidth: 2,
-                    pointRadius: 1,
+                    borderWidth: 1,
+                    pointRadius: 2,
                     fill: false
                 }, {
                     data: dwzDSBByAge,
@@ -251,8 +252,8 @@ $(document).ready(function () {
                     yAxisID: "ratings",
                     backgroundColor: '#0FA0A2',
                     borderColor: '#0FA0A2',
-                    borderWidth: 2,
-                    pointRadius: 1,
+                    borderWidth: 1,
+                    pointRadius: 2,
                     borderDashOffset: 3,
                     fill: false
                 }, {
@@ -262,8 +263,8 @@ $(document).ready(function () {
                     yAxisID: 'ratings',
                     backgroundColor: '#110FA2',
                     borderColor: '#110FA2',
-                    borderWidth: 2,
-                    pointRadius: 1,
+                    borderWidth: 1,
+                    pointRadius: 2,
                     fill: false
                 }, {
                     data: eloDSBByAge,
@@ -273,8 +274,8 @@ $(document).ready(function () {
                     yAxisID: 'ratings',
                     backgroundColor: '#A20FA0',
                     borderColor: '#A20FA0',
-                    borderWidth: 2,
-                    pointRadius: 1,
+                    borderWidth: 1,
+                    pointRadius: 2,
                     fill: false
                 }, {
                     data: membersWithELO,

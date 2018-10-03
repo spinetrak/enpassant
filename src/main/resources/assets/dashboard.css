@@ -23,7 +23,11 @@
  */
 
 body {
-    font-size: .875rem;
+    font-size: 11px;
+}
+
+.table-condensed {
+    font-size: 11px;
 }
 
 .feather {
