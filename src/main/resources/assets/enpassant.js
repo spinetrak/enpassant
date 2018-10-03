@@ -106,38 +106,39 @@ $(document).ready(function () {
                 {
                     data: null, render: function (data, type, row) {
                     return "<a href='#'>" + data.clubId + '-' + data.memberId + "</a>";
-                }
+                    }
                 },
                 {
                     data: "dsbId", "render": function (data, type, row) {
                     return data === 0 ? '' : "<a target='_blank' href='https://www.schachbund.de/spieler/" + data + ".html'>" + data + "</a>";
-                }
+                    }
                 },
                 {
                     data: "fideId", render: function (data, type, row) {
                     return data === 0 ? '' : "<a target='_blank' href='https://ratings.fide.com/card.phtml?event=" + data + "'>" + data + "</a>";
-                }
+                    }
                 },
                 {
                     data: "name", render: function (data, type, row) {
                     return data == 0 ? '' : "<a href='#'>" + data + "</a>";
-                }
+                    }
                 },
                 {"data": "gender"},
                 {"data": "yoB"},
                 {
                     data: null, render: function (data, type, row) {
                     return data.currentDWZ === 0 ? '' : data.currentDWZ;
-                }
+                    }
                 },
                 {
                     "data": "currentELO", "render": function (data, type, row) {
                     return data === 0 ? '' : data;
-                }
+                    }
                 },
                 {"data": "status"},
                 {"data": "eligibility"}
-            ]
+            ],
+            "order": [[ 6, "desc" ]]
         });
 
         myTable.off('click').on('click', 'thead tr', function () {
