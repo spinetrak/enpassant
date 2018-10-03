@@ -55,6 +55,8 @@ public class DSBPlayer
     }
   });
   private String _clubId;
+  private Integer _currentDWZ;
+  private Integer _currentELO;
   private Integer _dsbId = 0;
   private String _eligibility;
   private Integer _fideId = 0;
@@ -70,6 +72,19 @@ public class DSBPlayer
     {
       _dwz.add(dwz_);
     }
+    setCurrentDWZ();
+  }
+
+  private void setCurrentDWZ()
+  {
+    if (_dwz.isEmpty())
+    {
+      _currentDWZ = 0;
+    }
+    else
+    {
+      _currentDWZ = _dwz.last().getDwz();
+    }
   }
 
   public void addFIDE(final FIDE fide_)
@@ -82,6 +97,19 @@ public class DSBPlayer
         _fideId = fide_.getId();
       }
     }
+    setCurrentELO();
+  }
+
+  private void setCurrentELO()
+  {
+    if (_fide.isEmpty())
+    {
+      _currentELO = 0;
+    }
+    else
+    {
+      _currentELO = _fide.last().getElo();
+    }
   }
 
   public String getClubId()
@@ -91,20 +119,12 @@ public class DSBPlayer
 
   public Integer getCurrentDWZ()
   {
-    if (_dwz.isEmpty())
-    {
-      return 0;
-    }
-    return _dwz.last().getDwz();
+    return _currentDWZ;
   }
 
   public Integer getCurrentELO()
   {
-    if (_fide.isEmpty())
-    {
-      return 0;
-    }
-    return _fide.last().getElo();
+     return _currentELO;
   }
 
   public Set<DWZ> getDWZ()
@@ -171,6 +191,10 @@ public class DSBPlayer
         addDWZ(dwz);
       }
     }
+    else
+    {
+      _dwz.clear();
+    }
   }
 
   public void setDsbId(final Integer dsbid_)
@@ -194,6 +218,10 @@ public class DSBPlayer
       {
         addFIDE(fide);
       }
+    }
+    else
+    {
+      _fide.clear();
     }
   }
 

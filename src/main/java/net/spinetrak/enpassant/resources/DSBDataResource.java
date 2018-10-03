@@ -24,6 +24,7 @@
 
 package net.spinetrak.enpassant.resources;
 
+import io.dropwizard.jersey.params.BooleanParam;
 import net.spinetrak.enpassant.core.dsb.dtos.DSBOrganizationTree;
 import net.spinetrak.enpassant.core.dsb.dtos.DSBPlayerStats;
 import net.spinetrak.enpassant.core.dsb.dtos.DSBStats;
@@ -109,12 +110,21 @@ public class DSBDataResource
   @Path("/players/{organizationId_}")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
-  public Map<String, List<DSBPlayer>> getPlayers(@PathParam("organizationId_") final String organizationId_)
+  public Map<String, List<DSBPlayer>> getPlayers(@PathParam("organizationId_") final String organizationId_, @QueryParam("details") @DefaultValue("false") BooleanParam details_)
   {
     final List<DSBPlayer> players = _dsbDataCache.getDSBPlayers(organizationId_);
     if (players.isEmpty())
     {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
+    }
+
+    if(!details_.get())
+    {
+      for(final DSBPlayer player : players)
+      {
+        player.setDWZ(null);
+        player.setFIDE(null);
+      }
     }
     final Map<String, List<DSBPlayer>> map = new HashMap<>();
     map.put("players", players);
