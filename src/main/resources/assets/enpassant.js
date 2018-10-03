@@ -66,33 +66,33 @@ $(document).ready(function () {
             myLabel = myNode.find('span[data-role~="display"]').html();
 
             myTree.off().on('select', function (e, node, newid) {
-                    if (myChart != null) {
-                        myChart.destroy();
-                    }
-                    if (myTable != null) {
-                        myTable.clear().draw();
-                    }
-                    updatePage(newid);
+                if (myChart != null) {
+                    myChart.destroy();
+                }
+                if (myTable != null) {
+                    myTable.clear().draw();
+                }
+                updatePage(newid);
             });
         });
     }
 
     function buildTable(id) {
 
-        $('#playerTable thead tr').clone(true).appendTo( '#playerTable thead' );
-        $('#playerTable thead tr:eq(1) th').each( function (i) {
+        $('#playerTable thead tr').clone(true).appendTo('#playerTable thead');
+        $('#playerTable thead tr:eq(1) th').each(function (i) {
             var title = $(this).text();
-            $(this).html( '<input type="text" placeholder="Search '+title+'" />' );
+            $(this).html('<input type="text" placeholder="Search ' + title + '" />');
 
-            $( 'input', this ).on( 'keyup change', function () {
-                if ( myTable.column(i).search() !== this.value ) {
+            $('input', this).on('keyup change', function () {
+                if (myTable.column(i).search() !== this.value) {
                     myTable
                         .column(i)
-                        .search( this.value )
+                        .search(this.value)
                         .draw();
                 }
-            } );
-        } );
+            });
+        });
 
         myTable = $('#playerTable').DataTable({
             "lengthMenu": [[100, 500, 1000, -1], [100, 500, 1000, "All"]],
@@ -137,12 +137,12 @@ $(document).ready(function () {
                 {"data": "eligibility"}
             ]
         });
-        myTable.off('click').on('click', 'tr', function () {
+        myTable.off('click').on('click', 'tbody tr', function () {
             if (myChart != null) {
                 myChart.destroy();
             }
             var arr = $('#playerTable').DataTable().row(this).data();
-            if(typeof arr != 'undefined') {
+            if (typeof arr != 'undefined') {
                 var clubId = arr.clubId;
                 var memberId = arr.memberId;
                 var player = clubId + '-' + memberId;
