@@ -29,8 +29,9 @@ $(document).ready(function () {
     var myLabel = "40000: Hamburger Schachverband";
     var myChart = null;
     var myTable = null;
+    var myID = "40000";
 
-    buildPage("40000");
+    buildPage(myID);
 
     function buildPage(id) {
         buildFooter();
@@ -72,7 +73,8 @@ $(document).ready(function () {
                 if (myTable != null) {
                     myTable.clear().draw();
                 }
-                updatePage(newid);
+                myID = newid;
+                updatePage(myID);
             });
         });
     }
@@ -137,7 +139,15 @@ $(document).ready(function () {
                 {"data": "eligibility"}
             ]
         });
-        myTable.off('click').on('click', 'tbody tr', function () {
+
+        myTable.off('click').on('click', 'thead tr', function () {
+            if (myChart != null) {
+                myChart.destroy();
+            }
+            buildChart(myID);
+        });
+
+        myTable.on('click', 'tbody tr', function () {
             if (myChart != null) {
                 myChart.destroy();
             }
