@@ -269,7 +269,7 @@ $(document).ready(function () {
                 }, {
                     data: eloDSBByAge,
                     lineTension: 0,
-                    label: 'Avg. ELO by Age (/api/dsb/players/: Deutscher Schachbund)',
+                    label: 'Avg. ELO by Age (00000: Deutscher Schachbund)',
                     type: 'line',
                     yAxisID: 'ratings',
                     backgroundColor: '#A20FA0',

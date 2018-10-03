@@ -39,6 +39,7 @@ import io.dropwizard.setup.Environment;
 import net.spinetrak.enpassant.configuration.DSBZipFileProcessor;
 import net.spinetrak.enpassant.core.dsb.daos.DSBOrganizationDAO;
 import net.spinetrak.enpassant.core.dsb.daos.DSBPlayerDAO;
+import net.spinetrak.enpassant.core.dsb.providers.DSBPlayersProvider;
 import net.spinetrak.enpassant.db.DSBDataCache;
 import net.spinetrak.enpassant.db.DSBDataUpdater;
 import net.spinetrak.enpassant.health.DSBDataHealthCheck;
@@ -131,5 +132,7 @@ public class EnPassantApp extends Application<EnPassantConfig>
     monitorUpdater.scheduleWithFixedDelay(isr, 5, 5, TimeUnit.MINUTES);
 
     environment_.jersey().register(new JsonProcessingExceptionMapper(true));
+
+    environment_.jersey().register(new DSBPlayersProvider());
   }
 }

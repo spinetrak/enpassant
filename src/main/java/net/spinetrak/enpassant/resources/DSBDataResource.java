@@ -128,6 +128,32 @@ public class DSBDataResource
     return players;
   }
 
+  @Path("/players/html/{organizationId_}")
+  @Produces(MediaType.TEXT_HTML)
+  @GET
+  public Response getPlayersAsHTML(@PathParam("organizationId_") final String organizationId_, @QueryParam("details") @DefaultValue("false") BooleanParam details_)
+  {
+    final List<DSBPlayer> players = _dsbDataCache.getDSBPlayers(organizationId_);
+    if (players.isEmpty())
+    {
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
+    }
+
+    final boolean details = details_.get();
+    if(!details)
+    {
+      for(final DSBPlayer player : players)
+      {
+        player.setDWZ(null);
+        player.setFIDE(null);
+      }
+    }
+    return Response
+      .ok()
+      .entity(players)
+      .build();
+  }
+
   @Path("/stats/{organizationId}")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
