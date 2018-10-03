@@ -100,7 +100,7 @@ $(document).ready(function () {
             "lengthMenu": [[100, 500, 1000, -1], [100, 500, 1000, "All"]],
             "ajax": {
                 "url": "/api/dsb/players/" + id,
-                "dataSrc": "players"
+                "dataSrc": ""
             },
             "columns": [
                 {
@@ -269,7 +269,7 @@ $(document).ready(function () {
                 }, {
                     data: eloDSBByAge,
                     lineTension: 0,
-                    label: 'Avg. ELO by Age (00000: Deutscher Schachbund)',
+                    label: 'Avg. ELO by Age (/api/dsb/players/: Deutscher Schachbund)',
                     type: 'line',
                     yAxisID: 'ratings',
                     backgroundColor: '#A20FA0',

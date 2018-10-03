@@ -35,9 +35,7 @@ import net.spinetrak.enpassant.db.DSBDataCache;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Path("/dsb")
 @Produces(MediaType.APPLICATION_JSON)
@@ -110,7 +108,7 @@ public class DSBDataResource
   @Path("/players/{organizationId_}")
   @Produces(MediaType.APPLICATION_JSON)
   @GET
-  public Map<String, List<DSBPlayer>> getPlayers(@PathParam("organizationId_") final String organizationId_, @QueryParam("details") @DefaultValue("false") BooleanParam details_)
+  public List<DSBPlayer> getPlayers(@PathParam("organizationId_") final String organizationId_, @QueryParam("details") @DefaultValue("false") BooleanParam details_)
   {
     final List<DSBPlayer> players = _dsbDataCache.getDSBPlayers(organizationId_);
     if (players.isEmpty())
@@ -118,7 +116,8 @@ public class DSBDataResource
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
 
-    if(!details_.get())
+    final boolean details = details_.get();
+    if(!details)
     {
       for(final DSBPlayer player : players)
       {
@@ -126,9 +125,7 @@ public class DSBDataResource
         player.setFIDE(null);
       }
     }
-    final Map<String, List<DSBPlayer>> map = new HashMap<>();
-    map.put("players", players);
-    return map;
+    return players;
   }
 
   @Path("/stats/{organizationId}")
