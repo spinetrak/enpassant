@@ -128,7 +128,7 @@ public class EnPassantApp extends Application<EnPassantConfig>
       "monitorUpdater").build();
     final InitialStateReporter isr = new InitialStateReporter(configuration_.getInitialStateAPIKey(),
                                                               environment_.metrics());
-    monitorUpdater.scheduleWithFixedDelay(isr, 5, 5, TimeUnit.SECONDS);
+    monitorUpdater.scheduleWithFixedDelay(isr, 5, 5, TimeUnit.MINUTES);
 
     environment_.jersey().register(new JsonProcessingExceptionMapper(true));
   }
